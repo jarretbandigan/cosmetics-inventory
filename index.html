@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cosmetics Inventory</title>
+<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pink-50: #FBEAF0;
+    --pink-100: #F4C0D1;
+    --pink-200: #ED93B1;
+    --pink-400: #D4537E;
+    --pink-600: #993556;
+    --pink-800: #72243E;
+    --gray-50: #F1EFE8;
+    --gray-100: #D3D1C7;
+    --gray-200: #B4B2A9;
+    --gray-400: #888780;
+    --gray-600: #5F5E5A;
+    --gray-800: #444441;
+    --gray-900: #2C2C2A;
+    --teal-50: #E1F5EE;
+    --teal-600: #0F6E56;
+    --teal-800: #085041;
+    --red-50: #FCEBEB;
+    --red-600: #A32D2D;
+    --amber-50: #FAEEDA;
+    --amber-400: #BA7517;
+    --amber-800: #633806;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #faf9f7;
+    color: var(--gray-900);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .header {
+    background: var(--pink-800);
+    color: #fff;
+    padding: 16px 20px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header h1 { font-size: 17px; font-weight: 600; }
+  .header .subtitle { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+
+  .item-count {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .tabs {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 57px;
+    z-index: 99;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-400);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    transition: all 0.15s;
+  }
+
+  .tab.active { color: var(--pink-600); border-bottom-color: var(--pink-400); }
+
+  .section { display: none; padding: 16px; }
+  .section.active { display: block; }
+
+  .scanner-box {
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1;
+    max-width: 360px;
+    margin: 0 auto 16px;
+  }
+
+  #preview { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .scan-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .scan-frame { width: 200px; height: 120px; position: relative; }
+
+  .scan-frame::before, .scan-frame::after,
+  .scan-frame-inner::before, .scan-frame-inner::after {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: #fff;
+    border-style: solid;
+  }
+
+  .scan-frame::before { top:0; left:0; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
+  .scan-frame::after { top:0; right:0; border-width:3px 3px 0 0; border-radius:0 4px 0 0; }
+  .scan-frame-inner::before { bottom:0; left:0; border-width:0 0 3px 3px; border-radius:0 0 0 4px; }
+  .scan-frame-inner::after { bottom:0; right:0; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
+
+  .scan-line {
+    position: absolute;
+    left: 4px; right: 4px;
+    height: 2px;
+    background: var(--pink-400);
+    animation: scanline 2s ease-in-out infinite;
+    border-radius: 1px;
+  }
+
+  @keyframes scanline {
+    0%, 100% { top: 10px; }
+    50% { top: calc(100% - 12px); }
+  }
+
+  .scan-status {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-600);
+    margin-bottom: 12px;
+    min-height: 20px;
+    padding: 0 8px;
+    line-height: 1.5;
+  }
+
+  .scan-status.success { color: var(--teal-600); font-weight: 500; }
+  .scan-status.error { color: var(--red-600); font-weight: 500; }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.98); opacity: 0.85; }
+  .btn-primary { background: var(--pink-600); color: #fff; }
+  .btn-secondary { background: var(--gray-50); color: var(--gray-800); border: 1px solid var(--gray-100); }
+  .btn-teal { background: var(--teal-600); color: #fff; }
+  .btn-sm { display: inline-block; width: auto; padding: 7px 14px; font-size: 13px; font-weight: 500; border-radius: 8px; }
+  .btn-danger-outline { background: var(--red-50); color: var(--red-600); border: 1px solid #f7c1c1; }
+
+  #scanner-btn-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  #scanner-btn-row .btn { flex: 1; }
+
+  .camera-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    margin-bottom: 12px;
+  }
+
+  .manual-toggle { text-align: center; margin-bottom: 12px; }
+  .manual-toggle button {
+    background: none;
+    border: none;
+    color: var(--pink-600);
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 4px;
+  }
+
+  .form-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--gray-100);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .form-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pink-800);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--pink-50);
+  }
+
+  .field { margin-bottom: 12px; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    font-size: 15px;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: inherit;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--pink-200);
+    background: #fff;
+  }
+
+  .field textarea { resize: none; height: 72px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .barcode-display {
+    background: var(--pink-50);
+    border: 1px solid var(--pink-100);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--pink-800);
+    font-family: monospace;
+    letter-spacing: 1px;
+    word-break: break-all;
+  }
+
+  .inv-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .search-wrap { position: relative; flex: 1; }
+
+  .search-bar {
+    background: #fff;
+    border: 1px solid var(--gray-100);
+    border-radius: 12px;
+    padding: 10px 36px 10px 14px;
+    font-size: 15px;
+    width: 100%;
+    outline: none;
+    -webkit-appearance: none;
+    color: var(--gray-900);
+    font-family: inherit;
+  }
+
+  .search-bar:focus { border-color: var(--pink-200); }
+
+  .search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--gray-200);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--gray-800);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .sort-select {
+    background: #fff;
+    border: 1px solid var(--gray-100);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--gray-800);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .summary-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .summary-card {
+    background: #fff;
+    border: 1px solid var(--gray-100);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+
+  .summary-card .num { font-size: 22px; font-weight: 700; color: var(--pink-600); }
+  .summary-card .lbl { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  .item-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--gray-100);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .item-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .item-brand { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .item-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+  .chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .chip-qty { background: var(--pink-50); color: var(--pink-800); }
+  .chip-exp { background: var(--teal-50); color: var(--teal-800); }
+  .chip-exp.warning { background: var(--amber-50); color: var(--amber-800); }
+  .chip-exp.expired { background: var(--red-50); color: var(--red-600); }
+  .chip-cat { background: var(--gray-50); color: var(--gray-600); }
+  .chip-bc { background: var(--gray-50); color: var(--gray-400); font-family: monospace; font-size: 10px; }
+
+  .item-desc { font-size: 12px; color: var(--gray-600); margin-top: 6px; line-height: 1.4; }
+  .item-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+
+  .export-area {
+    background: #fff;
+    border: 1px solid var(--gray-100);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .export-area h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+  .export-area p { font-size: 13px; color: var(--gray-600); margin-bottom: 12px; line-height: 1.5; }
+
+  .import-result {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+    line-height: 1.4;
+  }
+
+  .import-result.success { background: var(--teal-50); color: var(--teal-800); }
+  .import-result.info { background: var(--amber-50); color: var(--amber-800); }
+
+  input[type="file"] { display: none; }
+
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--gray-900);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.25s;
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Cosmetics Inventory</h1>
+    <div class="subtitle">Scan. Track. Export.</div>
+  </div>
+  <span class="item-count" id="header-count">0 items</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('scan', this)">Scan</button>
+  <button class="tab" onclick="showTab('inventory', this)">Inventory</button>
+  <button class="tab" onclick="showTab('export', this)">Export</button>
+</div>
+
+<!-- SCAN TAB -->
+<div class="section active" id="tab-scan">
+  <div class="scanner-box">
+    <video id="preview" autoplay muted playsinline></video>
+    <div class="scan-overlay">
+      <div class="scan-frame">
+        <div class="scan-frame-inner"></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scan-status" id="scan-status">Camera not started</div>
+
+  <div id="scanner-btn-row">
+    <button class="btn btn-primary" id="start-btn" onclick="startScanner()">Start Camera</button>
+    <button class="btn btn-secondary" id="stop-btn" onclick="stopScanner()" style="display:none">Stop Camera</button>
+  </div>
+
+  <select class="camera-select" id="camera-select" style="display:none" onchange="switchCamera()"></select>
+
+  <div class="manual-toggle">
+    <button onclick="toggleManualEntry()">Enter barcode manually instead</button>
+  </div>
+
+  <div id="manual-entry" style="display:none">
+    <div class="field">
+      <label>Barcode Number</label>
+      <input type="text" id="manual-barcode" placeholder="e.g. 1234567890123" inputmode="numeric">
+    </div>
+    <button class="btn btn-secondary" style="margin-bottom:12px" onclick="useManualBarcode()">Use This Barcode</button>
+  </div>
+
+  <div id="item-form" style="display:none">
+    <div class="form-card">
+      <h3>Barcode</h3>
+      <div class="barcode-display" id="form-barcode">-</div>
+    </div>
+
+    <div class="form-card">
+      <h3>Product Details</h3>
+      <div class="field">
+        <label>Product Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Moisturizing Cream SPF30">
+      </div>
+      <div class="field">
+        <label>Brand</label>
+        <input type="text" id="f-brand" placeholder="e.g. Cetaphil">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="f-category">
+          <option value="">-- Select --</option>
+          <option>Skincare</option>
+          <option>Makeup</option>
+          <option>Haircare</option>
+          <option>Fragrance</option>
+          <option>Body Care</option>
+          <option>Nail Care</option>
+          <option>Sun Care</option>
+          <option>Eye Care</option>
+          <option>Lip Care</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Description / Notes</label>
+        <textarea id="f-desc" placeholder="Shade, variant, size, or any notes..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3>Stock and Dates</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>Quantity *</label>
+          <input type="number" id="f-qty" min="1" value="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Unit</label>
+          <select id="f-unit">
+            <option>pcs</option>
+            <option>ml</option>
+            <option>g</option>
+            <option>oz</option>
+            <option>box</option>
+            <option>set</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Expiration Date</label>
+          <input type="date" id="f-exp">
+        </div>
+        <div class="field">
+          <label>Date Added</label>
+          <input type="date" id="f-date">
+        </div>
+      </div>
+      <div class="field">
+        <label>Storage Location</label>
+        <input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2">
+      </div>
+      <div class="field">
+        <label>Batch / Lot Number</label>
+        <input type="text" id="f-batch" placeholder="Optional">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveItem()" style="margin-bottom:8px">Save to Inventory</button>
+    <button class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+  </div>
+</div>
+
+<!-- INVENTORY TAB -->
+<div class="section" id="tab-inventory">
+  <div class="summary-bar">
+    <div class="summary-card">
+      <div class="num" id="stat-total">0</div>
+      <div class="lbl">Total Products</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" id="stat-expiring" style="color:var(--amber-400)">0</div>
+      <div class="lbl">Expiring in 30d</div>
+    </div>
+  </div>
+
+  <div class="inv-controls">
+    <div class="search-wrap">
+      <input type="search" class="search-bar" id="search-input" placeholder="Search name or barcode..." oninput="onSearch(this)">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">&#x2715;</button>
+    </div>
+    <select class="sort-select" id="sort-select" onchange="applyFilters()">
+      <option value="dateAdded">Date Added</option>
+      <option value="name">Name</option>
+      <option value="barcode">Barcode</option>
+      <option value="exp">Expiry</option>
+    </select>
+  </div>
+
+  <div id="inventory-list"></div>
+</div>
+
+<!-- EXPORT TAB -->
+<div class="section" id="tab-export">
+  <div class="summary-bar">
+    <div class="summary-card">
+      <div class="num" id="exp-total">0</div>
+      <div class="lbl">Total Products</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" id="exp-qty">0</div>
+      <div class="lbl">Total Units</div>
+    </div>
+  </div>
+
+  <div class="export-area">
+    <h3>Export CSV</h3>
+    <p>Download all inventory data as a CSV file. Use it as a backup or open it in Excel or Google Sheets.</p>
+    <button class="btn btn-teal" onclick="exportCSV()">Download CSV</button>
+  </div>
+
+  <div class="export-area">
+    <h3>Import CSV</h3>
+    <p>Restore or merge items from a previously exported CSV. Items with duplicate barcodes will be skipped automatically.</p>
+    <button class="btn btn-secondary" onclick="document.getElementById('csv-file-input').click()">Choose CSV File</button>
+    <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(this)">
+    <div class="import-result" id="import-result"></div>
+  </div>
+
+  <div class="export-area">
+    <h3 style="color:var(--red-600)">Clear All Data</h3>
+    <p>Permanently deletes all inventory records. Download a CSV backup first.</p>
+    <button class="btn btn-danger-outline" onclick="clearAll()">Clear All Inventory</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let inventory = [];
+try { inventory = JSON.parse(localStorage.getItem('cosmetics_inv') || '[]'); } catch(e) {}
+let currentBarcode = '';
+let editingBarcode = null;
+let codeReader = null;
+
+function save() {
+  try { localStorage.setItem('cosmetics_inv', JSON.stringify(inventory)); } catch(e) {}
+  updateCounts();
+}
+
+function isDuplicate(barcode) {
+  return inventory.some(i => i.barcode === barcode);
+}
+
+function updateCounts() {
+  const count = inventory.length;
+  document.getElementById('header-count').textContent = count + ' item' + (count !== 1 ? 's' : '');
+  document.getElementById('stat-total').textContent = count;
+  document.getElementById('exp-total').textContent = count;
+  document.getElementById('exp-qty').textContent = inventory.reduce((s, i) => s + (parseInt(i.qty) || 0), 0);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const in30 = new Date(now.getTime() + 30 * 86400000);
+  const expiring = inventory.filter(i => {
+    if (!i.exp) return false;
+    const d = new Date(i.exp);
+    return d >= now && d <= in30;
+  }).length;
+  document.getElementById('stat-expiring').textContent = expiring;
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'inventory') applyFilters();
+  if (name === 'export') updateCounts();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// CAMERA
+
+async function startScanner() {
+  try {
+    document.getElementById('scan-status').textContent = 'Requesting camera access...';
+    document.getElementById('scan-status').className = 'scan-status';
+
+    // Request camera first so labels are populated
+    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+
+    const allDevices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
+
+    if (videoDevices.length === 0) throw new Error('No camera found on this device.');
+
+    const sel = document.getElementById('camera-select');
+    sel.innerHTML = '';
+    videoDevices.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = d.deviceId;
+      opt.textContent = d.label || 'Camera ' + (i + 1);
+      sel.appendChild(opt);
+    });
+
+    if (videoDevices.length > 1) sel.style.display = 'block';
+
+    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
+    sel.value = backCam.deviceId;
+
+    codeReader = new ZXing.BrowserMultiFormatReader();
+    beginDecode(backCam.deviceId);
+
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('stop-btn').style.display = 'block';
+
+  } catch (e) {
+    document.getElementById('scan-status').textContent = 'Camera error: ' + e.message;
+    document.getElementById('scan-status').className = 'scan-status error';
+  }
+}
+
+function beginDecode(deviceId) {
+  document.getElementById('scan-status').textContent = 'Point camera at a barcode...';
+  document.getElementById('scan-status').className = 'scan-status';
+  codeReader.decodeFromVideoDevice(deviceId, 'preview', (result, err) => {
+    if (result) onBarcodeDetected(result.getText());
+  });
+}
+
+function switchCamera() {
+  const id = document.getElementById('camera-select').value;
+  if (!id || !codeReader) return;
+  codeReader.reset();
+  beginDecode(id);
+}
+
+function stopScanner() {
+  if (codeReader) { codeReader.reset(); codeReader = null; }
+  document.getElementById('start-btn').style.display = 'block';
+  document.getElementById('stop-btn').style.display = 'none';
+  document.getElementById('camera-select').style.display = 'none';
+  document.getElementById('scan-status').textContent = 'Camera stopped';
+  document.getElementById('scan-status').className = 'scan-status';
+}
+
+function onBarcodeDetected(code) {
+  if (codeReader) { codeReader.reset(); codeReader = null; }
+  document.getElementById('start-btn').style.display = 'block';
+  document.getElementById('stop-btn').style.display = 'none';
+  document.getElementById('camera-select').style.display = 'none';
+
+  if (isDuplicate(code)) {
+    document.getElementById('scan-status').textContent = 'Duplicate item — barcode ' + code + ' is already in your inventory.';
+    document.getElementById('scan-status').className = 'scan-status error';
+    return;
+  }
+
+  currentBarcode = code;
+  document.getElementById('scan-status').textContent = 'Barcode detected: ' + code;
+  document.getElementById('scan-status').className = 'scan-status success';
+  openForm(code, null);
+}
+
+// MANUAL ENTRY
+
+function toggleManualEntry() {
+  const el = document.getElementById('manual-entry');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function useManualBarcode() {
+  const code = document.getElementById('manual-barcode').value.trim();
+  if (!code) { showToast('Please enter a barcode number'); return; }
+
+  if (isDuplicate(code)) {
+    document.getElementById('scan-status').textContent = 'Duplicate item — barcode ' + code + ' is already in your inventory.';
+    document.getElementById('scan-status').className = 'scan-status error';
+    document.getElementById('manual-entry').style.display = 'none';
+    document.getElementById('manual-barcode').value = '';
+    return;
+  }
+
+  currentBarcode = code;
+  document.getElementById('manual-entry').style.display = 'none';
+  document.getElementById('manual-barcode').value = '';
+  openForm(code, null);
+}
+
+// FORM
+
+function openForm(barcode, prefill) {
+  editingBarcode = prefill ? barcode : null;
+  document.getElementById('item-form').style.display = 'block';
+  document.getElementById('form-barcode').textContent = barcode;
+  document.getElementById('f-name').value = prefill ? (prefill.name || '') : '';
+  document.getElementById('f-brand').value = prefill ? (prefill.brand || '') : '';
+  document.getElementById('f-category').value = prefill ? (prefill.category || '') : '';
+  document.getElementById('f-desc').value = prefill ? (prefill.desc || '') : '';
+  document.getElementById('f-qty').value = prefill ? (prefill.qty || '1') : '1';
+  document.getElementById('f-unit').value = prefill ? (prefill.unit || 'pcs') : 'pcs';
+  document.getElementById('f-exp').value = prefill ? (prefill.exp || '') : '';
+  document.getElementById('f-date').value = prefill ? (prefill.dateAdded || today()) : today();
+  document.getElementById('f-loc').value = prefill ? (prefill.location || '') : '';
+  document.getElementById('f-batch').value = prefill ? (prefill.batch || '') : '';
+  setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function cancelForm() {
+  document.getElementById('item-form').style.display = 'none';
+  currentBarcode = '';
+  editingBarcode = null;
+  document.getElementById('scan-status').textContent = 'Ready to scan';
+  document.getElementById('scan-status').className = 'scan-status';
+}
+
+function saveItem() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast('Product name is required'); document.getElementById('f-name').focus(); return; }
+
+  const barcode = editingBarcode || currentBarcode;
+
+  if (!editingBarcode && isDuplicate(barcode)) {
+    showToast('Duplicate barcode — item already exists');
+    return;
+  }
+
+  const item = {
+    barcode,
+    name,
+    brand: document.getElementById('f-brand').value.trim(),
+    category: document.getElementById('f-category').value,
+    desc: document.getElementById('f-desc').value.trim(),
+    qty: document.getElementById('f-qty').value,
+    unit: document.getElementById('f-unit').value,
+    exp: document.getElementById('f-exp').value,
+    dateAdded: document.getElementById('f-date').value,
+    location: document.getElementById('f-loc').value.trim(),
+    batch: document.getElementById('f-batch').value.trim(),
+  };
+
+  if (editingBarcode) inventory = inventory.filter(i => i.barcode !== editingBarcode);
+  inventory.push(item);
+  save();
+  cancelForm();
+  showToast('Item saved!');
+}
+
+// INVENTORY LIST
+
+function onSearch(input) {
+  document.getElementById('search-clear').style.display = input.value ? 'flex' : 'none';
+  applyFilters();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
+  const sort = document.getElementById('sort-select').value;
+
+  let filtered = inventory.filter(i =>
+    (i.name || '').toLowerCase().includes(q) ||
+    (i.barcode || '').toLowerCase().includes(q)
+  );
+
+  filtered.sort((a, b) => {
+    if (sort === 'name') return (a.name || '').localeCompare(b.name || '');
+    if (sort === 'barcode') return (a.barcode || '').localeCompare(b.barcode || '');
+    if (sort === 'exp') {
+      if (!a.exp && !b.exp) return 0;
+      if (!a.exp) return 1;
+      if (!b.exp) return -1;
+      return a.exp.localeCompare(b.exp);
+    }
+    // dateAdded: newest first
+    if (!a.dateAdded && !b.dateAdded) return 0;
+    if (!a.dateAdded) return 1;
+    if (!b.dateAdded) return -1;
+    return b.dateAdded.localeCompare(a.dateAdded);
+  });
+
+  renderList(filtered, q);
+  updateCounts();
+}
+
+function renderList(filtered, q) {
+  const list = document.getElementById('inventory-list');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4E6;</div><p>' +
+      (inventory.length === 0
+        ? 'No items yet.<br>Go to Scan to add your first product.'
+        : 'No results for "' + esc(q) + '"') +
+      '</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(item => {
+    const expChip = getExpChip(item.exp);
+    const bc = esc(item.barcode);
+    return '<div class="item-card">' +
+      '<div class="item-name">' + esc(item.name) + '</div>' +
+      (item.brand ? '<div class="item-brand">' + esc(item.brand) + '</div>' : '') +
+      '<div class="item-chips">' +
+        '<span class="chip chip-qty">Qty: ' + esc(item.qty) + ' ' + esc(item.unit) + '</span>' +
+        expChip +
+        (item.category ? '<span class="chip chip-cat">' + esc(item.category) + '</span>' : '') +
+        '<span class="chip chip-bc">' + bc + '</span>' +
+      '</div>' +
+      (item.desc ? '<div class="item-desc">' + esc(item.desc) + '</div>' : '') +
+      (item.location ? '<div class="item-desc" style="margin-top:4px">&#x1F4CD; ' + esc(item.location) + '</div>' : '') +
+      '<div class="item-actions">' +
+        '<button class="btn btn-secondary btn-sm" onclick="editItem(\'' + bc + '\')">Edit</button>' +
+        '<button class="btn btn-danger-outline btn-sm" onclick="deleteItem(\'' + bc + '\')">Delete</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function getExpChip(exp) {
+  if (!exp) return '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(exp);
+  const diff = Math.ceil((d - now) / 86400000);
+  let cls = 'chip-exp';
+  let label = 'Exp: ' + exp;
+  if (diff < 0) { cls += ' expired'; label = 'Expired ' + exp; }
+  else if (diff <= 30) { cls += ' warning'; label = 'Expiring: ' + exp; }
+  return '<span class="chip ' + cls + '">' + label + '</span>';
+}
+
+function deleteItem(barcode) {
+  if (!confirm('Delete this item?')) return;
+  inventory = inventory.filter(i => i.barcode !== barcode);
+  save();
+  applyFilters();
+}
+
+function editItem(barcode) {
+  const item = inventory.find(i => i.barcode === barcode);
+  if (!item) return;
+  currentBarcode = barcode;
+  const scanTab = document.querySelector('.tabs .tab:nth-child(1)');
+  showTab('scan', scanTab);
+  openForm(barcode, item);
+  inventory = inventory.filter(i => i.barcode !== barcode);
+  save();
+}
+
+// EXPORT / IMPORT
+
+function exportCSV() {
+  if (inventory.length === 0) { showToast('No items to export'); return; }
+  const headers = ['Barcode','Name','Brand','Category','Description','Quantity','Unit','Expiration Date','Date Added','Storage Location','Batch/Lot Number'];
+  const rows = inventory.map(i =>
+    [i.barcode,i.name,i.brand,i.category,i.desc,i.qty,i.unit,i.exp,i.dateAdded,i.location,i.batch]
+    .map(v => '"' + String(v||'').replace(/"/g,'""') + '"')
+  );
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cosmetics_inventory_' + today() + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded!');
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const lines = e.target.result.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) { showImportResult('File is empty or has no data rows.', 'info'); return; }
+
+    let added = 0, skipped = 0;
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVLine(lines[i]);
+      const barcode = (cols[0] || '').trim();
+      if (!barcode || isDuplicate(barcode)) { skipped++; continue; }
+      inventory.push({
+        barcode,
+        name: cols[1] || '',
+        brand: cols[2] || '',
+        category: cols[3] || '',
+        desc: cols[4] || '',
+        qty: cols[5] || '1',
+        unit: cols[6] || 'pcs',
+        exp: cols[7] || '',
+        dateAdded: cols[8] || '',
+        location: cols[9] || '',
+        batch: cols[10] || '',
+      });
+      added++;
+    }
+
+    save();
+    input.value = '';
+    const msg = added + ' item' + (added !== 1 ? 's' : '') + ' added' +
+      (skipped > 0 ? ', ' + skipped + ' skipped (duplicate or missing barcode).' : '.');
+    showImportResult(msg, added > 0 ? 'success' : 'info');
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      result.push(cur); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+function showImportResult(msg, type) {
+  const el = document.getElementById('import-result');
+  el.textContent = msg;
+  el.className = 'import-result ' + type;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+
+function clearAll() {
+  if (!confirm('This will delete ALL inventory data. Are you sure?')) return;
+  if (!confirm('This cannot be undone. Confirm delete all?')) return;
+  inventory = [];
+  save();
+  applyFilters();
+  showToast('Inventory cleared');
+}
+
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+updateCounts();
+applyFilters();
+</script>
+</body>
+</html>
