@@ -464,7 +464,10 @@
       <label>Barcode Number</label>
       <input type="text" id="manual-barcode" placeholder="e.g. 1234567890123" inputmode="numeric">
     </div>
-    <button class="btn btn-secondary" style="margin-bottom:12px" onclick="useManualBarcode()">Use This Barcode</button>
+    <div style="display:flex; gap:8px; margin-bottom:12px">
+      <button class="btn btn-secondary" style="flex:1" onclick="useManualBarcode()">Use This Barcode</button>
+      <button class="btn btn-secondary" style="flex:1; color:var(--gray-600); font-size:13px" onclick="useNoBarcode()">No Barcode</button>
+    </div>
   </div>
 
   <div id="item-form" style="display:none">
@@ -601,7 +604,7 @@
     <h3>Import CSV</h3>
     <p>Restore or merge items from a previously exported CSV. Items with duplicate barcodes will be skipped automatically.</p>
     <button class="btn btn-secondary" onclick="document.getElementById('csv-file-input').click()">Choose CSV File</button>
-    <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(this)">
+    <input type="file" id="csv-file-input" accept=".csv,text/csv,text/plain,text/*" onchange="importCSV(this)">
     <div class="import-result" id="import-result"></div>
   </div>
 
@@ -727,7 +730,10 @@ function stopScanner() {
   document.getElementById('scan-status').className = 'scan-status';
 }
 
-function onBarcodeDetected(code) {
+function onBarcodeDetected(raw) {
+  if (!raw || !raw.trim()) return;
+  const code = raw.trim();
+
   if (codeReader) { codeReader.reset(); codeReader = null; }
   document.getElementById('start-btn').style.display = 'block';
   document.getElementById('stop-btn').style.display = 'none';
@@ -767,6 +773,25 @@ function useManualBarcode() {
   currentBarcode = code;
   document.getElementById('manual-entry').style.display = 'none';
   document.getElementById('manual-barcode').value = '';
+  openForm(code, null);
+}
+
+function generateNoBarcodeId() {
+  const existing = inventory
+    .map(i => i.barcode)
+    .filter(b => /^NOBC-\d+$/.test(b))
+    .map(b => parseInt(b.replace('NOBC-', ''), 10));
+  const next = existing.length > 0 ? Math.max(...existing) + 1 : 1;
+  return 'NOBC-' + String(next).padStart(3, '0');
+}
+
+function useNoBarcode() {
+  const code = generateNoBarcodeId();
+  currentBarcode = code;
+  document.getElementById('manual-entry').style.display = 'none';
+  document.getElementById('manual-barcode').value = '';
+  document.getElementById('scan-status').textContent = 'No barcode — assigned ID: ' + code;
+  document.getElementById('scan-status').className = 'scan-status success';
   openForm(code, null);
 }
 
