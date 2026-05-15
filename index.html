@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cosmetics Inventory</title>
-<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.21.0/umd/index.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -522,6 +522,121 @@ input[type="file"] { display: none; }
   pointer-events: none; max-width: 90vw; text-align: center;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── STAGE 1 ADDITIONS ── */
+.toast-undo {
+  background: var(--gray-900); color: #fff;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px 10px 20px;
+}
+.toast.toast-undo.show { pointer-events: auto; }
+.toast-undo button {
+  background: none; border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; padding: 5px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+  pointer-events: auto;
+}
+.home-backup-time {
+  font-size: 11px; color: var(--teal-800); opacity: 0.85;
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px dashed rgba(15, 110, 86, 0.2);
+}
+.storage-meter {
+  background: var(--gray-50); border-radius: 10px; padding: 10px 12px;
+  font-size: 12px; color: var(--gray-600); margin-top: 8px;
+}
+.storage-meter-bar {
+  background: var(--gray-100); height: 6px; border-radius: 3px;
+  margin-top: 6px; overflow: hidden;
+}
+.storage-meter-fill {
+  background: var(--teal-600); height: 100%; transition: width 0.3s;
+}
+.storage-meter-fill.warning { background: var(--amber-400); }
+.storage-meter-fill.danger { background: var(--red-600); }
+.qty-val.negative { color: var(--red-600); }
+.product-qty.negative { color: var(--red-600); }
+.import-result.error { background: var(--red-50); color: var(--red-600); }
+.scan-next-hint {
+  background: var(--teal-50); border: 1px solid #b2ddd0;
+  border-radius: 10px; padding: 8px 12px;
+  font-size: 12px; color: var(--teal-800); text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ── STAGE 2: SALES + MARKDOWN ── */
+.product-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.status-sale { background: #F3EEFB; color: #6B3FA0; }
+.filter-chip.sale-active { background: #6B3FA0; color: #fff; border-color: #6B3FA0; }
+.filter-row-label { font-size: 10px; color: var(--gray-400); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 2px; }
+
+.stock-line.has-markdown { border-color: #DCCEF2; background: #F3EEFB; }
+.stock-markdown-info { font-size: 11px; color: #6B3FA0; margin-top: 2px; font-weight: 500; }
+
+.sale-mode-tabs {
+  display: flex; gap: 8px; margin-bottom: 14px;
+  background: var(--gray-50); border-radius: 12px; padding: 4px;
+}
+.sale-mode-tab {
+  flex: 1; padding: 10px; border: none; background: none;
+  font-size: 13px; font-weight: 600; color: var(--gray-600);
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.sale-mode-tab.active { background: #fff; color: var(--pink-600); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+.sell-scan-result {
+  background: var(--teal-50); border: 1px solid #b2ddd0;
+  border-radius: 12px; padding: 14px; margin-bottom: 12px;
+}
+.sell-scan-result.not-found {
+  background: var(--red-50); border-color: #f7c1c1;
+}
+.sell-found-name { font-size: 15px; font-weight: 700; color: var(--teal-800); }
+.sell-found-name.not-found { color: var(--red-600); }
+.sell-found-sub { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
+.sell-stock-line-pick {
+  background: #fff; border: 1px solid var(--gray-100); border-radius: 10px;
+  padding: 10px 12px; margin-top: 8px; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.sell-stock-line-pick:active { background: var(--pink-50); border-color: var(--pink-200); }
+.sell-stock-line-pick.selected { background: var(--pink-50); border-color: var(--pink-400); }
+.sell-stock-line-info { flex: 1; min-width: 0; }
+.sell-stock-line-exp { font-size: 13px; font-weight: 600; }
+.sell-stock-line-meta { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.sell-stock-line-price { text-align: right; font-size: 12px; }
+.sell-stock-line-price .markdown { color: #6B3FA0; font-weight: 600; }
+.sell-stock-line-price .original { color: var(--gray-400); text-decoration: line-through; font-size: 10px; }
+
+.sale-summary-card {
+  background: var(--teal-50); border: 1px solid #b2ddd0;
+  border-radius: 14px; padding: 16px; margin-bottom: 14px; text-align: center;
+}
+.sale-summary-name { font-size: 16px; font-weight: 700; color: var(--teal-800); }
+.sale-summary-detail { font-size: 13px; color: var(--gray-600); margin-top: 6px; line-height: 1.5; }
+.sale-summary-total { font-size: 22px; font-weight: 700; color: var(--teal-600); margin-top: 10px; }
+
+.markdown-input-row { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--gray-100); }
+.markdown-input-row.visible { display: block; }
+.exp-item-prices { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
+.exp-item-prices .markdown-price { color: #6B3FA0; font-weight: 600; }
+.exp-item-actions { flex-wrap: wrap; }
+
+.btn-blue-outline { background: var(--blue-50); color: var(--blue-600); border: 1px solid #C8DDF1; }
+.btn-purple-outline { background: #F3EEFB; color: #6B3FA0; border: 1px solid #DCCEF2; }
+.btn-amber { background: var(--amber-400); color: #fff; }
+.btn-purple { background: #6B3FA0; color: #fff; }
+
+#sale-stock-line-list .sell-stock-line-pick { margin-top: 8px; }
+
+.sale-log-deleted-tag {
+  display: inline-block; font-size: 9px; font-weight: 600;
+  background: var(--gray-100); color: var(--gray-600);
+  padding: 1px 6px; border-radius: 10px; margin-left: 6px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+
+.sale-stock-info { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -532,7 +647,7 @@ input[type="file"] { display: none; }
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.1.0</div>
+    <div class="home-version">v2.3.0</div>
   </div>
 
   <div class="mode-selector">
@@ -588,7 +703,10 @@ input[type="file"] { display: none; }
 
   <div class="home-backup">
     <span class="icon">💾</span>
-    <div class="text">Keep your data safe. Export a backup regularly.</div>
+    <div style="flex:1">
+      <div class="text" style="font-size:12px;color:var(--teal-800);line-height:1.4">Keep your data safe. Export a backup regularly.</div>
+      <div class="home-backup-time" id="home-backup-time">No backup yet. Export one now.</div>
+    </div>
     <button onclick="exportCSV()">Backup Now</button>
   </div>
 </div>
@@ -672,7 +790,8 @@ input[type="file"] { display: none; }
         <div class="field"><label>Expiration Date</label><input type="date" id="f-exp"></div>
         <div class="field"><label>Storage Location</label><input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2"></div>
       </div>
-      <button class="btn btn-primary" onclick="confirmSaveProduct()" style="margin-bottom:8px">Save to Inventory</button>
+      <button class="btn btn-primary" onclick="confirmSaveProduct(false)" style="margin-bottom:8px">Save to Inventory</button>
+      <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">💾 Save and Scan Next</button>
       <button class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
     </div>
   </div>
@@ -700,29 +819,80 @@ input[type="file"] { display: none; }
         <option value="barcode">Barcode</option>
       </select>
     </div>
-    <div class="filter-row">
+    <div class="filter-row-label">Availability</div>
+    <div class="filter-row" id="filter-availability">
       <button class="filter-chip active" onclick="setStatusFilter('all',this)">All</button>
       <button class="filter-chip" onclick="setStatusFilter('active',this)">Active</button>
       <button class="filter-chip" onclick="setStatusFilter('out',this)">Out of Stock</button>
       <button class="filter-chip" onclick="setStatusFilter('pulled',this)">Pulled Out</button>
+    </div>
+    <div class="filter-row-label">Sales Status</div>
+    <div class="filter-row" id="filter-sale">
+      <button class="filter-chip active" onclick="setSaleFilter('all',this)">All</button>
+      <button class="filter-chip" onclick="setSaleFilter('onsale',this)">💰 On Sale Only</button>
     </div>
     <div id="inventory-list"></div>
   </div>
 
   <!-- SALES -->
   <div class="section" id="tab-sales">
-    <div class="sale-form-card">
-      <h3>Log a Sale</h3>
-      <div class="field">
-        <label>Product</label>
-        <select id="sale-product-select" onchange="onSaleProductChange()"><option value="">-- Select Product --</option></select>
-      </div>
-      <div class="field"><label>Qty Sold *</label><input type="number" id="sale-qty" min="1" value="1" inputmode="numeric"></div>
-      <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
-      <div class="field"><label>Date of Sale</label><input type="date" id="sale-date"></div>
-      <button class="btn btn-primary" onclick="logSale()">Record Sale</button>
+    <div class="sale-mode-tabs">
+      <button class="sale-mode-tab active" id="sale-tab-scan" onclick="setSaleMode('scan',this)">📷 Scan to Sell</button>
+      <button class="sale-mode-tab" id="sale-tab-manual" onclick="setSaleMode('manual',this)">✏️ Manual Log</button>
     </div>
-    <div id="sales-list"></div>
+
+    <!-- SCAN TO SELL -->
+    <div id="sale-scan-mode">
+      <div class="scanner-box">
+        <video id="sell-preview" autoplay muted playsinline></video>
+        <div class="scan-overlay">
+          <div class="scan-frame"><div class="scan-frame-inner"></div><div class="scan-line"></div></div>
+        </div>
+      </div>
+      <div class="scan-status" id="sell-scan-status">Camera not started</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="sell-start-btn" onclick="startSellScanner()">Start Camera</button>
+        <button class="btn btn-secondary" id="sell-stop-btn" onclick="stopSellScanner()" style="display:none">Stop Camera</button>
+      </div>
+
+      <div id="sell-result" style="display:none"></div>
+
+      <div id="sell-entry" style="display:none">
+        <div class="sale-form-card">
+          <h3>Confirm Sale Details</h3>
+          <div class="field"><label>Qty Sold *</label><input type="number" id="sell-qty" min="1" value="1" inputmode="numeric"></div>
+          <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Date of Sale</label><input type="date" id="sell-date"></div>
+          <button class="btn btn-primary" onclick="confirmSellScan()">Record Sale</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUAL LOG -->
+    <div id="sale-manual-mode" style="display:none">
+      <div class="sale-form-card">
+        <h3>Manual Sale Entry</h3>
+        <div class="field">
+          <label>Product *</label>
+          <select id="sale-product-select" onchange="onSaleProductChange()"><option value="">-- Select Product --</option></select>
+        </div>
+        <div id="sale-stock-line-picker" style="display:none">
+          <div class="field">
+            <label>Select Stock Line (by Expiry) *</label>
+            <div id="sale-stock-line-list"></div>
+          </div>
+        </div>
+        <div class="field"><label>Qty Sold *</label><input type="number" id="sale-qty" min="1" value="1" inputmode="numeric"></div>
+        <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Date of Sale</label><input type="date" id="sale-date"></div>
+        <button class="btn btn-primary" onclick="confirmLogSale()">Record Sale</button>
+      </div>
+    </div>
+
+    <div style="margin-top:18px">
+      <h3 style="font-size:13px;color:var(--gray-600);margin-bottom:10px;font-weight:600">Recent Sales</h3>
+      <div id="sales-list"></div>
+    </div>
   </div>
 
   <!-- DATA / EXPORT -->
@@ -731,6 +901,7 @@ input[type="file"] { display: none; }
       <h3>Export CSV</h3>
       <p>Downloads all inventory and sales data as a CSV backup.</p>
       <button class="btn btn-teal" onclick="exportCSV()">Download CSV</button>
+      <div class="storage-meter" id="storage-meter"></div>
     </div>
     <div class="export-area">
       <h3>Import CSV</h3>
@@ -746,6 +917,48 @@ input[type="file"] { display: none; }
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.3.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Scan to Sell mode — cashier-style sales recording</li>
+            <li>Manual sale log with stock line selection by expiry</li>
+            <li>Sales automatically deduct from the selected stock line</li>
+            <li>Oversell warning with option to Proceed Anyway</li>
+            <li>Sale confirmation summary modal with total</li>
+            <li>Per stock line price markdown (not per product)</li>
+            <li>Markdown auto-fills selling price when stock line is selected</li>
+            <li>Markdown auto-removed when stock line hits zero</li>
+            <li>"On Sale" badge alongside availability status (dual status)</li>
+            <li>Mark Down Price button in the expiry popup</li>
+            <li>New Sales Status filter row on inventory (On Sale Only)</li>
+            <li>Stock line shows markdown info inline when active</li>
+            <li>Sales tab now has two modes: Scan to Sell and Manual Log</li>
+            <li>Deleted product tag on sales of removed products</li>
+            <li>Markdown tag on sales recorded at marked-down prices</li>
+            <li>Stock line ID linked to sale record for full traceability</li>
+            <li>CSV export and import updated for new fields</li>
+          </ul>
+        </div>
+        <div class="version-item">
+          <div class="version-num">Version 2.2.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Save and Scan Next button for rapid product entry</li>
+            <li>Edit individual stock line (expiry and qty)</li>
+            <li>Auto status change to Out of Stock when qty hits zero</li>
+            <li>Auto status change back to Active when stock is added</li>
+            <li>Undo button on delete actions (6 seconds to undo)</li>
+            <li>Last backup timestamp visible on home screen</li>
+            <li>Storage usage meter with warnings on Data tab</li>
+            <li>Specific CSV import error messages</li>
+            <li>Sales now include productId for traceability</li>
+            <li>Sales now include timestamps</li>
+            <li>ZXing library pinned to specific version (stability fix)</li>
+            <li>Fixed XSS audit: full escaping of user input</li>
+            <li>Storage error warning when localStorage is full</li>
+          </ul>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.1.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -814,11 +1027,14 @@ input[type="file"] { display: none; }
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.1.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Critical data bugs fixed — migration and CSV import now work correctly.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Sales data is now included in CSV export so it is never lost.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Version History is now a clean dropdown on the Data page.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Qty controls and Add Stock now behave correctly after saving.</div></div>
+      <div class="whats-new-version">Version 2.3.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Scan to Sell mode for cashier-style sales recording.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Sales now automatically deduct from the correct stock line by expiry.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">New "On Sale" badge for items with price markdown.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Mark Down Price directly from the expiry popup (per stock line).</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Oversell warning protects against accidental stock errors.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Sale confirmation summary shows total after each sale.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Filter inventory by On Sale status.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
@@ -936,6 +1152,57 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
+<!-- STAGE 2: Sale modals -->
+<div class="modal-backdrop" id="modal-confirm-sale">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">🧾</div>
+    <div class="confirm-title">Record Sale?</div>
+    <div class="confirm-msg" id="confirm-sale-msg">Record this sale?</div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-sale')">Cancel</button>
+      <button class="btn btn-primary" onclick="doRecordSale()">Confirm</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-backdrop" id="modal-confirm-oversell">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title">Oversell Warning</div>
+    <div class="confirm-msg" id="oversell-msg"></div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-oversell')">Cancel</button>
+      <button class="btn btn-amber" onclick="doRecordSaleAnyway()">Proceed Anyway</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-backdrop" id="modal-sale-summary">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-header"><h3>✅ Sale Recorded</h3><button class="modal-close" onclick="closeModal('modal-sale-summary')">✕</button></div>
+    <div class="modal-body">
+      <div class="sale-summary-card">
+        <div class="sale-summary-name" id="summary-name"></div>
+        <div class="sale-summary-detail" id="summary-detail"></div>
+        <div class="sale-summary-total" id="summary-total"></div>
+      </div>
+      <button class="btn btn-primary" onclick="closeModal('modal-sale-summary')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-confirm-markdown">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">💰</div>
+    <div class="confirm-title">Apply Markdown?</div>
+    <div class="confirm-msg" id="markdown-confirm-msg"></div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-markdown')">Cancel</button>
+      <button class="btn btn-primary" onclick="doApplyMarkdown()">Apply</button>
+    </div>
+  </div></div>
+</div>
+
 <div class="modal-backdrop" id="modal-edit-product">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -995,6 +1262,35 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
+<!-- Edit Stock Line -->
+<div class="modal-backdrop" id="modal-edit-stock">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3>Edit Stock Entry</h3>
+      <button class="modal-close" onclick="closeModal('modal-edit-stock')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-stock-id">
+      <div class="field"><label>Expiry Date</label><input type="date" id="edit-stock-exp"></div>
+      <div class="field"><label>Quantity</label><input type="number" id="edit-stock-qty" min="0" inputmode="numeric"></div>
+      <button class="btn btn-primary" onclick="confirmEditStock()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-confirm-edit-stock">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">✏️</div>
+    <div class="confirm-title">Save Stock Changes?</div>
+    <div class="confirm-msg">Update this stock entry?</div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-edit-stock')">Cancel</button>
+      <button class="btn btn-primary" onclick="doEditStock()">Save</button>
+    </div>
+  </div></div>
+</div>
+
 <div class="modal-backdrop" id="modal-exp">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -1020,7 +1316,7 @@ input[type="file"] { display: none; }
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.3.0';
 
 function generateId(prefix) {
   return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -1031,14 +1327,77 @@ function today() {
 }
 
 function esc(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  // FIX L3: Properly escape all XSS-prone chars including single quote
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  t.className = 'toast show';
+  if (t._tid) clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// FIX H1: Undo system for destructive actions
+let undoTimer = null;
+function showUndoToast(msg, undoFn) {
+  const t = document.getElementById('toast');
+  t.innerHTML = '<span>' + esc(msg) + '</span><button id="undo-btn">UNDO</button>';
+  t.className = 'toast toast-undo show';
+  const btn = document.getElementById('undo-btn');
+  if (btn) {
+    btn.onclick = function() {
+      try { undoFn(); } catch(e) { console.error(e); }
+      t.classList.remove('show');
+      if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
+    };
+  }
+  if (undoTimer) clearTimeout(undoTimer);
+  undoTimer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.textContent = ''; t.className = 'toast'; }, 300);
+    undoTimer = null;
+  }, 6000);
+}
+
+// FIX H5: Storage size monitoring
+function getStorageInfo() {
+  let totalSize = 0;
+  try {
+    ['ci_products','ci_stocks','ci_sales','cosmetics_inv'].forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) totalSize += v.length;
+    });
+  } catch(e) {}
+  const approxLimit = 5 * 1024 * 1024;
+  const pct = Math.min(100, Math.round((totalSize / approxLimit) * 100));
+  return { used: totalSize, pct };
+}
+
+function updateStorageMeter() {
+  const meter = document.getElementById('storage-meter');
+  if (!meter) return;
+  const info = getStorageInfo();
+  const cls = info.pct > 85 ? 'danger' : info.pct > 65 ? 'warning' : '';
+  meter.innerHTML =
+    '<div>Storage: <strong>' + (info.used / 1024).toFixed(1) + ' KB</strong> used (~' + info.pct + '%)</div>' +
+    '<div class="storage-meter-bar"><div class="storage-meter-fill ' + cls + '" style="width:' + Math.min(100, info.pct) + '%"></div></div>' +
+    (info.pct > 85 ? '<div style="color:var(--red-600);margin-top:6px">⚠️ Storage almost full. Export backup and clear old data.</div>' : '');
+}
+
+// Update last backup display
+function updateBackupDisplay() {
+  const el = document.getElementById('home-backup-time');
+  if (!el) return;
+  let lastBackup = null;
+  try { lastBackup = localStorage.getItem('ci_last_backup'); } catch(e) {}
+  if (lastBackup) {
+    const d = new Date(lastBackup);
+    el.textContent = 'Last backup: ' + d.toLocaleDateString() + ' at ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  } else {
+    el.textContent = 'No backup yet. Export one now.';
+  }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('active'); }
@@ -1085,11 +1444,19 @@ if (oldData && products.length === 0) {
         dateAdded: item.dateAdded || today(),
       });
     });
-    try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) {}
-    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
-    localStorage.removeItem('cosmetics_inv');
   } catch(e) {}
 }
+
+// STAGE 2: Migrate stock lines to add markdownPrice field
+(function migrateStage2() {
+  let needsSave = false;
+  stockLines.forEach(s => {
+    if (s.markdownPrice === undefined) { s.markdownPrice = ''; needsSave = true; }
+  });
+  if (needsSave) {
+    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
+  }
+})();
 
 // State vars
 let currentBarcode = '';
@@ -1101,16 +1468,67 @@ let existingBarcodeProductId = null;
 let activeStatusFilter = 'all';
 let activeExpFilter = 30;
 let codeReader = null;
-// Track which product details panel is open so we can re-open after add stock
 let openDetailsPanelId = null;
+// FIX Issue 1: Save and Scan Next flag
+let saveAndScanNext = false;
+// FIX Issue 3: Edit stock line state
+let editingStockId = null;
+// STAGE 2: Sales + markdown state
+let activeSaleFilter = 'all';
+let saleMode = 'scan';
+let saleScannerReader = null;
+let pendingSale = null;
+let pendingMarkdown = null;
+
+// FIX Issue 4: Auto out of stock when qty hits zero
+function checkAutoOutOfStock(productId) {
+  const p = products.find(x => x.recordId === productId);
+  if (!p) return;
+  if (p.status === 'pulled') return; // don't override pulled out
+  const total = productTotalQty(productId);
+  if (total <= 0 && p.status === 'active') {
+    p.status = 'out';
+    return true;
+  }
+  if (total > 0 && p.status === 'out') {
+    p.status = 'active';
+    return true;
+  }
+  return false;
+}
+
+// STAGE 2: Product has any markdown stock line
+function productHasMarkdown(productId) {
+  return stockLines.some(s => s.productId === productId && s.markdownPrice && (parseInt(s.qty) || 0) > 0);
+}
+
+// STAGE 2: Auto-reset markdown when stock line hits zero
+function checkAutoMarkdownReset(stockLineId) {
+  const s = stockLines.find(x => x.id === stockLineId);
+  if (!s || !s.markdownPrice) return false;
+  if ((parseInt(s.qty) || 0) <= 0) {
+    s.markdownPrice = '';
+    return true;
+  }
+  return false;
+}
 
 // ─────────────────────────────────────────
 // SAVE
 // ─────────────────────────────────────────
 function saveAll() {
-  try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) {}
-  try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
-  try { localStorage.setItem('ci_sales', JSON.stringify(sales)); } catch(e) {}
+  // FIX C1: Validate arrays before writing to prevent data corruption
+  if (!Array.isArray(products)) products = [];
+  if (!Array.isArray(stockLines)) stockLines = [];
+  if (!Array.isArray(sales)) sales = [];
+  let storageError = false;
+  try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) { storageError = true; }
+  try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) { storageError = true; }
+  try { localStorage.setItem('ci_sales', JSON.stringify(sales)); } catch(e) { storageError = true; }
+  if (storageError) {
+    showToast('⚠️ Storage error! Export backup now.');
+  }
+  updateStorageMeter();
 }
 
 function productTotalQty(productId) {
@@ -1147,6 +1565,7 @@ function goHome() {
   document.getElementById('page-home').classList.add('active');
   document.getElementById('page-app').classList.remove('active');
   if (codeReader) { try { codeReader.reset(); } catch(e) {} codeReader = null; }
+  stopSellScanner();
   updateCounts();
 }
 
@@ -1158,17 +1577,24 @@ function goToApp(tab) {
 }
 
 function switchTab(name, el) {
+  // Stop scanners when leaving their tabs
+  if (name !== 'scan') stopScanner();
+  if (name !== 'sales') stopSellScanner();
+
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (el) el.classList.add('active');
-  const titles = { scan:'Scan Item', inventory:'Inventory', sales:'Sales Log', export:'Data and Export' };
+  const titles = { scan:'Scan Item', inventory:'Inventory', sales:'Sales', export:'Data and Export' };
   document.getElementById('app-header-title').textContent = titles[name] || name;
   if (name === 'inventory') applyFilters();
   if (name === 'sales') {
     renderSalesList();
     populateSaleProductSelect();
-    document.getElementById('sale-date').value = today();
+    const dateEl = document.getElementById('sale-date');
+    if (dateEl) dateEl.value = today();
+    const sellDateEl = document.getElementById('sell-date');
+    if (sellDateEl) sellDateEl.value = today();
   }
 }
 
@@ -1349,7 +1775,9 @@ function confirmAddToExisting() {
 
   saveAll();
   closeModal('modal-existing');
+  checkAutoOutOfStock(existingBarcodeProductId);
   existingBarcodeProductId = null;
+  updateCounts();
 }
 
 // ─────────────────────────────────────────
@@ -1377,9 +1805,10 @@ function cancelForm() {
   document.getElementById('scan-status').className = 'scan-status';
 }
 
-function confirmSaveProduct() {
+function confirmSaveProduct(scanNext) {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { showToast('Product name is required'); document.getElementById('f-name').focus(); return; }
+  saveAndScanNext = !!scanNext;
   openModal('modal-confirm-save');
 }
 
@@ -1413,19 +1842,43 @@ function doSaveProduct() {
     dateAdded: today(),
   });
 
+  checkAutoOutOfStock(recordId);
   saveAll();
   cancelForm();
   showToast('Product saved!');
   updateCounts();
+
+  // FIX Issue 1: Save and Scan Next
+  if (saveAndScanNext) {
+    saveAndScanNext = false;
+    setEl('scan-status', 'Ready to scan next item');
+    setTimeout(() => startScanner(), 300);
+  }
 }
+
+// Helper for safe DOM updates (used in counts)
+function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 
 // ─────────────────────────────────────────
 // INVENTORY LIST
 // ─────────────────────────────────────────
 function setStatusFilter(val, el) {
   activeStatusFilter = val;
-  document.querySelectorAll('.filter-row .filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#filter-availability .filter-chip').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
+  applyFilters();
+}
+
+// STAGE 2: Sales status filter
+function setSaleFilter(val, el) {
+  activeSaleFilter = val;
+  document.querySelectorAll('#filter-sale .filter-chip').forEach(c => {
+    c.classList.remove('active'); c.classList.remove('sale-active');
+  });
+  if (el) {
+    if (val === 'onsale') el.classList.add('sale-active');
+    else el.classList.add('active');
+  }
   applyFilters();
 }
 
@@ -1441,13 +1894,17 @@ function clearSearch() {
 }
 
 function applyFilters() {
-  const q = (document.getElementById('search-input').value || '').toLowerCase().trim();
-  const sort = document.getElementById('sort-select').value;
+  const searchEl = document.getElementById('search-input');
+  const sortEl = document.getElementById('sort-select');
+  if (!searchEl || !sortEl) return;
+  const q = (searchEl.value || '').toLowerCase().trim();
+  const sort = sortEl.value;
 
   let filtered = products.filter(p => {
-    const matchSearch = (p.name || '').toLowerCase().includes(q) || (p.barcode || '').toLowerCase().includes(q);
+    const matchSearch = !q || (p.name || '').toLowerCase().includes(q) || (p.barcode || '').toLowerCase().includes(q);
     const matchStatus = activeStatusFilter === 'all' || p.status === activeStatusFilter;
-    return matchSearch && matchStatus;
+    const matchSale = activeSaleFilter === 'all' || (activeSaleFilter === 'onsale' && productHasMarkdown(p.recordId));
+    return matchSearch && matchStatus && matchSale;
   });
 
   filtered.sort((a, b) => {
@@ -1476,7 +1933,7 @@ function renderList(filtered, q) {
     const totalQty = productTotalQty(p.recordId);
     const statusLabel = { active:'Active', out:'Out of Stock', pulled:'Pulled Out' }[p.status] || 'Active';
     const statusCls = { active:'status-active', out:'status-out', pulled:'status-pulled' }[p.status] || 'status-active';
-    // FIX 7: Use data attribute instead of embedding ID in onclick string
+    const onSale = productHasMarkdown(p.recordId);
     const rid = p.recordId;
     const ridEsc = esc(rid);
 
@@ -1492,13 +1949,14 @@ function renderList(filtered, q) {
       const sidEsc = esc(sid);
       const expLabel = getExpLabel(s.exp);
       const expCls = getExpCls(s.exp);
-      // FIX 10: Store original qty in data attribute not in onclick
       const origQty = parseInt(s.qty) || 0;
-      return '<div class="stock-line" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
+      const hasMarkdown = !!s.markdownPrice;
+      return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
         '<div class="stock-line-top">' +
           '<div>' +
             '<div class="stock-exp-label">Expiry</div>' +
-            '<div class="stock-exp ' + expCls + '">' + (s.exp ? s.exp + expLabel : 'No expiry set') + '</div>' +
+            '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
+            (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
           '</div>' +
           '<div class="qty-control">' +
             '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">−</button>' +
@@ -1512,6 +1970,7 @@ function renderList(filtered, q) {
           '<button class="stock-save-btn" onclick="saveStockQty(\'' + sidEsc + '\',\'' + ridEsc + '\')">Save</button>' +
         '</div>' +
         '<div class="stock-actions">' +
+          '<button class="btn btn-secondary btn-sm" onclick="openEditStock(\'' + sidEsc + '\')">Edit</button>' +
           '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStock(\'' + sidEsc + '\')">Remove</button>' +
         '</div>' +
       '</div>';
@@ -1544,7 +2003,10 @@ function renderList(filtered, q) {
           (p.brand ? '<div class="product-brand">' + esc(p.brand) + '</div>' : '') +
           '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + esc(p.unit || 'pcs') + '</span></div>' +
         '</div>' +
-        '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
+        '<div class="product-badges">' +
+          '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
+          (onSale ? '<span class="status-badge status-sale">💰 On Sale</span>' : '') +
+        '</div>' +
       '</div>' +
       '<button class="more-details-btn" onclick="toggleDetails(\'' + ridEsc + '\',this)">' +
         '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? '▾' : '▸') + '</span> More Details' +
@@ -1614,14 +2076,16 @@ function saveStockQty(sid, rid) {
   if (!stock) return;
   const newQty = parseInt(document.getElementById('qv-' + sid).textContent) || 0;
   stock.qty = newQty;
-  // Update data attr so cancel works correctly after a save
   const slEl = document.getElementById('sl-' + sid);
   if (slEl) slEl.dataset.origQty = newQty;
   document.getElementById('ssr-' + sid).classList.remove('visible');
   document.getElementById('sw-' + sid).textContent = 'was ' + newQty;
   openDetailsPanelId = rid;
+  checkAutoOutOfStock(rid);
   saveAll();
   showToast('Quantity updated!');
+  updateCounts();
+  applyFilters();
 }
 
 function confirmRemoveStock(sid) {
@@ -1629,13 +2093,54 @@ function confirmRemoveStock(sid) {
   openModal('modal-confirm-remove-stock');
 }
 
+// FIX Issue 3: Edit individual stock line
+function openEditStock(sid) {
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) return;
+  editingStockId = sid;
+  document.getElementById('edit-stock-id').value = sid;
+  document.getElementById('edit-stock-exp').value = s.exp || '';
+  document.getElementById('edit-stock-qty').value = s.qty || 0;
+  openModal('modal-edit-stock');
+}
+
+function confirmEditStock() {
+  openModal('modal-confirm-edit-stock');
+}
+
+function doEditStock() {
+  const s = stockLines.find(x => x.id === editingStockId);
+  if (!s) return;
+  s.exp = document.getElementById('edit-stock-exp').value;
+  s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
+  openDetailsPanelId = s.productId;
+  checkAutoOutOfStock(s.productId);
+  saveAll();
+  closeModal('modal-confirm-edit-stock');
+  closeModal('modal-edit-stock');
+  applyFilters();
+  showToast('Stock entry updated');
+  editingStockId = null;
+}
+
 function doRemoveStock() {
+  const backup = stockLines.find(s => s.id === removingStockId);
+  if (!backup) { closeModal('modal-confirm-remove-stock'); return; }
+  const stockBackup = JSON.parse(JSON.stringify(backup));
+  const rid = backup.productId;
   stockLines = stockLines.filter(s => s.id !== removingStockId);
-  removingStockId = null;
+  checkAutoOutOfStock(rid);
   saveAll();
   closeModal('modal-confirm-remove-stock');
   applyFilters();
-  showToast('Stock entry removed');
+  showUndoToast('Stock entry removed', () => {
+    stockLines.push(stockBackup);
+    checkAutoOutOfStock(rid);
+    saveAll();
+    applyFilters();
+    showToast('Restored!');
+  });
+  removingStockId = null;
 }
 
 // ─────────────────────────────────────────
@@ -1690,14 +2195,25 @@ function confirmDeleteProduct(rid) {
 }
 
 function doDeleteProduct() {
-  products = products.filter(p => p.recordId !== deletingProductId);
+  const p = products.find(x => x.recordId === deletingProductId);
+  if (!p) { closeModal('modal-confirm-delete'); return; }
+  const productBackup = JSON.parse(JSON.stringify(p));
+  const stockBackup = stockLines.filter(s => s.productId === deletingProductId).map(s => JSON.parse(JSON.stringify(s)));
+
+  products = products.filter(x => x.recordId !== deletingProductId);
   stockLines = stockLines.filter(s => s.productId !== deletingProductId);
   if (openDetailsPanelId === deletingProductId) openDetailsPanelId = null;
-  deletingProductId = null;
   saveAll();
   closeModal('modal-confirm-delete');
   applyFilters();
-  showToast('Product deleted');
+  showUndoToast('Product deleted', () => {
+    products.push(productBackup);
+    stockBackup.forEach(s => stockLines.push(s));
+    saveAll();
+    applyFilters();
+    showToast('Restored!');
+  });
+  deletingProductId = null;
 }
 
 // ─────────────────────────────────────────
@@ -1718,7 +2234,6 @@ function openAddStock(rid) {
 function doAddStock() {
   const rid = document.getElementById('add-stock-record-id').value;
   const exp = document.getElementById('add-stock-exp').value;
-  // FIX 14: validate qty minimum 1
   const qty = parseInt(document.getElementById('add-stock-qty').value) || 0;
   if (qty < 1) { showToast('Please enter a quantity of at least 1'); return; }
 
@@ -1732,6 +2247,7 @@ function doAddStock() {
   }
 
   openDetailsPanelId = rid;
+  checkAutoOutOfStock(rid);
   saveAll();
   closeModal('modal-add-stock');
   applyFilters();
@@ -1758,7 +2274,7 @@ function renderExpList() {
   const now = new Date(); now.setHours(0,0,0,0);
   const cutoff = new Date(now.getTime() + activeExpFilter * 86400000);
   const items = stockLines
-    .filter(s => s.exp && new Date(s.exp) <= cutoff)
+    .filter(s => s.exp && new Date(s.exp) <= cutoff && (parseInt(s.qty) || 0) > 0)
     .sort((a, b) => a.exp.localeCompare(b.exp));
 
   const list = document.getElementById('exp-modal-list');
@@ -1780,13 +2296,75 @@ function renderExpList() {
     return '<div class="exp-item' + (isCritical ? ' critical' : '') + '">' +
       '<div class="exp-name">' + esc(p.name) + '</div>' +
       '<div class="exp-sub">' + esc(p.barcode) + (p.brand ? ' | ' + esc(p.brand) : '') + ' | Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
-      '<div class="exp-days">' + daysLabel + ' (' + s.exp + ')</div>' +
+      '<div class="exp-days">' + daysLabel + ' (' + esc(s.exp) + ')</div>' +
+      '<div class="exp-item-prices">' +
+        (p.selling ? 'Selling: ₱' + esc(p.selling) : '') +
+        (s.markdownPrice ? ' <span class="markdown-price">| Marked down: ₱' + esc(s.markdownPrice) + '</span>' : '') +
+      '</div>' +
       '<div class="exp-item-actions">' +
+        '<button class="btn btn-purple-outline btn-sm" onclick="openMarkdownInput(\'' + sidEsc + '\')">💰 ' + (s.markdownPrice ? 'Edit Markdown' : 'Mark Down') + '</button>' +
         '<button class="btn btn-amber-outline btn-sm" onclick="pullOutFromExp(\'' + ridEsc + '\')">Pull Out</button>' +
         '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStockFromExp(\'' + sidEsc + '\')">Remove</button>' +
       '</div>' +
+      '<div class="markdown-input-row" id="mir-' + sidEsc + '">' +
+        '<div class="field" style="margin-top:8px"><label>New Markdown Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="mip-' + sidEsc + '" placeholder="0.00" min="0" step="0.01" inputmode="decimal" value="' + esc(s.markdownPrice || '') + '"></div></div>' +
+        '<div class="btn-row" style="margin-bottom:0">' +
+          '<button class="btn btn-secondary btn-sm" onclick="cancelMarkdownInput(\'' + sidEsc + '\')">Cancel</button>' +
+          (s.markdownPrice ? '<button class="btn btn-danger-outline btn-sm" onclick="removeMarkdown(\'' + sidEsc + '\')">Remove</button>' : '') +
+          '<button class="btn btn-primary btn-sm" onclick="confirmMarkdown(\'' + sidEsc + '\')">Apply</button>' +
+        '</div>' +
+      '</div>' +
     '</div>';
   }).join('');
+}
+
+// STAGE 2: Markdown input UI
+function openMarkdownInput(sid) {
+  document.querySelectorAll('.markdown-input-row').forEach(r => r.classList.remove('visible'));
+  const row = document.getElementById('mir-' + sid);
+  if (row) row.classList.add('visible');
+}
+
+function cancelMarkdownInput(sid) {
+  const row = document.getElementById('mir-' + sid);
+  if (row) row.classList.remove('visible');
+}
+
+function confirmMarkdown(sid) {
+  const inp = document.getElementById('mip-' + sid);
+  const price = inp.value.trim();
+  if (!price || parseFloat(price) <= 0) { showToast('Enter a valid price'); return; }
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) return;
+  const p = products.find(x => x.recordId === s.productId);
+  pendingMarkdown = { sid, price };
+  setEl('markdown-confirm-msg', 'Mark down ' + (p ? p.name : 'this item') + ' (exp: ' + (s.exp || 'no expiry') + ') to ₱' + price + '?');
+  openModal('modal-confirm-markdown');
+}
+
+function doApplyMarkdown() {
+  if (!pendingMarkdown) return;
+  const s = stockLines.find(x => x.id === pendingMarkdown.sid);
+  if (!s) return;
+  s.markdownPrice = pendingMarkdown.price;
+  saveAll();
+  closeModal('modal-confirm-markdown');
+  pendingMarkdown = null;
+  renderExpList();
+  applyFilters();
+  showToast('Markdown applied');
+  updateCounts();
+}
+
+function removeMarkdown(sid) {
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) return;
+  s.markdownPrice = '';
+  saveAll();
+  renderExpList();
+  applyFilters();
+  showToast('Markdown removed');
+  updateCounts();
 }
 
 function pullOutFromExp(rid) {
@@ -1795,6 +2373,7 @@ function pullOutFromExp(rid) {
   p.status = 'pulled';
   saveAll();
   renderExpList();
+  applyFilters();
   showToast(p.name + ' marked as Pulled Out');
 }
 
@@ -1805,22 +2384,49 @@ function confirmRemoveStockFromExp(sid) {
 }
 
 function doRemoveStockFromExp() {
+  const backup = stockLines.find(s => s.id === removingExpStockId);
+  if (!backup) { closeModal('modal-confirm-remove-exp'); return; }
+  const stockBackup = JSON.parse(JSON.stringify(backup));
+  const rid = backup.productId;
   stockLines = stockLines.filter(s => s.id !== removingExpStockId);
-  removingExpStockId = null;
+  checkAutoOutOfStock(rid);
   saveAll();
   closeModal('modal-confirm-remove-exp');
   renderExpList();
-  showToast('Stock entry removed');
+  applyFilters();
+  showUndoToast('Stock entry removed', () => {
+    stockLines.push(stockBackup);
+    checkAutoOutOfStock(rid);
+    saveAll();
+    renderExpList();
+    applyFilters();
+    showToast('Restored!');
+  });
+  removingExpStockId = null;
 }
 
 // ─────────────────────────────────────────
 // SALES LOG
 // ─────────────────────────────────────────
+// ═══════════════════════════════════════════
+// STAGE 2: SALES — Scan to Sell + Manual Log
+// ═══════════════════════════════════════════
+
+function setSaleMode(mode, el) {
+  saleMode = mode;
+  document.querySelectorAll('.sale-mode-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('sale-scan-mode').style.display = mode === 'scan' ? 'block' : 'none';
+  document.getElementById('sale-manual-mode').style.display = mode === 'manual' ? 'block' : 'none';
+  if (mode !== 'scan') stopSellScanner();
+}
+
 function populateSaleProductSelect() {
   const sel = document.getElementById('sale-product-select');
+  if (!sel) return;
   const current = sel.value;
   sel.innerHTML = '<option value="">-- Select Product --</option>';
-  products.filter(p => p.status === 'active').forEach(p => {
+  products.filter(p => p.status !== 'pulled' || productHasMarkdown(p.recordId)).forEach(p => {
     const opt = document.createElement('option');
     opt.value = p.recordId;
     opt.textContent = p.name + (p.brand ? ' (' + p.brand + ')' : '');
@@ -1831,40 +2437,300 @@ function populateSaleProductSelect() {
 
 function onSaleProductChange() {
   const rid = document.getElementById('sale-product-select').value;
-  const p = products.find(x => x.recordId === rid);
-  if (p && p.selling) document.getElementById('sale-price').value = p.selling;
-}
-
-function logSale() {
-  const rid = document.getElementById('sale-product-select').value;
-  if (!rid) { showToast('Please select a product'); return; }
-  const qty = parseInt(document.getElementById('sale-qty').value) || 1;
-  const price = document.getElementById('sale-price').value.trim();
-  const date = document.getElementById('sale-date').value || today();
+  const picker = document.getElementById('sale-stock-line-picker');
+  const list = document.getElementById('sale-stock-line-list');
+  if (!rid) { picker.style.display = 'none'; return; }
   const p = products.find(x => x.recordId === rid);
   if (!p) return;
 
-  sales.unshift({
-    id: generateId('SAL'),
-    productId: rid,
-    productName: p.name,
-    brand: p.brand || '',
-    qtySold: qty,
-    price,
-    date,
+  const lines = stockLines.filter(s => s.productId === rid && (parseInt(s.qty) || 0) > 0).sort((a, b) => {
+    if (!a.exp && !b.exp) return 0;
+    if (!a.exp) return 1;
+    if (!b.exp) return -1;
+    return a.exp.localeCompare(b.exp);
   });
 
+  if (lines.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--red-600);padding:10px;background:var(--red-50);border-radius:8px">No stock available for this product</div>';
+    picker.style.display = 'block';
+    return;
+  }
+
+  list.innerHTML = lines.map(s => {
+    const sidEsc = esc(s.id);
+    const ridEsc = esc(rid);
+    const priceUse = s.markdownPrice || p.selling || '';
+    const hasMarkdown = !!s.markdownPrice;
+    return '<div class="sell-stock-line-pick" id="ssp-' + sidEsc + '" onclick="selectManualStockLine(\'' + sidEsc + '\',\'' + ridEsc + '\')">' +
+      '<div class="sell-stock-line-info">' +
+        '<div class="sell-stock-line-exp">' + (s.exp ? 'Exp: ' + esc(s.exp) : 'No expiry') + '</div>' +
+        '<div class="sell-stock-line-meta">Qty available: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
+      '</div>' +
+      '<div class="sell-stock-line-price">' +
+        (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
+        '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  picker.style.display = 'block';
+  // Reset selection
+  document.getElementById('sale-product-select').dataset.stockLineId = '';
+}
+
+function selectManualStockLine(sid, rid) {
+  document.querySelectorAll('#sale-stock-line-list .sell-stock-line-pick').forEach(el => el.classList.remove('selected'));
+  const picked = document.getElementById('ssp-' + sid);
+  if (picked) picked.classList.add('selected');
+  const s = stockLines.find(x => x.id === sid);
+  const p = products.find(x => x.recordId === rid);
+  if (s && p) {
+    const priceEl = document.getElementById('sale-price');
+    if (priceEl) priceEl.value = s.markdownPrice || p.selling || '';
+  }
+  document.getElementById('sale-product-select').dataset.stockLineId = sid;
+}
+
+// MANUAL SALE CONFIRMATION
+function confirmLogSale() {
+  const rid = document.getElementById('sale-product-select').value;
+  if (!rid) { showToast('Please select a product'); return; }
+  const sid = document.getElementById('sale-product-select').dataset.stockLineId;
+  if (!sid) { showToast('Please select a stock line by expiry date'); return; }
+  const qty = parseInt(document.getElementById('sale-qty').value) || 0;
+  if (qty < 1) { showToast('Qty must be at least 1'); return; }
+  const price = document.getElementById('sale-price').value.trim();
+  const date = document.getElementById('sale-date').value || today();
+  const p = products.find(x => x.recordId === rid);
+  const s = stockLines.find(x => x.id === sid);
+  if (!p || !s) return;
+
+  const isMarkdown = !!s.markdownPrice;
+  pendingSale = { productId: rid, stockLineId: sid, qty, price, isMarkdown, date, productName: p.name, brand: p.brand || '', exp: s.exp || '' };
+
+  const currentStockQty = parseInt(s.qty) || 0;
+  if (qty > currentStockQty) {
+    setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available in this stock line (exp: ' + (s.exp || 'no expiry') + '). Stock will go to ' + (currentStockQty - qty) + '. Continue?');
+    openModal('modal-confirm-oversell');
+  } else {
+    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
+    openModal('modal-confirm-sale');
+  }
+}
+
+function doRecordSaleAnyway() {
+  closeModal('modal-confirm-oversell');
+  if (!pendingSale) return;
+  setEl('confirm-sale-msg', 'Proceed with this oversell?');
+  openModal('modal-confirm-sale');
+}
+
+function doRecordSale() {
+  closeModal('modal-confirm-sale');
+  if (!pendingSale) return;
+  recordSaleInternal(pendingSale);
+  pendingSale = null;
+}
+
+function recordSaleInternal(sale) {
+  const s = stockLines.find(x => x.id === sale.stockLineId);
+  const p = products.find(x => x.recordId === sale.productId);
+  if (!s || !p) return;
+
+  const oldQty = parseInt(s.qty) || 0;
+  s.qty = oldQty - sale.qty;
+
+  sales.unshift({
+    id: generateId('SAL'),
+    productId: sale.productId,
+    productName: sale.productName,
+    brand: sale.brand,
+    stockLineId: sale.stockLineId,
+    exp: sale.exp,
+    qtySold: sale.qty,
+    price: sale.price,
+    isMarkdown: sale.isMarkdown,
+    timestamp: new Date().toISOString(),
+    date: sale.date,
+  });
+
+  checkAutoMarkdownReset(sale.stockLineId);
+  checkAutoOutOfStock(sale.productId);
   saveAll();
+
+  // Reset forms
+  if (saleMode === 'manual') {
+    document.getElementById('sale-product-select').value = '';
+    document.getElementById('sale-product-select').dataset.stockLineId = '';
+    document.getElementById('sale-stock-line-picker').style.display = 'none';
+    document.getElementById('sale-qty').value = '1';
+    document.getElementById('sale-price').value = '';
+  } else {
+    // Scan to Sell - clear results
+    document.getElementById('sell-result').style.display = 'none';
+    document.getElementById('sell-entry').style.display = 'none';
+    setEl('sell-scan-status', 'Sale recorded! Tap Start Camera for next.');
+    document.getElementById('sell-scan-status').className = 'scan-status success';
+  }
   renderSalesList();
-  document.getElementById('sale-product-select').value = '';
-  document.getElementById('sale-qty').value = '1';
-  document.getElementById('sale-price').value = '';
-  showToast('Sale recorded!');
+  applyFilters();
+
+  // Show summary
+  const total = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
+  setEl('summary-name', sale.productName);
+  document.getElementById('summary-detail').innerHTML = 'Qty: ' + sale.qty + ' × ₱' + esc(sale.price || '0') + (sale.isMarkdown ? '  <span style="color:#6B3FA0;font-weight:600">[Markdown]</span>' : '') + '<br>Exp: ' + esc(sale.exp || 'no expiry');
+  setEl('summary-total', total ? total + ' total' : '—');
+  openModal('modal-sale-summary');
+  updateCounts();
+}
+
+// SCAN TO SELL
+async function startSellScanner() {
+  try {
+    setEl('sell-scan-status', 'Requesting camera access...');
+    document.getElementById('sell-scan-status').className = 'scan-status';
+    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const allDevices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
+    if (videoDevices.length === 0) throw new Error('No camera found.');
+    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
+    saleScannerReader = new ZXing.BrowserMultiFormatReader();
+    setEl('sell-scan-status', 'Point camera at a barcode...');
+    saleScannerReader.decodeFromVideoDevice(backCam.deviceId, 'sell-preview', (result) => {
+      if (result) onSellBarcodeDetected(result.getText());
+    });
+    document.getElementById('sell-start-btn').style.display = 'none';
+    document.getElementById('sell-stop-btn').style.display = 'block';
+  } catch(e) {
+    setEl('sell-scan-status', 'Camera error: ' + e.message);
+    document.getElementById('sell-scan-status').className = 'scan-status error';
+  }
+}
+
+function stopSellScanner() {
+  if (saleScannerReader) { try { saleScannerReader.reset(); } catch(e) {} saleScannerReader = null; }
+  const sb = document.getElementById('sell-start-btn');
+  const eb = document.getElementById('sell-stop-btn');
+  if (sb) sb.style.display = 'block';
+  if (eb) eb.style.display = 'none';
+}
+
+function onSellBarcodeDetected(raw) {
+  if (!raw || !raw.trim()) return;
+  const code = raw.trim();
+  if (saleScannerReader) { try { saleScannerReader.reset(); } catch(e) {} saleScannerReader = null; }
+  document.getElementById('sell-start-btn').style.display = 'block';
+  document.getElementById('sell-stop-btn').style.display = 'none';
+
+  const p = products.find(x => x.barcode === code);
+  const resultEl = document.getElementById('sell-result');
+  resultEl.style.display = 'block';
+
+  if (!p) {
+    resultEl.innerHTML = '<div class="sell-scan-result not-found">' +
+      '<div class="sell-found-name not-found">Product not found</div>' +
+      '<div class="sell-found-sub">Barcode: ' + esc(code) + '</div>' +
+      '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Scan again</button>' +
+    '</div>';
+    setEl('sell-scan-status', 'Barcode not in inventory');
+    document.getElementById('sell-scan-status').className = 'scan-status error';
+    return;
+  }
+
+  const lines = stockLines.filter(s => s.productId === p.recordId && (parseInt(s.qty) || 0) > 0).sort((a,b) => {
+    if (!a.exp && !b.exp) return 0;
+    if (!a.exp) return 1;
+    if (!b.exp) return -1;
+    return a.exp.localeCompare(b.exp);
+  });
+
+  const ridEsc = esc(p.recordId);
+  let html = '<div class="sell-scan-result">' +
+    '<div class="sell-found-name">✅ ' + esc(p.name) + '</div>' +
+    '<div class="sell-found-sub">' + (p.brand ? esc(p.brand) + ' | ' : '') + 'Total: ' + productTotalQty(p.recordId) + ' ' + esc(p.unit || 'pcs') + '</div>';
+
+  if (lines.length === 0) {
+    html += '<div style="margin-top:10px;font-size:13px;color:var(--red-600)">No stock available</div>' +
+      '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Scan again</button>';
+  } else {
+    html += '<div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--gray-600)">Select which stock line:</div>';
+    lines.forEach(s => {
+      const sidEsc = esc(s.id);
+      const priceUse = s.markdownPrice || p.selling || '';
+      const hasMarkdown = !!s.markdownPrice;
+      html += '<div class="sell-stock-line-pick" id="ssl-' + sidEsc + '" onclick="selectSellStockLine(\'' + sidEsc + '\',\'' + ridEsc + '\')">' +
+        '<div class="sell-stock-line-info">' +
+          '<div class="sell-stock-line-exp">' + (s.exp ? 'Exp: ' + esc(s.exp) : 'No expiry') + '</div>' +
+          '<div class="sell-stock-line-meta">Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
+        '</div>' +
+        '<div class="sell-stock-line-price">' +
+          (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
+          '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Cancel / Wrong Item</button>';
+  }
+
+  html += '</div>';
+  resultEl.innerHTML = html;
+  setEl('sell-scan-status', 'Product found — select stock line');
+  document.getElementById('sell-scan-status').className = 'scan-status success';
+}
+
+function selectSellStockLine(sid, rid) {
+  document.querySelectorAll('#sell-result .sell-stock-line-pick').forEach(el => el.classList.remove('selected'));
+  const picked = document.getElementById('ssl-' + sid);
+  if (picked) picked.classList.add('selected');
+
+  const s = stockLines.find(x => x.id === sid);
+  const p = products.find(x => x.recordId === rid);
+  if (!s || !p) return;
+
+  document.getElementById('sell-result').dataset.stockLineId = sid;
+  document.getElementById('sell-result').dataset.productId = rid;
+
+  document.getElementById('sell-entry').style.display = 'block';
+  document.getElementById('sell-qty').value = '1';
+  document.getElementById('sell-price').value = s.markdownPrice || p.selling || '';
+  document.getElementById('sell-date').value = today();
+}
+
+function confirmSellScan() {
+  const sid = document.getElementById('sell-result').dataset.stockLineId;
+  const rid = document.getElementById('sell-result').dataset.productId;
+  if (!sid || !rid) { showToast('Select a stock line'); return; }
+  const qty = parseInt(document.getElementById('sell-qty').value) || 0;
+  if (qty < 1) { showToast('Qty must be at least 1'); return; }
+  const price = document.getElementById('sell-price').value.trim();
+  const date = document.getElementById('sell-date').value || today();
+  const s = stockLines.find(x => x.id === sid);
+  const p = products.find(x => x.recordId === rid);
+  if (!s || !p) return;
+
+  const isMarkdown = !!s.markdownPrice;
+  pendingSale = { productId: rid, stockLineId: sid, qty, price, isMarkdown, date, productName: p.name, brand: p.brand || '', exp: s.exp || '' };
+
+  const currentStockQty = parseInt(s.qty) || 0;
+  if (qty > currentStockQty) {
+    setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available. Stock will go to ' + (currentStockQty - qty) + '. Continue?');
+    openModal('modal-confirm-oversell');
+  } else {
+    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
+    openModal('modal-confirm-sale');
+  }
+}
+
+function resetSellScan() {
+  document.getElementById('sell-result').style.display = 'none';
+  document.getElementById('sell-entry').style.display = 'none';
+  setEl('sell-scan-status', 'Ready to scan');
+  document.getElementById('sell-scan-status').className = 'scan-status';
 }
 
 // FIX 12: show all sales with a note when over 50
 function renderSalesList() {
   const list = document.getElementById('sales-list');
+  if (!list) return;
   if (sales.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="icon">🧾</div><p>No sales recorded yet.</p></div>';
     return;
@@ -1872,9 +2738,14 @@ function renderSalesList() {
   const shown = sales.slice(0, 50);
   list.innerHTML = shown.map(s => {
     const total = s.price ? '₱' + (parseFloat(s.price) * s.qtySold).toFixed(2) : '';
+    // FIX L4: detect deleted product
+    const productExists = s.productId ? products.some(p => p.recordId === s.productId) : true;
+    const deletedTag = !productExists ? ' <span class="sale-log-deleted-tag">Product Removed</span>' : '';
+    const markdownTag = s.isMarkdown ? ' <span class="sale-log-deleted-tag" style="background:#F3EEFB;color:#6B3FA0">Markdown</span>' : '';
     return '<div class="sale-log-item">' +
-      '<div class="sale-log-name">' + esc(s.productName) + (s.brand ? ' <span style="font-weight:400;color:var(--gray-400)">(' + esc(s.brand) + ')</span>' : '') + '</div>' +
+      '<div class="sale-log-name">' + esc(s.productName) + (s.brand ? ' <span style="font-weight:400;color:var(--gray-400)">(' + esc(s.brand) + ')</span>' : '') + deletedTag + markdownTag + '</div>' +
       '<div class="sale-log-meta">Qty: ' + s.qtySold + (s.price ? '  |  ₱' + esc(s.price) + ' each' : '') + '  |  ' + esc(s.date) + '</div>' +
+      (s.exp ? '<div class="sale-stock-info">Stock line: exp ' + esc(s.exp) + '</div>' : '') +
       (total ? '<div class="sale-log-price">' + total + ' total</div>' : '') +
     '</div>';
   }).join('') + (sales.length > 50 ? '<div class="sales-note">Showing 50 most recent. Export CSV to see all ' + sales.length + ' sales.</div>' : '');
@@ -1888,27 +2759,27 @@ function exportCSV() {
 
   let csv = '';
 
-  // Products + stock sheet
+  // Products + stock sheet (STAGE 2: includes markdownPrice column)
   if (products.length > 0) {
-    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added'];
+    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price'];
     const prodRows = [];
     products.forEach(p => {
       const lines = stockLines.filter(s => s.productId === p.recordId);
       if (lines.length === 0) {
-        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','',''].map(csvCell));
+        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','',''].map(csvCell));
       } else {
         lines.forEach(s => {
-          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded].map(csvCell));
+          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||''].map(csvCell));
         });
       }
     });
     csv += '## INVENTORY\n' + prodHeaders.join(',') + '\n' + prodRows.map(r => r.join(',')).join('\n');
   }
 
-  // Sales sheet
+  // Sales sheet (STAGE 2: includes productId, stockLineId, exp, isMarkdown)
   if (sales.length > 0) {
-    const salesHeaders = ['Sale ID','Product Name','Brand','Qty Sold','Price','Date'];
-    const salesRows = sales.map(s => [s.id, s.productName, s.brand, s.qtySold, s.price, s.date].map(csvCell));
+    const salesHeaders = ['Sale ID','Product ID','Product Name','Brand','Stock Line ID','Expiry','Qty Sold','Price','Is Markdown','Date','Timestamp'];
+    const salesRows = sales.map(s => [s.id, s.productId||'', s.productName, s.brand, s.stockLineId||'', s.exp||'', s.qtySold, s.price, s.isMarkdown?'yes':'', s.date, s.timestamp||''].map(csvCell));
     csv += '\n\n## SALES\n' + salesHeaders.join(',') + '\n' + salesRows.map(r => r.join(',')).join('\n');
   }
 
@@ -1919,6 +2790,8 @@ function exportCSV() {
   a.download = 'cosmetics_inventory_' + today() + '.csv';
   a.click();
   URL.revokeObjectURL(url);
+  try { localStorage.setItem('ci_last_backup', new Date().toISOString()); } catch(e) {}
+  updateBackupDisplay();
   showToast('CSV downloaded!');
 }
 
@@ -1928,9 +2801,26 @@ function csvCell(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }
 function importCSV(input) {
   const file = input.files[0];
   if (!file) return;
+  // FIX Issue 16: Specific error messages
+  if (file.size === 0) {
+    showImportResult('File is empty.', 'error');
+    input.value = '';
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showImportResult('File too large (over 10MB). This may not be a valid CSV.', 'error');
+    input.value = '';
+    return;
+  }
   const reader = new FileReader();
+  reader.onerror = function() {
+    showImportResult('Could not read the file. Try again.', 'error');
+    input.value = '';
+  };
   reader.onload = function(e) {
     const text = e.target.result;
+    if (!text || text.length < 10) { showImportResult('File appears empty or corrupted.', 'error'); input.value = ''; return; }
+    if (!text.includes(',')) { showImportResult('This does not appear to be a valid CSV file (no commas found).', 'error'); input.value = ''; return; }
 
     // Split into sections if ## headers present
     const inventorySection = extractSection(text, 'INVENTORY');
@@ -1940,45 +2830,67 @@ function importCSV(input) {
 
     // Import inventory
     const invLines = (inventorySection || text).split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
-    if (invLines.length >= 2) {
-      const header = invLines[0].toLowerCase();
-      const isNewFormat = header.includes('stock id');
-      invLines.slice(1).forEach(line => {
-        const c = parseCSVLine(line);
-        if (isNewFormat) {
-          const rid = (c[0] || '').trim();
-          if (!rid) { skipped++; return; }
-          if (!products.find(p => p.recordId === rid)) {
-            products.push({ recordId:rid, barcode:c[1]||'', name:c[2]||'', brand:c[3]||'', category:c[4]||'', desc:c[5]||'', notes:c[6]||'', cost:c[7]||'', selling:c[8]||'', status:c[9]||'active', unit:c[10]||'pcs', location:c[11]||'', dateAdded:c[12]||'' });
-            addedProducts++;
-          }
-          const sid = (c[13] || '').trim();
-          if (sid && !stockLines.find(s => s.id === sid)) {
-            stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'' });
-            addedStocks++;
-          }
-        } else {
-          // FIX 3 (legacy import): corrected column mapping
-          // Old format: Barcode,Name,Brand,Category,Description,Quantity,Unit,Expiration Date,Date Added,Storage Location,Batch/Lot Number
-          const barcode = (c[0] || '').trim();
-          if (!barcode) { skipped++; return; }
-          const rid = generateId('REC');
-          products.push({ recordId:rid, barcode, name:c[1]||'', brand:c[2]||'', category:c[3]||'', desc:c[4]||'', notes:'', cost:'', selling:'', status:'active', unit:c[6]||'pcs', location:c[9]||'', dateAdded:c[8]||'' });
-          stockLines.push({ id:generateId('STK'), productId:rid, exp:c[7]||'', qty:parseInt(c[5])||1, dateAdded:c[8]||'' });
-          addedProducts++;
-        }
-      });
+    if (invLines.length < 2) {
+      showImportResult('Inventory section has no data rows.', 'error');
+      input.value = '';
+      return;
+    }
+    const header = invLines[0].toLowerCase();
+    const isNewFormat = header.includes('stock id');
+
+    if (!header.includes('barcode') && !header.includes('record id')) {
+      showImportResult('Header row does not match expected format. Make sure this is an exported CSV from this app.', 'error');
+      input.value = '';
+      return;
     }
 
-    // Import sales
+    invLines.slice(1).forEach(line => {
+      const c = parseCSVLine(line);
+      if (isNewFormat) {
+        const rid = (c[0] || '').trim();
+        if (!rid) { skipped++; return; }
+        if (!products.find(p => p.recordId === rid)) {
+          products.push({ recordId:rid, barcode:c[1]||'', name:c[2]||'', brand:c[3]||'', category:c[4]||'', desc:c[5]||'', notes:c[6]||'', cost:c[7]||'', selling:c[8]||'', status:c[9]||'active', unit:c[10]||'pcs', location:c[11]||'', dateAdded:c[12]||'' });
+          addedProducts++;
+        }
+        const sid = (c[13] || '').trim();
+        if (sid && !stockLines.find(s => s.id === sid)) {
+          // STAGE 2: c[17] is markdownPrice (new column)
+          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'' });
+          addedStocks++;
+        }
+      } else {
+        const barcode = (c[0] || '').trim();
+        if (!barcode) { skipped++; return; }
+        const rid = generateId('REC');
+        products.push({ recordId:rid, barcode, name:c[1]||'', brand:c[2]||'', category:c[3]||'', desc:c[4]||'', notes:'', cost:'', selling:'', status:'active', unit:c[6]||'pcs', location:c[9]||'', dateAdded:c[8]||'' });
+        stockLines.push({ id:generateId('STK'), productId:rid, exp:c[7]||'', qty:parseInt(c[5])||1, dateAdded:c[8]||'', markdownPrice:'' });
+        addedProducts++;
+      }
+    });
+
+    // Import sales — auto-detect format by column count
     if (salesSection) {
       const sLines = salesSection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
       if (sLines.length >= 2) {
+        const salesHeader = sLines[0].toLowerCase();
+        const newSaleFormat = salesHeader.includes('product id') || salesHeader.includes('stock line id');
         sLines.slice(1).forEach(line => {
           const c = parseCSVLine(line);
           const sid = (c[0] || '').trim();
           if (!sid || sales.find(s => s.id === sid)) return;
-          sales.push({ id:sid, productName:c[1]||'', brand:c[2]||'', qtySold:parseInt(c[3])||1, price:c[4]||'', date:c[5]||'' });
+          if (newSaleFormat) {
+            // New: Sale ID, Product ID, Product Name, Brand, Stock Line ID, Expiry, Qty, Price, Is Markdown, Date, Timestamp
+            sales.push({
+              id:sid, productId:c[1]||'', productName:c[2]||'', brand:c[3]||'',
+              stockLineId:c[4]||'', exp:c[5]||'', qtySold:parseInt(c[6])||1,
+              price:c[7]||'', isMarkdown:(c[8]||'').toLowerCase()==='yes',
+              date:c[9]||'', timestamp:c[10]||''
+            });
+          } else {
+            // Old: Sale ID, Product Name, Brand, Qty, Price, Date
+            sales.push({ id:sid, productName:c[1]||'', brand:c[2]||'', qtySold:parseInt(c[3])||1, price:c[4]||'', date:c[5]||'' });
+          }
           addedSales++;
         });
       }
@@ -1990,11 +2902,16 @@ function importCSV(input) {
     if (addedStocks) msg += ', ' + addedStocks + ' stock entries';
     if (addedSales) msg += ', ' + addedSales + ' sale(s)';
     msg += ' imported';
-    if (skipped) msg += ', ' + skipped + ' skipped.';
+    if (skipped) msg += ', ' + skipped + ' skipped (duplicate or missing ID)';
+    msg += '.';
     showImportResult(msg, (addedProducts + addedSales) > 0 ? 'success' : 'info');
     updateCounts();
+    applyFilters();
   };
-  reader.readAsText(file);
+  try { reader.readAsText(file); } catch(e) {
+    showImportResult('Failed to read file: ' + e.message, 'error');
+    input.value = '';
+  }
 }
 
 function extractSection(text, sectionName) {
@@ -2040,6 +2957,9 @@ function doClearAll() {
 // ─────────────────────────────────────────
 updateCounts();
 initWhatsNew();
+updateBackupDisplay();
+updateStorageMeter();
+applyFilters();
 </script>
 </body>
 </html>
