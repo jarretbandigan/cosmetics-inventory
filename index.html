@@ -637,6 +637,65 @@ input[type="file"] { display: none; }
 }
 
 .sale-stock-info { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+/* ── STAGE 3: ACTIVITY LOG + REPORTS ── */
+.report-section-tabs {
+  display: flex; gap: 6px; margin-bottom: 14px;
+  overflow-x: auto; padding-bottom: 2px;
+}
+.report-section-tab {
+  padding: 8px 14px; border: 1px solid var(--gray-100); background: #fff;
+  border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--gray-600);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit;
+}
+.report-section-tab.active { background: var(--pink-600); color: #fff; border-color: var(--pink-600); }
+
+.activity-toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
+.activity-toolbar .search-wrap { flex: 2; }
+.activity-toolbar .sort-select { flex: 1; }
+
+.activity-filter-chips {
+  display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px;
+}
+
+.activity-item {
+  background: #fff; border-radius: 12px; border: 1px solid var(--gray-100);
+  padding: 12px 14px; margin-bottom: 8px;
+}
+.activity-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.activity-type-badge {
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0;
+}
+.activity-type-add { background: var(--teal-50); color: #0A5A45; }
+.activity-type-update { background: var(--blue-50); color: #115789; }
+.activity-type-sale { background: var(--pink-50); color: var(--pink-800); }
+.activity-type-markdown { background: #F3EEFB; color: #553080; }
+.activity-type-markdown-removed { background: var(--gray-100); color: var(--gray-700); }
+.activity-type-pulled { background: var(--red-50); color: #842323; }
+.activity-type-status { background: var(--amber-50); color: #704600; }
+.activity-type-delivery { background: var(--teal-50); color: #0A5A45; }
+.activity-type-transfer { background: var(--blue-50); color: #115789; }
+.activity-type-damaged { background: var(--red-50); color: #842323; }
+.activity-type-note { background: var(--gray-100); color: var(--gray-700); }
+.activity-type-other { background: var(--gray-100); color: var(--gray-700); }
+.activity-type-removed { background: var(--red-50); color: #842323; }
+.activity-type-edit { background: var(--amber-50); color: #704600; }
+.activity-type-check { background: var(--blue-50); color: #115789; }
+.activity-type-discrepancy { background: var(--red-50); color: #842323; }
+
+.activity-desc { font-size: 13px; color: var(--gray-800); margin-top: 6px; line-height: 1.5; }
+.activity-product { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+.activity-date { font-size: 11px; color: var(--gray-400); }
+.activity-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+
+.home-stats-3 {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; padding: 8px 16px 0;
+}
+.home-stat .num.small { font-size: 15px; }
+.home-stat.teal .num { color: var(--teal-600); }
+.home-stat.blue .num { color: var(--blue-600); }
 </style>
 </head>
 <body>
@@ -647,7 +706,7 @@ input[type="file"] { display: none; }
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.3.0</div>
+    <div class="home-version">v2.4.0</div>
   </div>
 
   <div class="mode-selector">
@@ -668,13 +727,24 @@ input[type="file"] { display: none; }
       <div class="num" id="home-active">0</div>
       <div class="lbl">Active Products</div>
     </div>
-    <div class="home-stat">
-      <div class="num" id="home-total">0</div>
-      <div class="lbl">Total Units</div>
-    </div>
     <div class="home-stat warn">
       <div class="num" id="home-expiring">0</div>
-      <div class="lbl">Expiring Soon</div>
+      <div class="lbl">Expiring in 30d</div>
+    </div>
+  </div>
+
+  <div class="home-stats-3">
+    <div class="home-stat">
+      <div class="num small" id="home-total">0</div>
+      <div class="lbl">Total Units</div>
+    </div>
+    <div class="home-stat teal">
+      <div class="num small" id="home-cost-value">₱0</div>
+      <div class="lbl">Cost Value</div>
+    </div>
+    <div class="home-stat blue">
+      <div class="num small" id="home-selling-value">₱0</div>
+      <div class="lbl">Selling Value</div>
     </div>
   </div>
 
@@ -691,11 +761,16 @@ input[type="file"] { display: none; }
     </button>
     <button class="home-action-btn" onclick="goToApp('sales')">
       <span class="icon">🧾</span>
-      <div><div class="label">Sales Log</div><div class="desc">Record and view sales</div></div>
+      <div><div class="label">Sales</div><div class="desc">Record sales by scan or manual</div></div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="home-action-btn" onclick="goToApp('reports')">
+      <span class="icon">📊</span>
+      <div><div class="label">Reports</div><div class="desc">Sales log, activity log, history</div></div>
       <span class="arrow">›</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('export')">
-      <span class="icon">📊</span>
+      <span class="icon">💾</span>
       <div><div class="label">Data and Export</div><div class="desc">Backup, restore, version history</div></div>
       <span class="arrow">›</span>
     </button>
@@ -888,9 +963,42 @@ input[type="file"] { display: none; }
         <button class="btn btn-primary" onclick="confirmLogSale()">Record Sale</button>
       </div>
     </div>
+  </div>
 
-    <div style="margin-top:18px">
-      <h3 style="font-size:13px;color:var(--gray-600);margin-bottom:10px;font-weight:600">Recent Sales</h3>
+  <!-- REPORTS TAB (STAGE 3) -->
+  <div class="section" id="tab-reports">
+    <div class="report-section-tabs">
+      <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">📋 Activity</button>
+      <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">🧾 Sales</button>
+    </div>
+
+    <!-- Activity Log -->
+    <div id="report-activity">
+      <div class="activity-toolbar">
+        <div class="search-wrap">
+          <input type="search" class="search-bar" id="activity-search" placeholder="Search activity..." oninput="renderActivityLog()">
+        </div>
+        <select class="sort-select" id="activity-date-filter" onchange="renderActivityLog()">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+      <div class="activity-filter-chips" id="activity-type-filter">
+        <button class="filter-chip active" onclick="setActivityTypeFilter('all',this)">All</button>
+        <button class="filter-chip" onclick="setActivityTypeFilter('sale',this)">Sales</button>
+        <button class="filter-chip" onclick="setActivityTypeFilter('add',this)">Added</button>
+        <button class="filter-chip" onclick="setActivityTypeFilter('update',this)">Updates</button>
+        <button class="filter-chip" onclick="setActivityTypeFilter('markdown',this)">Markdown</button>
+        <button class="filter-chip" onclick="setActivityTypeFilter('manual',this)">Manual</button>
+      </div>
+      <button class="btn btn-secondary" onclick="openManualLogModal()" style="margin-bottom:12px">+ Add Manual Log Entry</button>
+      <div id="activity-list"></div>
+    </div>
+
+    <!-- Sales Log -->
+    <div id="report-sales" style="display:none">
       <div id="sales-list"></div>
     </div>
   </div>
@@ -917,6 +1025,25 @@ input[type="file"] { display: none; }
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.4.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>New Reports tab consolidates Activity Log and Sales Log</li>
+            <li>Activity Log auto-captures every action: adds, updates, sales, markdowns, deletes, edits, status changes</li>
+            <li>Add Manual Log Entry for deliveries, transfers, damaged goods, notes</li>
+            <li>Activity Log search and date filter (Today/Week/Month)</li>
+            <li>Activity type filter chips (Sales, Added, Updates, Markdown, Manual)</li>
+            <li>Edit and delete activity log entries</li>
+            <li>Undo button on activity log deletion</li>
+            <li>Home screen now shows Cost Value and Selling Value of inventory</li>
+            <li>Home stats reorganized: 2 main + 3 value cards</li>
+            <li>Bottom nav restructured: Scan / Inventory / Sales / Reports / Data</li>
+            <li>Activity log included in CSV export and import</li>
+            <li>Activity log capped at 5000 entries (oldest removed)</li>
+            <li>Recent Sales moved from Sales tab to Reports tab</li>
+          </ul>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.3.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -1013,7 +1140,8 @@ input[type="file"] { display: none; }
     <button class="bnav-btn active" id="bnav-scan" onclick="switchTab('scan',this)"><span class="bnav-icon">📷</span>Scan</button>
     <button class="bnav-btn" id="bnav-inventory" onclick="switchTab('inventory',this)"><span class="bnav-icon">📦</span>Inventory</button>
     <button class="bnav-btn" id="bnav-sales" onclick="switchTab('sales',this)"><span class="bnav-icon">🧾</span>Sales</button>
-    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">📊</span>Data</button>
+    <button class="bnav-btn" id="bnav-reports" onclick="switchTab('reports',this)"><span class="bnav-icon">📊</span>Reports</button>
+    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">💾</span>Data</button>
   </div>
 </div>
 
@@ -1027,14 +1155,13 @@ input[type="file"] { display: none; }
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.3.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Scan to Sell mode for cashier-style sales recording.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Sales now automatically deduct from the correct stock line by expiry.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">New "On Sale" badge for items with price markdown.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Mark Down Price directly from the expiry popup (per stock line).</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Oversell warning protects against accidental stock errors.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Sale confirmation summary shows total after each sale.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Filter inventory by On Sale status.</div></div>
+      <div class="whats-new-version">Version 2.4.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">New Reports tab with Activity Log and Sales Log together.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Activity Log auto-records everything you do for full traceability.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Add manual log entries for deliveries, transfers, damaged goods.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Search and filter the activity log by type or date.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home screen shows Cost Value and Selling Value at a glance.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Activity Log included in CSV backup for permanent record.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
@@ -1203,6 +1330,92 @@ input[type="file"] { display: none; }
   </div></div>
 </div>
 
+<!-- STAGE 3: Activity Log modals -->
+<div class="modal-backdrop" id="modal-manual-log">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-header"><h3>Add Manual Log Entry</h3><button class="modal-close" onclick="closeModal('modal-manual-log')">✕</button></div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Type</label>
+        <select id="manual-log-type">
+          <option value="delivery">Delivery Received</option>
+          <option value="transfer">Store Transfer</option>
+          <option value="damaged">Damaged Goods</option>
+          <option value="note">General Note</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Product (optional)</label>
+        <select id="manual-log-product"><option value="">-- None --</option></select>
+      </div>
+      <div class="field">
+        <label>Description *</label>
+        <textarea id="manual-log-desc" placeholder="Describe what happened..."></textarea>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="manual-log-date"></div>
+      <button class="btn btn-primary" onclick="confirmManualLog()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-confirm-manual-log">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">📝</div>
+    <div class="confirm-title">Save Log Entry?</div>
+    <div class="confirm-msg">Add this manual entry to the activity log?</div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-manual-log')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSaveManualLog()">Save</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-backdrop" id="modal-edit-activity">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-header"><h3>Edit Activity Entry</h3><button class="modal-close" onclick="closeModal('modal-edit-activity')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-activity-id">
+      <div class="field">
+        <label>Type</label>
+        <select id="edit-activity-type">
+          <option value="add">Item Added</option>
+          <option value="update">Stock Updated</option>
+          <option value="sale">Sale Recorded</option>
+          <option value="markdown">Price Markdown</option>
+          <option value="markdown-removed">Markdown Removed</option>
+          <option value="pulled">Item Pulled Out</option>
+          <option value="status">Status Changed</option>
+          <option value="delivery">Delivery Received</option>
+          <option value="transfer">Store Transfer</option>
+          <option value="damaged">Damaged Goods</option>
+          <option value="note">General Note</option>
+          <option value="other">Other</option>
+          <option value="removed">Item Removed</option>
+          <option value="edit">Item Edited</option>
+        </select>
+      </div>
+      <div class="field"><label>Description</label><textarea id="edit-activity-desc"></textarea></div>
+      <div class="field"><label>Product Reference (optional)</label><input type="text" id="edit-activity-product" placeholder="Product name"></div>
+      <div class="field"><label>Date</label><input type="date" id="edit-activity-date"></div>
+      <button class="btn btn-primary" onclick="doEditActivity()" style="margin-bottom:8px">Save Changes</button>
+      <button class="btn btn-danger-outline" onclick="confirmDeleteActivity()">Delete This Entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-confirm-delete-activity">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Delete Log Entry?</div>
+    <div class="confirm-msg">Permanently delete this activity log entry?</div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm-delete-activity')">Cancel</button>
+      <button class="btn btn-danger-outline" onclick="doDeleteActivity()">Delete</button>
+    </div>
+  </div></div>
+</div>
+
 <div class="modal-backdrop" id="modal-edit-product">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -1316,7 +1529,7 @@ input[type="file"] { display: none; }
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.4.0';
 
 function generateId(prefix) {
   return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -1365,7 +1578,7 @@ function showUndoToast(msg, undoFn) {
 function getStorageInfo() {
   let totalSize = 0;
   try {
-    ['ci_products','ci_stocks','ci_sales','cosmetics_inv'].forEach(k => {
+    ['ci_products','ci_stocks','ci_sales','ci_activity','cosmetics_inv'].forEach(k => {
       const v = localStorage.getItem(k);
       if (v) totalSize += v.length;
     });
@@ -1409,10 +1622,13 @@ function closeModal(id) { document.getElementById(id).classList.remove('active')
 let products = [];
 let stockLines = [];
 let sales = [];
+// STAGE 3: Activity log
+let activityLog = [];
 
 try { products = JSON.parse(localStorage.getItem('ci_products') || '[]'); } catch(e) {}
 try { stockLines = JSON.parse(localStorage.getItem('ci_stocks') || '[]'); } catch(e) {}
 try { sales = JSON.parse(localStorage.getItem('ci_sales') || '[]'); } catch(e) {}
+try { activityLog = JSON.parse(localStorage.getItem('ci_activity') || '[]'); } catch(e) {}
 
 // FIX 2: Migration now runs AFTER utility functions are defined
 const oldData = localStorage.getItem('cosmetics_inv');
@@ -1479,6 +1695,53 @@ let saleMode = 'scan';
 let saleScannerReader = null;
 let pendingSale = null;
 let pendingMarkdown = null;
+// STAGE 3: Activity log + reports state
+let activeReportSection = 'activity';
+let activityTypeFilter = 'all';
+let editingActivityId = null;
+let deletingActivityId = null;
+let pendingManualLog = null;
+
+// STAGE 3: Log activity helper (used by all actions)
+function logActivity(type, productId, productName, description) {
+  activityLog.unshift({
+    id: generateId('ACT'),
+    type: type,
+    productId: productId || '',
+    productName: productName || '',
+    description: description,
+    timestamp: new Date().toISOString(),
+    date: today(),
+  });
+  // Cap at 5000 entries to prevent storage bloat
+  if (activityLog.length > 5000) activityLog = activityLog.slice(0, 5000);
+}
+
+// STAGE 3: Calculate inventory values for home stats
+function calcInventoryValue() {
+  let cost = 0, sell = 0;
+  products.forEach(p => {
+    if (p.status === 'pulled') return;
+    const lines = stockLines.filter(s => s.productId === p.recordId);
+    lines.forEach(s => {
+      const qty = parseInt(s.qty) || 0;
+      if (qty <= 0) return;
+      const costPrice = parseFloat(p.cost) || 0;
+      const sellPrice = parseFloat(s.markdownPrice || p.selling) || 0;
+      cost += qty * costPrice;
+      sell += qty * sellPrice;
+    });
+  });
+  return { cost, sell };
+}
+
+function formatMoney(n) {
+  if (!n) return '₱0';
+  if (n >= 1000000) return '₱' + (n/1000000).toFixed(1) + 'M';
+  if (n >= 10000) return '₱' + (n/1000).toFixed(0) + 'K';
+  if (n >= 1000) return '₱' + n.toLocaleString(undefined, {maximumFractionDigits:0});
+  return '₱' + n.toFixed(n % 1 === 0 ? 0 : 2);
+}
 
 // FIX Issue 4: Auto out of stock when qty hits zero
 function checkAutoOutOfStock(productId) {
@@ -1521,10 +1784,12 @@ function saveAll() {
   if (!Array.isArray(products)) products = [];
   if (!Array.isArray(stockLines)) stockLines = [];
   if (!Array.isArray(sales)) sales = [];
+  if (!Array.isArray(activityLog)) activityLog = [];
   let storageError = false;
   try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) { storageError = true; }
   try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) { storageError = true; }
   try { localStorage.setItem('ci_sales', JSON.stringify(sales)); } catch(e) { storageError = true; }
+  try { localStorage.setItem('ci_activity', JSON.stringify(activityLog)); } catch(e) { storageError = true; }
   if (storageError) {
     showToast('⚠️ Storage error! Export backup now.');
   }
@@ -1544,18 +1809,23 @@ function updateCounts() {
   const now = new Date(); now.setHours(0,0,0,0);
   const in30 = new Date(now.getTime() + 30 * 86400000);
   const expiring = stockLines.filter(s => {
-    if (!s.exp) return false;
+    if (!s.exp || (parseInt(s.qty) || 0) <= 0) return false;
     const d = new Date(s.exp);
     return d >= now && d <= in30;
   }).length;
 
-  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setEl('home-active', activeProds);
-  setEl('home-total', totalUnits);
-  setEl('home-expiring', expiring);
-  setEl('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
-  setEl('stat-expiring', expiring);
-  setEl('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
+  const setElVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setElVal('home-active', activeProds);
+  setElVal('home-total', totalUnits);
+  setElVal('home-expiring', expiring);
+  setElVal('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
+  setElVal('stat-expiring', expiring);
+  setElVal('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
+
+  // STAGE 3: Cost and selling value
+  const val = calcInventoryValue();
+  setElVal('home-cost-value', formatMoney(val.cost));
+  setElVal('home-selling-value', formatMoney(val.sell));
 }
 
 // ─────────────────────────────────────────
@@ -1585,17 +1855,17 @@ function switchTab(name, el) {
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (el) el.classList.add('active');
-  const titles = { scan:'Scan Item', inventory:'Inventory', sales:'Sales', export:'Data and Export' };
+  const titles = { scan:'Scan Item', inventory:'Inventory', sales:'Sales', reports:'Reports', export:'Data and Export' };
   document.getElementById('app-header-title').textContent = titles[name] || name;
   if (name === 'inventory') applyFilters();
   if (name === 'sales') {
-    renderSalesList();
     populateSaleProductSelect();
     const dateEl = document.getElementById('sale-date');
     if (dateEl) dateEl.value = today();
     const sellDateEl = document.getElementById('sell-date');
     if (sellDateEl) sellDateEl.value = today();
   }
+  if (name === 'reports') renderReports();
 }
 
 // ─────────────────────────────────────────
@@ -1760,7 +2030,9 @@ function confirmAddToExisting() {
 
   const existingLine = stockLines.find(s => s.productId === existingBarcodeProductId && s.exp === exp);
   if (existingLine) {
-    existingLine.qty = (parseInt(existingLine.qty) || 0) + qtyToAdd;
+    const oldQty = parseInt(existingLine.qty) || 0;
+    existingLine.qty = oldQty + qtyToAdd;
+    logActivity('update', product.recordId, product.name, 'Stock added: +' + qtyToAdd + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qtyToAdd + ' unit(s) added to existing stock entry.');
   } else {
     stockLines.push({
@@ -1770,6 +2042,7 @@ function confirmAddToExisting() {
       qty: qtyToAdd,
       dateAdded: today(),
     });
+    logActivity('add', product.recordId, product.name, 'New stock entry: ' + qtyToAdd + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added' + (exp ? ' for exp: ' + exp : '') + '.');
   }
 
@@ -1843,6 +2116,7 @@ function doSaveProduct() {
   });
 
   checkAutoOutOfStock(recordId);
+  logActivity('add', recordId, document.getElementById('f-name').value.trim(), 'New product added: ' + document.getElementById('f-name').value.trim() + ', initial qty: ' + qty + (document.getElementById('f-exp').value ? ', exp: ' + document.getElementById('f-exp').value : ''));
   saveAll();
   cancelForm();
   showToast('Product saved!');
@@ -2074,6 +2348,8 @@ function cancelStockQty(sid) {
 function saveStockQty(sid, rid) {
   const stock = stockLines.find(s => s.id === sid);
   if (!stock) return;
+  const product = products.find(p => p.recordId === rid);
+  const oldQty = parseInt(stock.qty) || 0;
   const newQty = parseInt(document.getElementById('qv-' + sid).textContent) || 0;
   stock.qty = newQty;
   const slEl = document.getElementById('sl-' + sid);
@@ -2081,6 +2357,8 @@ function saveStockQty(sid, rid) {
   document.getElementById('ssr-' + sid).classList.remove('visible');
   document.getElementById('sw-' + sid).textContent = 'was ' + newQty;
   openDetailsPanelId = rid;
+  if (product) logActivity('update', rid, product.name, 'Qty manually adjusted (exp: ' + (stock.exp || 'no expiry') + '): ' + oldQty + ' → ' + newQty);
+  checkAutoMarkdownReset(sid);
   checkAutoOutOfStock(rid);
   saveAll();
   showToast('Quantity updated!');
@@ -2111,9 +2389,18 @@ function confirmEditStock() {
 function doEditStock() {
   const s = stockLines.find(x => x.id === editingStockId);
   if (!s) return;
+  const product = products.find(p => p.recordId === s.productId);
+  const oldExp = s.exp, oldQty = s.qty;
   s.exp = document.getElementById('edit-stock-exp').value;
   s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
+  if (product) {
+    const changes = [];
+    if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' → ' + (s.exp || 'none'));
+    if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' → ' + s.qty);
+    if (changes.length) logActivity('edit', product.recordId, product.name, 'Stock entry edited: ' + changes.join(', '));
+  }
   openDetailsPanelId = s.productId;
+  checkAutoMarkdownReset(s.id);
   checkAutoOutOfStock(s.productId);
   saveAll();
   closeModal('modal-confirm-edit-stock');
@@ -2128,13 +2415,16 @@ function doRemoveStock() {
   if (!backup) { closeModal('modal-confirm-remove-stock'); return; }
   const stockBackup = JSON.parse(JSON.stringify(backup));
   const rid = backup.productId;
+  const product = products.find(p => p.recordId === rid);
   stockLines = stockLines.filter(s => s.id !== removingStockId);
+  if (product) logActivity('removed', rid, product.name, 'Stock entry removed (exp: ' + (stockBackup.exp || 'no expiry') + ', qty was: ' + stockBackup.qty + ')');
   checkAutoOutOfStock(rid);
   saveAll();
   closeModal('modal-confirm-remove-stock');
   applyFilters();
   showUndoToast('Stock entry removed', () => {
     stockLines.push(stockBackup);
+    if (product) logActivity('edit', rid, product.name, 'Stock entry restore (undo)');
     checkAutoOutOfStock(rid);
     saveAll();
     applyFilters();
@@ -2170,6 +2460,7 @@ function confirmEditProduct() {
 function doEditProduct() {
   const p = products.find(x => x.recordId === editingProductId);
   if (!p) return;
+  const oldStatus = p.status;
   p.name = document.getElementById('edit-name').value.trim();
   p.brand = document.getElementById('edit-brand').value.trim();
   p.category = document.getElementById('edit-category').value;
@@ -2179,6 +2470,7 @@ function doEditProduct() {
   p.selling = document.getElementById('edit-selling').value.trim();
   p.status = document.getElementById('edit-status').value;
   openDetailsPanelId = editingProductId;
+  logActivity('edit', p.recordId, p.name, 'Product edited' + (oldStatus !== p.status ? ' (status: ' + oldStatus + ' → ' + p.status + ')' : ''));
   saveAll();
   closeModal('modal-confirm-edit');
   closeModal('modal-edit-product');
@@ -2203,12 +2495,14 @@ function doDeleteProduct() {
   products = products.filter(x => x.recordId !== deletingProductId);
   stockLines = stockLines.filter(s => s.productId !== deletingProductId);
   if (openDetailsPanelId === deletingProductId) openDetailsPanelId = null;
+  logActivity('removed', productBackup.recordId, productBackup.name, 'Product deleted: ' + productBackup.name);
   saveAll();
   closeModal('modal-confirm-delete');
   applyFilters();
   showUndoToast('Product deleted', () => {
     products.push(productBackup);
     stockBackup.forEach(s => stockLines.push(s));
+    logActivity('add', productBackup.recordId, productBackup.name, 'Product delete undone');
     saveAll();
     applyFilters();
     showToast('Restored!');
@@ -2236,13 +2530,17 @@ function doAddStock() {
   const exp = document.getElementById('add-stock-exp').value;
   const qty = parseInt(document.getElementById('add-stock-qty').value) || 0;
   if (qty < 1) { showToast('Please enter a quantity of at least 1'); return; }
+  const p = products.find(x => x.recordId === rid);
 
   const existingLine = stockLines.find(s => s.productId === rid && s.exp === exp);
   if (existingLine) {
-    existingLine.qty = (parseInt(existingLine.qty) || 0) + qty;
+    const oldQty = parseInt(existingLine.qty) || 0;
+    existingLine.qty = oldQty + qty;
+    if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qty + ' unit(s) added to existing stock entry.');
   } else {
     stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today() });
+    if (p) logActivity('add', rid, p.name, 'New stock entry: ' + qty + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added.');
   }
 
@@ -2346,7 +2644,13 @@ function doApplyMarkdown() {
   if (!pendingMarkdown) return;
   const s = stockLines.find(x => x.id === pendingMarkdown.sid);
   if (!s) return;
+  const p = products.find(x => x.recordId === s.productId);
+  const oldPrice = s.markdownPrice;
   s.markdownPrice = pendingMarkdown.price;
+  if (p) {
+    const verb = oldPrice ? 'updated from ₱' + oldPrice + ' to' : 'set to';
+    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' ₱' + pendingMarkdown.price + ' (exp: ' + (s.exp || 'no expiry') + ')');
+  }
   saveAll();
   closeModal('modal-confirm-markdown');
   pendingMarkdown = null;
@@ -2359,7 +2663,10 @@ function doApplyMarkdown() {
 function removeMarkdown(sid) {
   const s = stockLines.find(x => x.id === sid);
   if (!s) return;
+  const p = products.find(x => x.recordId === s.productId);
+  const old = s.markdownPrice;
   s.markdownPrice = '';
+  if (p) logActivity('markdown-removed', p.recordId, p.name, 'Markdown removed (was ₱' + old + ', exp: ' + (s.exp || 'no expiry') + ')');
   saveAll();
   renderExpList();
   applyFilters();
@@ -2370,7 +2677,9 @@ function removeMarkdown(sid) {
 function pullOutFromExp(rid) {
   const p = products.find(x => x.recordId === rid);
   if (!p) return;
+  const old = p.status;
   p.status = 'pulled';
+  logActivity('pulled', rid, p.name, p.name + ' marked as Pulled Out (was ' + old + ')');
   saveAll();
   renderExpList();
   applyFilters();
@@ -2388,7 +2697,9 @@ function doRemoveStockFromExp() {
   if (!backup) { closeModal('modal-confirm-remove-exp'); return; }
   const stockBackup = JSON.parse(JSON.stringify(backup));
   const rid = backup.productId;
+  const product = products.find(p => p.recordId === rid);
   stockLines = stockLines.filter(s => s.id !== removingExpStockId);
+  if (product) logActivity('removed', rid, product.name, 'Stock entry removed from expiry list (exp: ' + (stockBackup.exp || 'no expiry') + ', qty: ' + stockBackup.qty + ')');
   checkAutoOutOfStock(rid);
   saveAll();
   closeModal('modal-confirm-remove-exp');
@@ -2396,6 +2707,7 @@ function doRemoveStockFromExp() {
   applyFilters();
   showUndoToast('Stock entry removed', () => {
     stockLines.push(stockBackup);
+    if (product) logActivity('edit', rid, product.name, 'Stock entry restore from expiry (undo)');
     checkAutoOutOfStock(rid);
     saveAll();
     renderExpList();
@@ -2552,6 +2864,10 @@ function recordSaleInternal(sale) {
     timestamp: new Date().toISOString(),
     date: sale.date,
   });
+
+  // STAGE 3: Log the sale
+  const totalAmt = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
+  logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at ₱' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
 
   checkAutoMarkdownReset(sale.stockLineId);
   checkAutoOutOfStock(sale.productId);
@@ -2751,6 +3067,197 @@ function renderSalesList() {
   }).join('') + (sales.length > 50 ? '<div class="sales-note">Showing 50 most recent. Export CSV to see all ' + sales.length + ' sales.</div>' : '');
 }
 
+// ═══════════════════════════════════════════
+// STAGE 3: REPORTS TAB
+// ═══════════════════════════════════════════
+function setReportSection(name, el) {
+  activeReportSection = name;
+  document.querySelectorAll('.report-section-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('report-activity').style.display = name === 'activity' ? 'block' : 'none';
+  document.getElementById('report-sales').style.display = name === 'sales' ? 'block' : 'none';
+  renderReports();
+}
+
+function renderReports() {
+  if (activeReportSection === 'activity') renderActivityLog();
+  if (activeReportSection === 'sales') renderSalesList();
+}
+
+function setActivityTypeFilter(val, el) {
+  activityTypeFilter = val;
+  document.querySelectorAll('#activity-type-filter .filter-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderActivityLog();
+}
+
+function renderActivityLog() {
+  const list = document.getElementById('activity-list');
+  if (!list) return;
+  const searchEl = document.getElementById('activity-search');
+  const dateFilterEl = document.getElementById('activity-date-filter');
+  const q = (searchEl ? searchEl.value : '').toLowerCase().trim();
+  const dateFilter = dateFilterEl ? dateFilterEl.value : 'all';
+
+  const now = new Date(); now.setHours(0,0,0,0);
+  const todayStr = today();
+  const weekStart = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0,10);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+
+  const manualTypes = ['delivery','transfer','damaged','note','other'];
+
+  let filtered = activityLog.filter(a => {
+    if (q) {
+      const text = ((a.description || '') + ' ' + (a.productName || '') + ' ' + (a.type || '')).toLowerCase();
+      if (!text.includes(q)) return false;
+    }
+    if (activityTypeFilter !== 'all') {
+      if (activityTypeFilter === 'manual') {
+        if (manualTypes.indexOf(a.type) === -1) return false;
+      } else if (a.type !== activityTypeFilter) return false;
+    }
+    if (dateFilter === 'today' && a.date !== todayStr) return false;
+    if (dateFilter === 'week' && a.date < weekStart) return false;
+    if (dateFilter === 'month' && a.date < monthStart) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No activity entries match your filters.</p></div>';
+    return;
+  }
+
+  const shown = filtered.slice(0, 200);
+  list.innerHTML = shown.map(a => {
+    const typeLabel = activityTypeLabel(a.type);
+    const typeCls = 'activity-type-' + a.type;
+    const aidEsc = esc(a.id);
+    const timeStr = a.timestamp ? new Date(a.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+    return '<div class="activity-item">' +
+      '<div class="activity-item-top">' +
+        '<span class="activity-date">' + esc(a.date || '') + (timeStr ? ' ' + timeStr : '') + '</span>' +
+        '<span class="activity-type-badge ' + typeCls + '">' + typeLabel + '</span>' +
+      '</div>' +
+      '<div class="activity-desc">' + esc(a.description || '') + '</div>' +
+      (a.productName ? '<div class="activity-product">📦 ' + esc(a.productName) + '</div>' : '') +
+      '<div class="activity-actions">' +
+        '<button class="btn btn-secondary btn-sm" onclick="openEditActivity(\'' + aidEsc + '\')">Edit</button>' +
+      '</div>' +
+    '</div>';
+  }).join('') + (filtered.length > 200 ? '<div class="sales-note">Showing 200 most recent of ' + filtered.length + '. Export CSV for full log.</div>' : '');
+}
+
+function activityTypeLabel(t) {
+  return {
+    'add':'Added','update':'Updated','sale':'Sale','markdown':'Markdown',
+    'markdown-removed':'Markdown Off','pulled':'Pulled Out','status':'Status',
+    'delivery':'Delivery','transfer':'Transfer','damaged':'Damaged','note':'Note',
+    'other':'Other','removed':'Removed','edit':'Edited','check':'Stock Check',
+    'discrepancy':'Discrepancy'
+  }[t] || t;
+}
+
+// ── MANUAL LOG ENTRY ──
+function openManualLogModal() {
+  document.getElementById('manual-log-type').value = 'note';
+  document.getElementById('manual-log-desc').value = '';
+  document.getElementById('manual-log-date').value = today();
+  // Populate product dropdown
+  const sel = document.getElementById('manual-log-product');
+  sel.innerHTML = '<option value="">-- None --</option>';
+  products.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.recordId;
+    opt.textContent = p.name + (p.brand ? ' (' + p.brand + ')' : '');
+    sel.appendChild(opt);
+  });
+  openModal('modal-manual-log');
+}
+
+function confirmManualLog() {
+  const desc = document.getElementById('manual-log-desc').value.trim();
+  if (!desc) { showToast('Description is required'); return; }
+  pendingManualLog = {
+    type: document.getElementById('manual-log-type').value,
+    productId: document.getElementById('manual-log-product').value,
+    description: desc,
+    date: document.getElementById('manual-log-date').value || today(),
+  };
+  openModal('modal-confirm-manual-log');
+}
+
+function doSaveManualLog() {
+  if (!pendingManualLog) return;
+  const m = pendingManualLog;
+  const p = m.productId ? products.find(x => x.recordId === m.productId) : null;
+  activityLog.unshift({
+    id: generateId('ACT'),
+    type: m.type,
+    productId: m.productId || '',
+    productName: p ? p.name : '',
+    description: m.description,
+    timestamp: new Date().toISOString(),
+    date: m.date,
+  });
+  saveAll();
+  closeModal('modal-confirm-manual-log');
+  closeModal('modal-manual-log');
+  renderActivityLog();
+  showToast('Log entry saved');
+  pendingManualLog = null;
+}
+
+// ── EDIT / DELETE ACTIVITY ──
+function openEditActivity(aid) {
+  const a = activityLog.find(x => x.id === aid);
+  if (!a) return;
+  editingActivityId = aid;
+  document.getElementById('edit-activity-id').value = aid;
+  document.getElementById('edit-activity-type').value = a.type;
+  document.getElementById('edit-activity-desc').value = a.description || '';
+  document.getElementById('edit-activity-product').value = a.productName || '';
+  document.getElementById('edit-activity-date').value = a.date || today();
+  openModal('modal-edit-activity');
+}
+
+function doEditActivity() {
+  const a = activityLog.find(x => x.id === editingActivityId);
+  if (!a) return;
+  a.type = document.getElementById('edit-activity-type').value;
+  a.description = document.getElementById('edit-activity-desc').value.trim();
+  a.productName = document.getElementById('edit-activity-product').value.trim();
+  a.date = document.getElementById('edit-activity-date').value || today();
+  saveAll();
+  closeModal('modal-edit-activity');
+  renderActivityLog();
+  showToast('Entry updated');
+  editingActivityId = null;
+}
+
+function confirmDeleteActivity() {
+  deletingActivityId = editingActivityId;
+  openModal('modal-confirm-delete-activity');
+}
+
+function doDeleteActivity() {
+  const backup = activityLog.find(x => x.id === deletingActivityId);
+  if (!backup) { closeModal('modal-confirm-delete-activity'); return; }
+  const backupCopy = JSON.parse(JSON.stringify(backup));
+  activityLog = activityLog.filter(x => x.id !== deletingActivityId);
+  saveAll();
+  closeModal('modal-confirm-delete-activity');
+  closeModal('modal-edit-activity');
+  renderActivityLog();
+  showUndoToast('Log entry deleted', () => {
+    activityLog.unshift(backupCopy);
+    saveAll();
+    renderActivityLog();
+    showToast('Restored!');
+  });
+  deletingActivityId = null;
+  editingActivityId = null;
+}
+
 // ─────────────────────────────────────────
 // EXPORT / IMPORT — FIX 5: include sales
 // ─────────────────────────────────────────
@@ -2781,6 +3288,13 @@ function exportCSV() {
     const salesHeaders = ['Sale ID','Product ID','Product Name','Brand','Stock Line ID','Expiry','Qty Sold','Price','Is Markdown','Date','Timestamp'];
     const salesRows = sales.map(s => [s.id, s.productId||'', s.productName, s.brand, s.stockLineId||'', s.exp||'', s.qtySold, s.price, s.isMarkdown?'yes':'', s.date, s.timestamp||''].map(csvCell));
     csv += '\n\n## SALES\n' + salesHeaders.join(',') + '\n' + salesRows.map(r => r.join(',')).join('\n');
+  }
+
+  // STAGE 3: Activity log sheet
+  if (activityLog.length > 0) {
+    const actHeaders = ['Activity ID','Type','Product ID','Product Name','Description','Date','Timestamp'];
+    const actRows = activityLog.map(a => [a.id, a.type, a.productId||'', a.productName||'', a.description||'', a.date||'', a.timestamp||''].map(csvCell));
+    csv += '\n\n## ACTIVITY\n' + actHeaders.join(',') + '\n' + actRows.map(r => r.join(',')).join('\n');
   }
 
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -2825,8 +3339,9 @@ function importCSV(input) {
     // Split into sections if ## headers present
     const inventorySection = extractSection(text, 'INVENTORY');
     const salesSection = extractSection(text, 'SALES');
+    const activitySection = extractSection(text, 'ACTIVITY');
 
-    let addedProducts = 0, addedStocks = 0, addedSales = 0, skipped = 0;
+    let addedProducts = 0, addedStocks = 0, addedSales = 0, addedActivity = 0, skipped = 0;
 
     // Import inventory
     const invLines = (inventorySection || text).split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
@@ -2896,15 +3411,36 @@ function importCSV(input) {
       }
     }
 
+    // STAGE 3: Import activity log
+    if (activitySection) {
+      const aLines = activitySection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
+      if (aLines.length >= 2) {
+        aLines.slice(1).forEach(line => {
+          const c = parseCSVLine(line);
+          const aid = (c[0] || '').trim();
+          if (!aid || activityLog.find(a => a.id === aid)) return;
+          activityLog.push({
+            id: aid, type: c[1] || 'note', productId: c[2] || '',
+            productName: c[3] || '', description: c[4] || '',
+            date: c[5] || '', timestamp: c[6] || ''
+          });
+          addedActivity++;
+        });
+        // Re-sort activity by timestamp descending
+        activityLog.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+      }
+    }
+
     saveAll();
     input.value = '';
     let msg = addedProducts + ' product(s)';
     if (addedStocks) msg += ', ' + addedStocks + ' stock entries';
     if (addedSales) msg += ', ' + addedSales + ' sale(s)';
+    if (addedActivity) msg += ', ' + addedActivity + ' activity entries';
     msg += ' imported';
     if (skipped) msg += ', ' + skipped + ' skipped (duplicate or missing ID)';
     msg += '.';
-    showImportResult(msg, (addedProducts + addedSales) > 0 ? 'success' : 'info');
+    showImportResult(msg, (addedProducts + addedSales + addedActivity) > 0 ? 'success' : 'info');
     updateCounts();
     applyFilters();
   };
