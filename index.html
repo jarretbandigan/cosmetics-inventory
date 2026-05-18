@@ -696,6 +696,74 @@ input[type="file"] { display: none; }
 .home-stat .num.small { font-size: 15px; }
 .home-stat.teal .num { color: var(--teal-600); }
 .home-stat.blue .num { color: var(--blue-600); }
+
+/* ── STAGE 4: INVENTORY CHECK ── */
+.check-banner {
+  background: var(--amber-50); border: 1px solid var(--amber-100);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.check-banner .icon { font-size: 22px; flex-shrink: 0; }
+.check-banner .text { flex: 1; font-size: 12px; color: var(--amber-800); line-height: 1.4; }
+.check-banner-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.check-card {
+  background: #fff; border: 1px solid var(--gray-100);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+}
+.check-card .name { font-size: 14px; font-weight: 600; }
+.check-card .sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.check-card-stockline {
+  background: var(--gray-50); border-radius: 10px;
+  padding: 10px 12px; margin-top: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.check-card-stockline.checked { background: var(--teal-50); border: 1px solid var(--teal-100); }
+.check-card-stockline.discrepancy { background: var(--amber-50); border: 1px solid var(--amber-100); }
+.check-card-stockline .info { flex: 1; min-width: 0; }
+.check-card-stockline .exp { font-size: 13px; font-weight: 600; }
+.check-card-stockline .recorded { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.check-card-stockline .actual-input {
+  width: 70px; padding: 6px 8px; border-radius: 8px;
+  border: 1px solid var(--gray-100); text-align: center; font-size: 14px;
+  font-family: inherit; -webkit-appearance: none; appearance: none;
+  background: #fff;
+}
+.check-card-stockline .check-icon { font-size: 18px; color: var(--teal-600); }
+
+.check-summary-item {
+  background: var(--gray-50); border-radius: 10px; padding: 10px 12px;
+  margin-bottom: 6px;
+}
+.check-summary-item.discrepancy { background: var(--amber-50); border: 1px solid var(--amber-100); }
+.check-summary-item .name { font-size: 13px; font-weight: 600; }
+.check-summary-item .nums { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+.check-summary-item .diff { font-size: 12px; font-weight: 600; margin-top: 3px; }
+.check-summary-item .diff.positive { color: var(--teal-600); }
+.check-summary-item .diff.negative { color: var(--red-600); }
+
+.check-history-item {
+  background: #fff; border: 1px solid var(--gray-100); border-radius: 12px;
+  padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+}
+.check-history-item:active { background: var(--gray-50); }
+.check-history-item .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.check-history-item .date { font-size: 13px; font-weight: 600; }
+.check-history-item .meta { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+.check-history-item .badge {
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.check-history-item .badge.confirmed { background: var(--teal-50); color: var(--teal-600); }
+.check-history-item .badge.flagged { background: var(--amber-50); color: var(--amber-600); }
+
+.report-section-tab.discrepancy-alert {
+  position: relative;
+}
+.report-section-tab.discrepancy-alert::after {
+  content: ''; position: absolute; top: 6px; right: 6px;
+  width: 6px; height: 6px; background: var(--red-600); border-radius: 50%;
+}
 </style>
 </head>
 <body>
@@ -706,7 +774,7 @@ input[type="file"] { display: none; }
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.4.0</div>
+    <div class="home-version">v2.5.0</div>
   </div>
 
   <div class="mode-selector">
@@ -970,6 +1038,7 @@ input[type="file"] { display: none; }
     <div class="report-section-tabs">
       <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">📋 Activity</button>
       <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">🧾 Sales</button>
+      <button class="report-section-tab" id="report-tab-check" onclick="setReportSection('check',this)">✅ Stock Check</button>
     </div>
 
     <!-- Activity Log -->
@@ -1001,6 +1070,14 @@ input[type="file"] { display: none; }
     <div id="report-sales" style="display:none">
       <div id="sales-list"></div>
     </div>
+
+    <!-- Stock Check (STAGE 4) -->
+    <div id="report-check" style="display:none">
+      <div id="check-banner-area"></div>
+      <button class="btn btn-primary" onclick="openStartCheckModal()" style="margin-bottom:14px">+ Start New Inventory Check</button>
+      <h3 style="font-size:13px;color:var(--gray-600);margin-bottom:10px;font-weight:600">Past Checks</h3>
+      <div id="check-history-list"></div>
+    </div>
   </div>
 
   <!-- DATA / EXPORT -->
@@ -1025,6 +1102,27 @@ input[type="file"] { display: none; }
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.5.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Full Inventory Check feature with two modes</li>
+            <li>Scan Mode: scan items physically, app marks each as checked</li>
+            <li>Manual Count: enter actual qty for each stock entry by hand</li>
+            <li>Auto-save check progress — resume if app is closed mid-check</li>
+            <li>Resume banner appears at top of Stock Check tab</li>
+            <li>Duplicate scan handling: prompts Mark Again or Skip</li>
+            <li>Check summary screen shows all discrepancies before applying</li>
+            <li>Three actions on summary: Continue, Flag, Confirm</li>
+            <li>Flag: logs discrepancies but does not change stock</li>
+            <li>Confirm: applies adjustments and updates inventory</li>
+            <li>Stock Check tab in Reports shows full history</li>
+            <li>Tap any past check to view its full discrepancy details</li>
+            <li>Before/after numbers stored in check log for tracing</li>
+            <li>Inventory checks included in CSV export and import</li>
+            <li>Clear All Data now clears activity log and check history too</li>
+          </ul>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.4.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -1155,13 +1253,14 @@ input[type="file"] { display: none; }
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.4.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">New Reports tab with Activity Log and Sales Log together.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Activity Log auto-records everything you do for full traceability.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Add manual log entries for deliveries, transfers, damaged goods.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Search and filter the activity log by type or date.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home screen shows Cost Value and Selling Value at a glance.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Activity Log included in CSV backup for permanent record.</div></div>
+      <div class="whats-new-version">Version 2.5.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Full Inventory Check feature: Scan Mode or Manual Count.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Scan items physically and the app marks them as checked.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Summary shows discrepancies. Review before applying adjustments.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Three actions: Continue, Flag (log only), or Confirm (apply changes).</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Resume unfinished checks if you close the app mid-count.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Full check history in Reports tab with all discrepancy details.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Inventory checks included in CSV backup.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
@@ -1416,6 +1515,91 @@ input[type="file"] { display: none; }
   </div></div>
 </div>
 
+<!-- STAGE 4: Inventory Check modals -->
+<div class="modal-backdrop" id="modal-start-check">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-header"><h3>Start Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-start-check')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.5">Choose how you want to do this check.</p>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="startCheck('scan')">📷 Scan Mode</button>
+      <p style="font-size:12px;color:var(--gray-400);margin:-4px 0 12px;text-align:center;line-height:1.4">Scan each item physically. Unscanned items will be flagged.</p>
+      <button class="btn btn-secondary" onclick="startCheck('manual')">✏️ Manual Count</button>
+      <p style="font-size:12px;color:var(--gray-400);margin:4px 0 0;text-align:center;line-height:1.4">Enter actual qty for each stock entry by hand.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-active-check">
+  <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
+    <div class="modal-header"><h3 id="check-title">Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-active-check')">✕</button></div>
+    <div class="modal-body">
+      <div id="check-scan-area" style="display:none">
+        <div class="scanner-box" style="margin-bottom:10px;max-width:280px">
+          <video id="check-preview" autoplay muted playsinline></video>
+          <div class="scan-overlay"><div class="scan-frame"><div class="scan-frame-inner"></div><div class="scan-line"></div></div></div>
+        </div>
+        <div class="scan-status" id="check-scan-status">Camera not started</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="check-start-btn" onclick="startCheckScanner()">Start Camera</button>
+          <button class="btn btn-secondary" id="check-stop-btn" onclick="stopCheckScanner()" style="display:none">Stop</button>
+        </div>
+      </div>
+      <div id="check-progress" style="margin-bottom:12px;font-size:13px;color:var(--gray-600);text-align:center;font-weight:600"></div>
+      <div id="check-list"></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-danger-outline" onclick="confirmDiscardCheck()">Discard</button>
+        <button class="btn btn-primary" onclick="finishCheck()">Finish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-check-summary">
+  <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
+    <div class="modal-header"><h3>Check Summary</h3><button class="modal-close" onclick="closeModal('modal-check-summary')">✕</button></div>
+    <div class="modal-body">
+      <div id="check-summary-content"></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-secondary" onclick="continueCheck()">Continue</button>
+        <button class="btn btn-amber-outline" onclick="flagDiscrepancies()">Flag</button>
+        <button class="btn btn-primary" onclick="confirmCheck()">Confirm</button>
+      </div>
+      <p style="font-size:11px;color:var(--gray-400);margin-top:10px;text-align:center;line-height:1.5">Continue: keep checking. Flag: log discrepancies but don't apply. Confirm: apply adjustments to inventory.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-past-check">
+  <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
+    <div class="modal-header"><h3 id="past-check-title">Past Check</h3><button class="modal-close" onclick="closeModal('modal-past-check')">✕</button></div>
+    <div class="modal-body" id="past-check-body"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-discard-check">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title">Discard Check?</div>
+    <div class="confirm-msg">Discard this inventory check? All progress will be lost.</div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-discard-check')">Cancel</button>
+      <button class="btn btn-danger-outline" onclick="doDiscardCheck()">Discard</button>
+    </div>
+  </div></div>
+</div>
+
+<div class="modal-backdrop" id="modal-duplicate-scan">
+  <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title">Already Scanned</div>
+    <div class="confirm-msg" id="duplicate-scan-msg"></div>
+    <div class="confirm-btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-duplicate-scan')">Skip</button>
+      <button class="btn btn-primary" onclick="markScannedAgain()">Mark Again</button>
+    </div>
+  </div></div>
+</div>
+
 <div class="modal-backdrop" id="modal-edit-product">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -1529,7 +1713,7 @@ input[type="file"] { display: none; }
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 
 function generateId(prefix) {
   return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -1578,7 +1762,7 @@ function showUndoToast(msg, undoFn) {
 function getStorageInfo() {
   let totalSize = 0;
   try {
-    ['ci_products','ci_stocks','ci_sales','ci_activity','cosmetics_inv'].forEach(k => {
+    ['ci_products','ci_stocks','ci_sales','ci_activity','ci_checks','ci_active_check','cosmetics_inv'].forEach(k => {
       const v = localStorage.getItem(k);
       if (v) totalSize += v.length;
     });
@@ -1624,11 +1808,19 @@ let stockLines = [];
 let sales = [];
 // STAGE 3: Activity log
 let activityLog = [];
+// STAGE 4: Inventory checks
+let inventoryChecks = [];
+let activeCheck = null;
 
 try { products = JSON.parse(localStorage.getItem('ci_products') || '[]'); } catch(e) {}
 try { stockLines = JSON.parse(localStorage.getItem('ci_stocks') || '[]'); } catch(e) {}
 try { sales = JSON.parse(localStorage.getItem('ci_sales') || '[]'); } catch(e) {}
 try { activityLog = JSON.parse(localStorage.getItem('ci_activity') || '[]'); } catch(e) {}
+try { inventoryChecks = JSON.parse(localStorage.getItem('ci_checks') || '[]'); } catch(e) {}
+try {
+  const ac = localStorage.getItem('ci_active_check');
+  if (ac) activeCheck = JSON.parse(ac);
+} catch(e) { activeCheck = null; }
 
 // FIX 2: Migration now runs AFTER utility functions are defined
 const oldData = localStorage.getItem('cosmetics_inv');
@@ -1701,6 +1893,10 @@ let activityTypeFilter = 'all';
 let editingActivityId = null;
 let deletingActivityId = null;
 let pendingManualLog = null;
+// STAGE 4: Inventory check state
+let checkScannerReader = null;
+let pendingDuplicateScan = null;
+let viewingCheckId = null;
 
 // STAGE 3: Log activity helper (used by all actions)
 function logActivity(type, productId, productName, description) {
@@ -1785,11 +1981,17 @@ function saveAll() {
   if (!Array.isArray(stockLines)) stockLines = [];
   if (!Array.isArray(sales)) sales = [];
   if (!Array.isArray(activityLog)) activityLog = [];
+  if (!Array.isArray(inventoryChecks)) inventoryChecks = [];
   let storageError = false;
   try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) { storageError = true; }
   try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) { storageError = true; }
   try { localStorage.setItem('ci_sales', JSON.stringify(sales)); } catch(e) { storageError = true; }
   try { localStorage.setItem('ci_activity', JSON.stringify(activityLog)); } catch(e) { storageError = true; }
+  try { localStorage.setItem('ci_checks', JSON.stringify(inventoryChecks)); } catch(e) { storageError = true; }
+  try {
+    if (activeCheck) localStorage.setItem('ci_active_check', JSON.stringify(activeCheck));
+    else localStorage.removeItem('ci_active_check');
+  } catch(e) { storageError = true; }
   if (storageError) {
     showToast('⚠️ Storage error! Export backup now.');
   }
@@ -1836,6 +2038,7 @@ function goHome() {
   document.getElementById('page-app').classList.remove('active');
   if (codeReader) { try { codeReader.reset(); } catch(e) {} codeReader = null; }
   stopSellScanner();
+  stopCheckScanner();
   updateCounts();
 }
 
@@ -3076,12 +3279,14 @@ function setReportSection(name, el) {
   if (el) el.classList.add('active');
   document.getElementById('report-activity').style.display = name === 'activity' ? 'block' : 'none';
   document.getElementById('report-sales').style.display = name === 'sales' ? 'block' : 'none';
+  document.getElementById('report-check').style.display = name === 'check' ? 'block' : 'none';
   renderReports();
 }
 
 function renderReports() {
   if (activeReportSection === 'activity') renderActivityLog();
   if (activeReportSection === 'sales') renderSalesList();
+  if (activeReportSection === 'check') renderCheckHistory();
 }
 
 function setActivityTypeFilter(val, el) {
@@ -3258,6 +3463,430 @@ function doDeleteActivity() {
   editingActivityId = null;
 }
 
+// ═══════════════════════════════════════════
+// STAGE 4: INVENTORY CHECK
+// ═══════════════════════════════════════════
+
+// Render banner if there is an active check draft
+function renderCheckBanner() {
+  const area = document.getElementById('check-banner-area');
+  if (!area) return;
+  if (!activeCheck) { area.innerHTML = ''; return; }
+  area.innerHTML =
+    '<div class="check-banner">' +
+      '<span class="icon">⚠️</span>' +
+      '<div class="text"><strong>Unfinished check in progress</strong><br>Started ' + esc(new Date(activeCheck.startedAt).toLocaleString()) + ' (' + esc(activeCheck.mode) + ' mode)</div>' +
+      '<div class="check-banner-actions">' +
+        '<button class="btn btn-primary btn-sm" onclick="resumeCheck()">Resume</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderCheckHistory() {
+  renderCheckBanner();
+  const list = document.getElementById('check-history-list');
+  if (!list) return;
+  if (inventoryChecks.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>No inventory checks yet.<br>Tap Start above to begin.</p></div>';
+    return;
+  }
+  const sorted = inventoryChecks.slice().sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || ''));
+  list.innerHTML = sorted.map(c => {
+    const cidEsc = esc(c.id);
+    const discrepancyCount = (c.items || []).filter(i => i.recordedQty != i.actualQty).length;
+    const badgeCls = c.status === 'flagged' ? 'flagged' : 'confirmed';
+    const badgeText = c.status === 'flagged' ? 'Flagged' : 'Confirmed';
+    return '<div class="check-history-item" onclick="viewPastCheck(\'' + cidEsc + '\')">' +
+      '<div class="header">' +
+        '<div>' +
+          '<div class="date">' + esc(new Date(c.completedAt).toLocaleString()) + '</div>' +
+          '<div class="meta">' + esc(c.mode) + ' mode | ' + (c.items || []).length + ' items checked' + (discrepancyCount > 0 ? ' | ' + discrepancyCount + ' discrepancies' : '') + '</div>' +
+        '</div>' +
+        '<span class="badge ' + badgeCls + '">' + badgeText + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function openStartCheckModal() {
+  if (activeCheck) {
+    showToast('Resume or discard the active check first');
+    return;
+  }
+  openModal('modal-start-check');
+}
+
+function startCheck(mode) {
+  closeModal('modal-start-check');
+  // Build items list from all stock entries with qty > 0 (and active or out products, not pulled out)
+  const items = [];
+  stockLines.forEach(s => {
+    const p = products.find(x => x.recordId === s.productId);
+    if (!p || p.status === 'pulled') return;
+    items.push({
+      stockLineId: s.id,
+      productId: s.productId,
+      productName: p.name,
+      brand: p.brand || '',
+      exp: s.exp || '',
+      recordedQty: parseInt(s.qty) || 0,
+      actualQty: mode === 'scan' ? null : parseInt(s.qty) || 0, // manual pre-fills with recorded
+      scanned: false,
+      scanCount: 0,
+    });
+  });
+  activeCheck = {
+    id: generateId('CHK'),
+    mode: mode,
+    startedAt: new Date().toISOString(),
+    items: items,
+  };
+  saveAll();
+  openActiveCheckModal();
+}
+
+function resumeCheck() {
+  if (!activeCheck) return;
+  openActiveCheckModal();
+}
+
+function openActiveCheckModal() {
+  if (!activeCheck) return;
+  setEl('check-title', activeCheck.mode === 'scan' ? '📷 Scan Mode Check' : '✏️ Manual Count Check');
+  document.getElementById('check-scan-area').style.display = activeCheck.mode === 'scan' ? 'block' : 'none';
+  renderCheckList();
+  openModal('modal-active-check');
+}
+
+function renderCheckList() {
+  if (!activeCheck) return;
+  const list = document.getElementById('check-list');
+  const progress = document.getElementById('check-progress');
+
+  if (activeCheck.mode === 'scan') {
+    const scannedCount = activeCheck.items.filter(i => i.scanned).length;
+    progress.textContent = scannedCount + ' / ' + activeCheck.items.length + ' items scanned';
+  } else {
+    progress.textContent = activeCheck.items.length + ' stock entries to count';
+  }
+
+  // Group by product
+  const byProduct = {};
+  activeCheck.items.forEach(i => {
+    if (!byProduct[i.productId]) byProduct[i.productId] = { name: i.productName, brand: i.brand, items: [] };
+    byProduct[i.productId].items.push(i);
+  });
+
+  const html = Object.keys(byProduct).map(pid => {
+    const grp = byProduct[pid];
+    const lines = grp.items.map(i => {
+      const sidEsc = esc(i.stockLineId);
+      const isChecked = activeCheck.mode === 'scan' && i.scanned;
+      const isDiscrepancy = activeCheck.mode === 'manual' && i.actualQty != null && i.actualQty != i.recordedQty;
+      const cls = isChecked ? ' checked' : (isDiscrepancy ? ' discrepancy' : '');
+      let rightContent = '';
+      if (activeCheck.mode === 'scan') {
+        rightContent = isChecked ?
+          '<div style="text-align:right"><span class="check-icon">✓</span><div style="font-size:11px;color:var(--teal-600)">Scanned ' + (i.scanCount || 1) + '×</div></div>' :
+          '<span style="font-size:11px;color:var(--gray-400)">Not scanned</span>';
+      } else {
+        rightContent = '<input type="number" class="actual-input" id="actual-' + sidEsc + '" value="' + (i.actualQty != null ? i.actualQty : '') + '" min="0" inputmode="numeric" onchange="updateActualQty(\'' + sidEsc + '\',this.value)">';
+      }
+      return '<div class="check-card-stockline' + cls + '">' +
+        '<div class="info">' +
+          '<div class="exp">' + (i.exp ? 'Exp: ' + esc(i.exp) : 'No expiry') + '</div>' +
+          '<div class="recorded">Recorded: ' + i.recordedQty + '</div>' +
+        '</div>' +
+        rightContent +
+      '</div>';
+    }).join('');
+    return '<div class="check-card">' +
+      '<div class="name">' + esc(grp.name) + '</div>' +
+      (grp.brand ? '<div class="sub">' + esc(grp.brand) + '</div>' : '') +
+      lines +
+    '</div>';
+  }).join('');
+
+  list.innerHTML = html || '<div class="empty-state"><p>No stock entries to check.</p></div>';
+}
+
+function updateActualQty(sid, val) {
+  if (!activeCheck) return;
+  const item = activeCheck.items.find(i => i.stockLineId === sid);
+  if (!item) return;
+  item.actualQty = parseInt(val);
+  if (isNaN(item.actualQty)) item.actualQty = null;
+  saveAll(); // auto-save draft
+  // Update class for discrepancy highlight without full re-render
+  const el = document.querySelector('#actual-' + sid);
+  if (el && el.parentElement) {
+    const parent = el.parentElement;
+    parent.classList.remove('discrepancy');
+    if (item.actualQty != null && item.actualQty != item.recordedQty) {
+      parent.classList.add('discrepancy');
+    }
+  }
+}
+
+// SCAN MODE CAMERA
+async function startCheckScanner() {
+  try {
+    setEl('check-scan-status', 'Requesting camera access...');
+    document.getElementById('check-scan-status').className = 'scan-status';
+    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const allDevices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
+    if (videoDevices.length === 0) throw new Error('No camera found.');
+    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
+    checkScannerReader = new ZXing.BrowserMultiFormatReader();
+    setEl('check-scan-status', 'Point camera at a barcode...');
+    checkScannerReader.decodeFromVideoDevice(backCam.deviceId, 'check-preview', (result) => {
+      if (result) onCheckBarcodeDetected(result.getText());
+    });
+    document.getElementById('check-start-btn').style.display = 'none';
+    document.getElementById('check-stop-btn').style.display = 'block';
+  } catch(e) {
+    setEl('check-scan-status', 'Camera error: ' + e.message);
+    document.getElementById('check-scan-status').className = 'scan-status error';
+  }
+}
+
+function stopCheckScanner() {
+  if (checkScannerReader) { try { checkScannerReader.reset(); } catch(e) {} checkScannerReader = null; }
+  const sb = document.getElementById('check-start-btn');
+  const eb = document.getElementById('check-stop-btn');
+  if (sb) sb.style.display = 'block';
+  if (eb) eb.style.display = 'none';
+}
+
+let lastCheckScan = 0;
+function onCheckBarcodeDetected(raw) {
+  if (!raw || !raw.trim()) return;
+  // Debounce - same barcode within 1.5s ignored
+  const nowT = Date.now();
+  if (nowT - lastCheckScan < 1500) return;
+  lastCheckScan = nowT;
+
+  const code = raw.trim();
+  if (!activeCheck) return;
+  const product = products.find(p => p.barcode === code);
+  if (!product) {
+    setEl('check-scan-status', 'Not in inventory: ' + code);
+    document.getElementById('check-scan-status').className = 'scan-status error';
+    setTimeout(() => {
+      if (checkScannerReader) {
+        setEl('check-scan-status', 'Point camera at a barcode...');
+        document.getElementById('check-scan-status').className = 'scan-status';
+      }
+    }, 2000);
+    return;
+  }
+  // Find all stock entries for this product
+  const matchingItems = activeCheck.items.filter(i => i.productId === product.recordId);
+  if (matchingItems.length === 0) {
+    setEl('check-scan-status', product.name + ' has no stock to check');
+    document.getElementById('check-scan-status').className = 'scan-status error';
+    return;
+  }
+  // If any of them are already scanned, show duplicate prompt
+  const scannedExisting = matchingItems.find(i => i.scanned);
+  if (scannedExisting) {
+    pendingDuplicateScan = { productId: product.recordId, productName: product.name };
+    setEl('duplicate-scan-msg', product.name + ' was already scanned. Mark again or skip?');
+    openModal('modal-duplicate-scan');
+    return;
+  }
+  // Mark the first matching (sorted by exp) as scanned
+  const sorted = matchingItems.slice().sort((a, b) => {
+    if (!a.exp && !b.exp) return 0;
+    if (!a.exp) return 1;
+    if (!b.exp) return -1;
+    return a.exp.localeCompare(b.exp);
+  });
+  sorted[0].scanned = true;
+  sorted[0].scanCount = (sorted[0].scanCount || 0) + 1;
+  sorted[0].actualQty = sorted[0].recordedQty; // assume present means count matches
+  saveAll();
+  setEl('check-scan-status', '✓ ' + product.name + ' marked');
+  document.getElementById('check-scan-status').className = 'scan-status success';
+  renderCheckList();
+}
+
+function markScannedAgain() {
+  closeModal('modal-duplicate-scan');
+  if (!pendingDuplicateScan || !activeCheck) return;
+  const matchingItems = activeCheck.items.filter(i => i.productId === pendingDuplicateScan.productId && i.scanned);
+  if (matchingItems.length > 0) {
+    matchingItems[0].scanCount = (matchingItems[0].scanCount || 1) + 1;
+    saveAll();
+    setEl('check-scan-status', '✓ ' + pendingDuplicateScan.productName + ' marked again');
+    document.getElementById('check-scan-status').className = 'scan-status success';
+    renderCheckList();
+  }
+  pendingDuplicateScan = null;
+}
+
+function finishCheck() {
+  if (!activeCheck) return;
+  // Stop scanner if running
+  stopCheckScanner();
+  // For scan mode, unscanned items have actualQty = 0 (treat as missing)
+  if (activeCheck.mode === 'scan') {
+    activeCheck.items.forEach(i => {
+      if (!i.scanned) i.actualQty = 0;
+    });
+  }
+  closeModal('modal-active-check');
+  renderCheckSummary();
+  openModal('modal-check-summary');
+}
+
+function renderCheckSummary() {
+  if (!activeCheck) return;
+  const items = activeCheck.items;
+  const discrepancies = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
+  const ok = items.length - discrepancies.length;
+
+  let html = '<div style="margin-bottom:14px;padding:12px;background:var(--gray-50);border-radius:10px">' +
+    '<div style="font-size:14px;font-weight:600;margin-bottom:6px">Summary</div>' +
+    '<div style="font-size:12px;color:var(--gray-600);line-height:1.6">' +
+      'Items checked: <strong>' + items.length + '</strong><br>' +
+      'Matches recorded: <strong style="color:var(--teal-600)">' + ok + '</strong><br>' +
+      'Discrepancies: <strong style="color:' + (discrepancies.length > 0 ? 'var(--amber-600)' : 'var(--teal-600)') + '">' + discrepancies.length + '</strong>' +
+    '</div></div>';
+
+  if (discrepancies.length > 0) {
+    html += '<div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px">Discrepancies:</div>';
+    html += discrepancies.map(i => {
+      const diff = i.actualQty - i.recordedQty;
+      const cls = diff > 0 ? 'positive' : 'negative';
+      const sign = diff > 0 ? '+' : '';
+      return '<div class="check-summary-item discrepancy">' +
+        '<div class="name">' + esc(i.productName) + (i.brand ? ' (' + esc(i.brand) + ')' : '') + '</div>' +
+        '<div class="nums">Exp: ' + esc(i.exp || 'no expiry') + ' | Recorded: ' + i.recordedQty + ' | Actual: ' + i.actualQty + '</div>' +
+        '<div class="diff ' + cls + '">Difference: ' + sign + diff + '</div>' +
+      '</div>';
+    }).join('');
+  } else {
+    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts match recorded inventory!</div>';
+  }
+
+  setEl('check-summary-content', '');
+  document.getElementById('check-summary-content').innerHTML = html;
+}
+
+function continueCheck() {
+  closeModal('modal-check-summary');
+  openActiveCheckModal();
+}
+
+function flagDiscrepancies() {
+  if (!activeCheck) return;
+  const discrepancies = activeCheck.items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
+  // Log each discrepancy as activity
+  discrepancies.forEach(i => {
+    const diff = i.actualQty - i.recordedQty;
+    const sign = diff > 0 ? '+' : '';
+    logActivity('discrepancy', i.productId, i.productName, 'Discrepancy flagged: recorded ' + i.recordedQty + ' but counted ' + i.actualQty + ' (diff: ' + sign + diff + ', exp: ' + (i.exp || 'no expiry') + ')');
+  });
+  // Save the check as flagged
+  const completed = JSON.parse(JSON.stringify(activeCheck));
+  completed.completedAt = new Date().toISOString();
+  completed.status = 'flagged';
+  inventoryChecks.unshift(completed);
+  logActivity('check', '', '', 'Inventory check FLAGGED: ' + completed.items.length + ' items, ' + discrepancies.length + ' discrepancies (not applied)');
+
+  activeCheck = null;
+  saveAll();
+  closeModal('modal-check-summary');
+  renderCheckHistory();
+  showToast(discrepancies.length + ' discrepancies flagged in log');
+}
+
+function confirmCheck() {
+  if (!activeCheck) return;
+  const items = activeCheck.items;
+  const adjustments = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
+  // Apply each adjustment
+  adjustments.forEach(i => {
+    const s = stockLines.find(x => x.id === i.stockLineId);
+    if (!s) return;
+    s.qty = i.actualQty;
+    checkAutoMarkdownReset(s.id);
+    checkAutoOutOfStock(s.productId);
+  });
+  // Save the check as confirmed
+  const completed = JSON.parse(JSON.stringify(activeCheck));
+  completed.completedAt = new Date().toISOString();
+  completed.status = 'confirmed';
+  inventoryChecks.unshift(completed);
+  logActivity('check', '', '', 'Inventory check CONFIRMED: ' + items.length + ' items, ' + adjustments.length + ' adjustments applied');
+
+  activeCheck = null;
+  saveAll();
+  closeModal('modal-check-summary');
+  renderCheckHistory();
+  applyFilters();
+  updateCounts();
+  showToast('Check confirmed: ' + adjustments.length + ' adjustments applied');
+}
+
+function confirmDiscardCheck() {
+  openModal('modal-discard-check');
+}
+
+function doDiscardCheck() {
+  // Silently delete - reminder noted: future admin should log this
+  activeCheck = null;
+  saveAll();
+  closeModal('modal-discard-check');
+  closeModal('modal-active-check');
+  renderCheckHistory();
+  showToast('Check discarded');
+}
+
+function viewPastCheck(cid) {
+  const c = inventoryChecks.find(x => x.id === cid);
+  if (!c) return;
+  viewingCheckId = cid;
+  setEl('past-check-title', new Date(c.completedAt).toLocaleString());
+  const items = c.items || [];
+  const discrepancies = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
+  const badgeCls = c.status === 'flagged' ? 'flagged' : 'confirmed';
+  const badgeText = c.status === 'flagged' ? 'Flagged (not applied)' : 'Confirmed (applied)';
+
+  let html =
+    '<div style="margin-bottom:14px;padding:12px;background:var(--gray-50);border-radius:10px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<div style="font-size:14px;font-weight:600">' + esc(c.mode) + ' mode</div>' +
+        '<span class="badge ' + badgeCls + '" style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;text-transform:uppercase;background:' + (c.status === 'flagged' ? 'var(--amber-50);color:var(--amber-600)' : 'var(--teal-50);color:var(--teal-600)') + '">' + badgeText + '</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--gray-600);line-height:1.6">' +
+        'Started: ' + esc(new Date(c.startedAt).toLocaleString()) + '<br>' +
+        'Items checked: <strong>' + items.length + '</strong><br>' +
+        'Discrepancies: <strong>' + discrepancies.length + '</strong>' +
+      '</div></div>';
+
+  if (discrepancies.length > 0) {
+    html += '<div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px">Discrepancies:</div>';
+    html += discrepancies.map(i => {
+      const diff = i.actualQty - i.recordedQty;
+      const cls = diff > 0 ? 'positive' : 'negative';
+      const sign = diff > 0 ? '+' : '';
+      return '<div class="check-summary-item discrepancy">' +
+        '<div class="name">' + esc(i.productName) + '</div>' +
+        '<div class="nums">Exp: ' + esc(i.exp || 'no expiry') + ' | Recorded: ' + i.recordedQty + ' | Actual: ' + i.actualQty + '</div>' +
+        '<div class="diff ' + cls + '">Difference: ' + sign + diff + '</div>' +
+      '</div>';
+    }).join('');
+  } else {
+    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts matched.</div>';
+  }
+
+  document.getElementById('past-check-body').innerHTML = html;
+  openModal('modal-past-check');
+}
+
 // ─────────────────────────────────────────
 // EXPORT / IMPORT — FIX 5: include sales
 // ─────────────────────────────────────────
@@ -3295,6 +3924,18 @@ function exportCSV() {
     const actHeaders = ['Activity ID','Type','Product ID','Product Name','Description','Date','Timestamp'];
     const actRows = activityLog.map(a => [a.id, a.type, a.productId||'', a.productName||'', a.description||'', a.date||'', a.timestamp||''].map(csvCell));
     csv += '\n\n## ACTIVITY\n' + actHeaders.join(',') + '\n' + actRows.map(r => r.join(',')).join('\n');
+  }
+
+  // STAGE 4: Inventory checks sheet (one row per item per check)
+  if (inventoryChecks.length > 0) {
+    const checkHeaders = ['Check ID','Mode','Status','Started At','Completed At','Stock Line ID','Product ID','Product Name','Expiry','Recorded Qty','Actual Qty','Scanned'];
+    const checkRows = [];
+    inventoryChecks.forEach(c => {
+      (c.items || []).forEach(i => {
+        checkRows.push([c.id, c.mode, c.status, c.startedAt, c.completedAt, i.stockLineId, i.productId, i.productName, i.exp || '', i.recordedQty, i.actualQty != null ? i.actualQty : '', i.scanned ? 'yes' : ''].map(csvCell));
+      });
+    });
+    csv += '\n\n## CHECKS\n' + checkHeaders.join(',') + '\n' + checkRows.map(r => r.join(',')).join('\n');
   }
 
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -3340,8 +3981,9 @@ function importCSV(input) {
     const inventorySection = extractSection(text, 'INVENTORY');
     const salesSection = extractSection(text, 'SALES');
     const activitySection = extractSection(text, 'ACTIVITY');
+    const checksSection = extractSection(text, 'CHECKS');
 
-    let addedProducts = 0, addedStocks = 0, addedSales = 0, addedActivity = 0, skipped = 0;
+    let addedProducts = 0, addedStocks = 0, addedSales = 0, addedActivity = 0, addedChecks = 0, skipped = 0;
 
     // Import inventory
     const invLines = (inventorySection || text).split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
@@ -3431,16 +4073,49 @@ function importCSV(input) {
       }
     }
 
+    // STAGE 4: Import inventory checks (rows grouped by Check ID)
+    if (checksSection) {
+      const ckLines = checksSection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
+      if (ckLines.length >= 2) {
+        const byCheckId = {};
+        ckLines.slice(1).forEach(line => {
+          const c = parseCSVLine(line);
+          const cid = (c[0] || '').trim();
+          if (!cid) return;
+          if (inventoryChecks.find(x => x.id === cid)) return; // skip dupes
+          if (!byCheckId[cid]) {
+            byCheckId[cid] = {
+              id: cid, mode: c[1] || 'manual', status: c[2] || 'confirmed',
+              startedAt: c[3] || '', completedAt: c[4] || '',
+              items: []
+            };
+          }
+          byCheckId[cid].items.push({
+            stockLineId: c[5] || '', productId: c[6] || '',
+            productName: c[7] || '', exp: c[8] || '',
+            recordedQty: parseInt(c[9]) || 0,
+            actualQty: c[10] === '' ? null : parseInt(c[10]) || 0,
+            scanned: c[11] === 'yes',
+          });
+        });
+        Object.keys(byCheckId).forEach(k => {
+          inventoryChecks.push(byCheckId[k]);
+          addedChecks++;
+        });
+      }
+    }
+
     saveAll();
     input.value = '';
     let msg = addedProducts + ' product(s)';
     if (addedStocks) msg += ', ' + addedStocks + ' stock entries';
     if (addedSales) msg += ', ' + addedSales + ' sale(s)';
     if (addedActivity) msg += ', ' + addedActivity + ' activity entries';
+    if (addedChecks) msg += ', ' + addedChecks + ' check(s)';
     msg += ' imported';
     if (skipped) msg += ', ' + skipped + ' skipped (duplicate or missing ID)';
     msg += '.';
-    showImportResult(msg, (addedProducts + addedSales + addedActivity) > 0 ? 'success' : 'info');
+    showImportResult(msg, (addedProducts + addedSales + addedActivity + addedChecks) > 0 ? 'success' : 'info');
     updateCounts();
     applyFilters();
   };
@@ -3481,6 +4156,7 @@ function showImportResult(msg, type) {
 
 function doClearAll() {
   products = []; stockLines = []; sales = [];
+  activityLog = []; inventoryChecks = []; activeCheck = null;
   openDetailsPanelId = null;
   saveAll();
   closeModal('modal-confirm-clear');
