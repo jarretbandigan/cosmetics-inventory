@@ -1,858 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cosmetics Inventory</title>
 <script src="https://unpkg.com/@zxing/library@0.21.0/umd/index.min.js"></script>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-:root {
-  --pink-50: #FBEAF0;
-  --pink-100: #F4C0D1;
-  --pink-200: #ED93B1;
-  --pink-400: #D4537E;
-  --pink-600: #993556;
-  --pink-800: #72243E;
-  --gray-50: #F1EFE8;
-  --gray-100: #D3D1C7;
-  --gray-200: #B4B2A9;
-  --gray-400: #888780;
-  --gray-600: #5F5E5A;
-  --gray-800: #444441;
-  --gray-900: #2C2C2A;
-  --teal-50: #E1F5EE;
-  --teal-600: #0F6E56;
-  --teal-800: #085041;
-  --red-50: #FCEBEB;
-  --red-600: #A32D2D;
-  --amber-50: #FAEEDA;
-  --amber-400: #BA7517;
-  --amber-600: #8C5800;
-  --amber-800: #633806;
-  --blue-50: #EAF3FB;
-  --blue-600: #1A6FAD;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #faf9f7;
-  color: var(--gray-900);
-  min-height: 100vh;
-  padding-bottom: 72px;
-}
-
-.page { display: none; min-height: 100vh; }
-.page.active { display: block; }
-
-/* ── HOME ── */
-.home-header {
-  background: var(--pink-800);
-  padding: 36px 24px 28px;
-  text-align: center;
-  color: #fff;
-}
-.home-logo { font-size: 38px; margin-bottom: 8px; }
-.home-title { font-size: 21px; font-weight: 700; }
-.home-sub { font-size: 12px; opacity: 0.65; margin-top: 3px; }
-.home-version { font-size: 11px; opacity: 0.5; margin-top: 4px; }
-
-.mode-selector {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 16px 16px 0;
-}
-.mode-btn {
-  border-radius: 14px;
-  padding: 16px 12px;
-  text-align: center;
-  border: 1.5px solid var(--gray-100);
-  background: #fff;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-.mode-btn:active { transform: scale(0.97); }
-.mode-btn .mode-icon { font-size: 26px; margin-bottom: 6px; }
-.mode-btn .mode-label { font-size: 14px; font-weight: 600; color: var(--gray-900); }
-.mode-btn .mode-desc { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-.mode-btn.coming-soon { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.coming-soon-tag {
-  display: inline-block;
-  background: var(--gray-100); color: var(--gray-600);
-  font-size: 9px; font-weight: 600; padding: 2px 7px;
-  border-radius: 10px; margin-top: 4px;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.mode-btn.primary-mode { border-color: var(--pink-200); background: var(--pink-50); }
-.mode-btn.primary-mode .mode-label { color: var(--pink-800); }
-
-.home-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  padding: 14px 16px 0;
-}
-.home-stat {
-  background: #fff; border: 1px solid var(--gray-100);
-  border-radius: 12px; padding: 12px 8px; text-align: center;
-}
-.home-stat .num { font-size: 22px; font-weight: 700; color: var(--pink-600); }
-.home-stat .lbl { font-size: 10px; color: var(--gray-400); margin-top: 2px; line-height: 1.3; }
-.home-stat.warn .num { color: var(--amber-400); }
-
-.home-actions {
-  padding: 14px 16px 0;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.home-action-btn {
-  background: #fff; border: 1px solid var(--gray-100);
-  border-radius: 14px; padding: 16px 18px;
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer; transition: all 0.15s;
-  width: 100%; text-align: left; font-family: inherit;
-}
-.home-action-btn:active { background: var(--gray-50); transform: scale(0.98); }
-.home-action-btn .icon { font-size: 24px; flex-shrink: 0; }
-.home-action-btn .label { font-size: 15px; font-weight: 600; color: var(--gray-900); }
-.home-action-btn .desc { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
-.home-action-btn .arrow { margin-left: auto; color: var(--gray-200); font-size: 18px; }
-
-.home-backup {
-  margin: 14px 16px 20px;
-  background: var(--teal-50); border: 1px solid #b2ddd0;
-  border-radius: 14px; padding: 12px 14px;
-  display: flex; align-items: center; gap: 10px;
-}
-.home-backup .icon { font-size: 20px; }
-.home-backup .text { flex: 1; font-size: 12px; color: var(--teal-800); line-height: 1.4; }
-.home-backup button {
-  background: var(--teal-600); color: #fff; border: none;
-  border-radius: 10px; padding: 7px 12px; font-size: 12px;
-  font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit;
-}
-
-/* ── APP HEADER ── */
-.app-header {
-  background: var(--pink-800); color: #fff;
-  padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; gap: 10px;
-}
-.back-btn {
-  background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
-  color: #fff; font-size: 20px; width: 34px; height: 34px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.app-header h2 { font-size: 17px; font-weight: 600; flex: 1; }
-.app-header .hdr-right { font-size: 12px; opacity: 0.75; }
-
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; border-top: 1px solid var(--gray-100);
-  display: flex; z-index: 200;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-.bnav-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 9px 4px 7px; background: none; border: none; cursor: pointer;
-  color: var(--gray-400); font-size: 10px; font-weight: 500; gap: 3px;
-  transition: color 0.15s; font-family: inherit;
-}
-.bnav-btn .bnav-icon { font-size: 20px; line-height: 1; }
-.bnav-btn.active { color: var(--pink-600); }
-
-/* ── SECTIONS ── */
-.section { display: none; padding: 16px; }
-.section.active { display: block; }
-
-/* ── SCANNER ── */
-.scanner-box {
-  background: #000; border-radius: 16px; overflow: hidden;
-  position: relative; aspect-ratio: 1; max-width: 360px; margin: 0 auto 14px;
-}
-#preview { width: 100%; height: 100%; object-fit: cover; display: block; }
-.scan-overlay {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center; pointer-events: none;
-}
-.scan-frame { width: 200px; height: 120px; position: relative; }
-.scan-frame::before, .scan-frame::after,
-.scan-frame-inner::before, .scan-frame-inner::after {
-  content: ''; position: absolute; width: 28px; height: 28px;
-  border-color: #fff; border-style: solid;
-}
-.scan-frame::before { top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0; }
-.scan-frame::after { top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0; }
-.scan-frame-inner::before { bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px; }
-.scan-frame-inner::after { bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0; }
-.scan-line {
-  position: absolute; left:4px; right:4px; height:2px;
-  background: var(--pink-400); animation: scanline 2s ease-in-out infinite; border-radius: 1px;
-}
-@keyframes scanline { 0%,100%{top:10px} 50%{top:calc(100% - 12px)} }
-
-.scan-hint {
-  background: var(--pink-50); border: 1px solid var(--pink-100);
-  border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
-  font-size: 12px; color: var(--pink-800); text-align: center; line-height: 1.5;
-}
-.scan-status {
-  text-align: center; font-size: 13px; color: var(--gray-600);
-  margin-bottom: 12px; min-height: 20px; padding: 0 8px; line-height: 1.5;
-}
-.scan-status.success { color: var(--teal-600); font-weight: 500; }
-.scan-status.error { color: var(--red-600); font-weight: 500; }
-
-/* ── BUTTONS ── */
-.btn {
-  display: block; width: 100%; padding: 13px; border-radius: 12px;
-  font-size: 15px; font-weight: 600; cursor: pointer; border: none;
-  transition: opacity 0.15s, transform 0.1s; font-family: inherit;
-}
-.btn:active { transform: scale(0.98); opacity: 0.85; }
-.btn-primary { background: var(--pink-600); color: #fff; }
-.btn-secondary { background: var(--gray-50); color: var(--gray-800); border: 1px solid var(--gray-100); }
-.btn-teal { background: var(--teal-600); color: #fff; }
-.btn-sm {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: auto; padding: 7px 14px; font-size: 13px; font-weight: 500; border-radius: 8px;
-}
-.btn-danger-outline { background: var(--red-50); color: var(--red-600); border: 1px solid #f7c1c1; }
-.btn-amber-outline { background: var(--amber-50); color: var(--amber-600); border: 1px solid #f0d5a0; }
-.btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.btn-row .btn { flex: 1; }
-
-.camera-select {
-  width: 100%; padding: 10px 12px; border-radius: 10px;
-  border: 1px solid var(--gray-100); font-size: 14px;
-  color: var(--gray-800); background: var(--gray-50); margin-bottom: 12px; font-family: inherit;
-}
-.manual-toggle { text-align: center; margin-bottom: 12px; }
-.manual-toggle button {
-  background: none; border: none; color: var(--pink-600);
-  font-size: 13px; cursor: pointer; text-decoration: underline; padding: 4px; font-family: inherit;
-}
-
-/* ── FORM ── */
-.form-card {
-  background: #fff; border-radius: 16px;
-  border: 1px solid var(--gray-100); padding: 16px; margin-bottom: 12px;
-}
-.form-card h3 {
-  font-size: 14px; font-weight: 600; color: var(--pink-800);
-  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--pink-50);
-}
-.record-id-display {
-  font-size: 11px; color: var(--gray-400); font-family: monospace;
-  background: var(--gray-50); border-radius: 8px; padding: 5px 10px;
-  margin-bottom: 10px; display: inline-block;
-}
-.field { margin-bottom: 12px; }
-.field label {
-  display: block; font-size: 12px; font-weight: 500; color: var(--gray-600);
-  margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px;
-}
-.field input, .field select, .field textarea {
-  width: 100%; padding: 10px 12px; border-radius: 10px;
-  border: 1px solid var(--gray-100); font-size: 15px; color: var(--gray-900);
-  background: var(--gray-50); outline: none; transition: border-color 0.15s;
-  -webkit-appearance: none; appearance: none; font-family: inherit;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  border-color: var(--pink-200); background: #fff;
-}
-.field textarea { resize: none; height: 72px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.price-wrap { position: relative; }
-.price-wrap input { padding-left: 28px; }
-.price-symbol {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  font-size: 15px; color: var(--gray-600); font-weight: 500; pointer-events: none;
-}
-.barcode-display {
-  background: var(--pink-50); border: 1px solid var(--pink-100);
-  border-radius: 10px; padding: 10px 12px; font-size: 15px; font-weight: 600;
-  color: var(--pink-800); font-family: monospace; letter-spacing: 1px; word-break: break-all;
-}
-
-/* ── INVENTORY ── */
-.inv-toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
-.search-wrap { position: relative; flex: 1; min-width: 0; }
-.search-bar {
-  background: #fff; border: 1px solid var(--gray-100); border-radius: 12px;
-  padding: 10px 36px 10px 14px; font-size: 15px; width: 100%;
-  outline: none; -webkit-appearance: none; color: var(--gray-900); font-family: inherit;
-}
-.search-bar:focus { border-color: var(--pink-200); }
-.search-clear {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: var(--gray-200); border: none; border-radius: 50%;
-  width: 20px; height: 20px; font-size: 11px; cursor: pointer;
-  color: var(--gray-800); display: none; align-items: center; justify-content: center; padding: 0;
-}
-.sort-select {
-  background: #fff; border: 1px solid var(--gray-100); border-radius: 12px;
-  padding: 10px 12px; font-size: 13px; color: var(--gray-800); outline: none;
-  -webkit-appearance: none; cursor: pointer; font-family: inherit;
-}
-.filter-row { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
-.filter-chip {
-  border: 1px solid var(--gray-100); border-radius: 20px; padding: 6px 14px;
-  font-size: 12px; font-weight: 500; cursor: pointer; background: #fff;
-  color: var(--gray-600); white-space: nowrap; flex-shrink: 0; font-family: inherit;
-}
-.filter-chip.active { background: var(--pink-600); color: #fff; border-color: var(--pink-600); }
-
-.summary-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.summary-card {
-  background: #fff; border: 1px solid var(--gray-100); border-radius: 14px;
-  padding: 12px 14px; text-align: center;
-}
-.summary-card.clickable { cursor: pointer; }
-.summary-card.clickable:active { background: var(--pink-50); }
-.summary-card .num { font-size: 22px; font-weight: 700; color: var(--pink-600); }
-.summary-card .lbl { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-.summary-card.warn .num { color: var(--amber-400); }
-
-/* ── PRODUCT CARD ── */
-.product-card {
-  background: #fff; border-radius: 16px;
-  border: 1px solid var(--gray-100); margin-bottom: 10px; overflow: hidden;
-}
-.product-card-main {
-  padding: 14px 16px;
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
-}
-.product-card-left { flex: 1; min-width: 0; }
-.product-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
-.product-brand { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
-.product-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-.product-qty { font-size: 13px; font-weight: 600; color: var(--pink-600); }
-
-.status-badge {
-  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
-  text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0;
-}
-.status-active { background: var(--teal-50); color: var(--teal-600); }
-.status-out { background: var(--amber-50); color: var(--amber-600); }
-.status-pulled { background: var(--red-50); color: var(--red-600); }
-
-.more-details-btn {
-  width: 100%; padding: 10px 16px;
-  background: var(--gray-50); border: none; border-top: 1px solid var(--gray-100);
-  font-size: 13px; font-weight: 500; color: var(--pink-600);
-  cursor: pointer; text-align: center; font-family: inherit;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.more-details-btn:active { background: var(--pink-50); }
-.product-details { border-top: 1px solid var(--gray-100); padding: 14px 16px; display: none; }
-.product-details.open { display: block; }
-
-.detail-row { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
-.detail-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.3px; min-width: 70px; flex-shrink: 0; padding-top: 1px; }
-.detail-value { font-size: 13px; color: var(--gray-800); flex: 1; }
-
-.stock-lines { margin: 12px 0; }
-.stock-lines-title { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
-.stock-line {
-  background: var(--gray-50); border-radius: 10px;
-  padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--gray-100);
-}
-.stock-line-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.stock-exp { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-.stock-exp.warning { color: var(--amber-600); }
-.stock-exp.expired { color: var(--red-600); }
-.stock-exp-label { font-size: 10px; color: var(--gray-400); }
-
-.qty-control { display: flex; align-items: center; gap: 6px; }
-.qty-ctrl-btn {
-  width: 28px; height: 28px; border-radius: 8px; border: none;
-  font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-family: inherit;
-}
-.qty-ctrl-btn.minus { background: var(--red-50); color: var(--red-600); }
-.qty-ctrl-btn.plus { background: var(--teal-50); color: var(--teal-600); }
-.qty-val { font-size: 15px; font-weight: 700; color: var(--gray-900); min-width: 28px; text-align: center; }
-
-.stock-save-row {
-  display: none; align-items: center; gap: 8px; margin-top: 8px;
-  padding-top: 8px; border-top: 1px dashed var(--gray-100);
-}
-.stock-save-row.visible { display: flex; }
-.stock-was { font-size: 11px; color: var(--gray-400); flex: 1; }
-.stock-save-btn {
-  background: var(--pink-600); color: #fff; border: none; border-radius: 8px;
-  padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
-}
-.stock-cancel-btn {
-  background: var(--gray-100); color: var(--gray-700); border: none; border-radius: 8px;
-  padding: 6px 12px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit;
-}
-.stock-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
-.product-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-
-/* ── SALES ── */
-.sale-form-card {
-  background: #fff; border-radius: 16px;
-  border: 1px solid var(--gray-100); padding: 16px; margin-bottom: 12px;
-}
-.sale-form-card h3 {
-  font-size: 14px; font-weight: 600; color: var(--pink-800);
-  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--pink-50);
-}
-.sale-log-item {
-  background: #fff; border-radius: 14px; border: 1px solid var(--gray-100);
-  padding: 12px 14px; margin-bottom: 8px;
-}
-.sale-log-name { font-size: 14px; font-weight: 600; }
-.sale-log-meta { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
-.sale-log-price { font-size: 14px; font-weight: 600; color: var(--teal-600); margin-top: 4px; }
-.sales-note { font-size: 12px; color: var(--gray-400); text-align: center; padding: 8px; }
-
-/* ── EXPORT ── */
-.export-area {
-  background: #fff; border: 1px solid var(--gray-100);
-  border-radius: 16px; padding: 16px; margin-bottom: 12px;
-}
-.export-area h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
-.export-area p { font-size: 13px; color: var(--gray-600); margin-bottom: 12px; line-height: 1.5; }
-
-.import-result {
-  margin-top: 10px; padding: 10px 12px; border-radius: 10px;
-  font-size: 13px; font-weight: 500; display: none; line-height: 1.4;
-}
-.import-result.success { background: var(--teal-50); color: var(--teal-800); }
-.import-result.info { background: var(--amber-50); color: var(--amber-800); }
-
-input[type="file"] { display: none; }
-
-/* ── CHANGELOG DROPDOWN ── */
-.changelog-toggle {
-  width: 100%; background: none; border: none; padding: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; font-family: inherit;
-}
-.changelog-toggle h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); }
-.changelog-arrow { font-size: 13px; color: var(--gray-400); transition: transform 0.2s; }
-.changelog-arrow.open { transform: rotate(180deg); }
-.changelog-body { display: none; margin-top: 12px; }
-.changelog-body.open { display: block; }
-
-.version-item { margin-bottom: 16px; }
-.version-item:last-child { margin-bottom: 0; }
-.version-num { font-size: 13px; font-weight: 700; color: var(--pink-800); margin-bottom: 2px; }
-.version-date { font-size: 11px; color: var(--gray-400); margin-bottom: 6px; }
-.version-changes { padding-left: 14px; }
-.version-changes li { font-size: 12px; color: var(--gray-700); margin-bottom: 3px; line-height: 1.5; list-style: disc; }
-
-/* ── MODALS ── */
-.modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 500; display: none; align-items: flex-end; justify-content: center;
-}
-.modal-backdrop.active { display: flex; }
-.modal {
-  background: #fff; border-radius: 24px 24px 0 0;
-  width: 100%; max-height: 88vh; overflow-y: auto;
-  animation: slideup 0.25s ease;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-@keyframes slideup { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.modal-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 12px auto 0; }
-.modal-header {
-  padding: 14px 20px 12px; border-bottom: 1px solid var(--gray-100);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.modal-header h3 { font-size: 17px; font-weight: 600; }
-.modal-close {
-  background: var(--gray-100); border: none; border-radius: 50%;
-  width: 28px; height: 28px; font-size: 14px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-family: inherit;
-}
-.modal-body { padding: 16px 20px 24px; }
-.modal-filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.modal-filter-row .filter-chip { flex: 1; text-align: center; }
-
-.whats-new-version { font-size: 13px; color: var(--gray-400); margin-bottom: 12px; }
-.whats-new-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-.whats-new-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink-400); margin-top: 6px; flex-shrink: 0; }
-.whats-new-text { font-size: 14px; color: var(--gray-800); line-height: 1.5; }
-
-.existing-product-card {
-  background: var(--pink-50); border: 1px solid var(--pink-100);
-  border-radius: 14px; padding: 14px; margin-bottom: 16px;
-}
-.existing-product-name { font-size: 16px; font-weight: 700; color: var(--pink-800); }
-.existing-product-sub { font-size: 13px; color: var(--pink-600); margin-top: 3px; }
-.existing-product-qty { font-size: 13px; color: var(--gray-600); margin-top: 6px; }
-
-.exp-item {
-  background: var(--gray-50); border-radius: 14px; padding: 14px; margin-bottom: 10px;
-  border-left: 3px solid var(--amber-400);
-}
-.exp-item.critical { border-left-color: var(--red-600); }
-.exp-item .exp-name { font-size: 14px; font-weight: 600; }
-.exp-item .exp-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
-.exp-item .exp-days { font-size: 12px; font-weight: 600; color: var(--amber-600); margin-top: 6px; }
-.exp-item.critical .exp-days { color: var(--red-600); }
-.exp-item-actions { display: flex; gap: 8px; margin-top: 10px; }
-
-.confirm-modal .modal-body { text-align: center; padding: 24px 20px; }
-.confirm-modal .confirm-icon { font-size: 36px; margin-bottom: 12px; }
-.confirm-modal .confirm-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-.confirm-modal .confirm-msg { font-size: 14px; color: var(--gray-600); line-height: 1.5; margin-bottom: 20px; }
-.confirm-btn-row { display: flex; gap: 10px; }
-.confirm-btn-row .btn { flex: 1; }
-
-/* ── EMPTY STATE ── */
-.empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
-.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-.empty-state p { font-size: 14px; line-height: 1.5; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 85px; left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--gray-900); color: #fff; padding: 10px 20px;
-  border-radius: 24px; font-size: 13px; font-weight: 500;
-  opacity: 0; transition: all 0.25s; z-index: 999;
-  pointer-events: none; max-width: 90vw; text-align: center;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── STAGE 1 ADDITIONS ── */
-.toast-undo {
-  background: var(--gray-900); color: #fff;
-  display: flex; align-items: center; gap: 14px;
-  padding: 10px 14px 10px 20px;
-}
-.toast.toast-undo.show { pointer-events: auto; }
-.toast-undo button {
-  background: none; border: 1px solid rgba(255,255,255,0.3);
-  color: #fff; padding: 5px 12px; border-radius: 6px;
-  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
-  pointer-events: auto;
-}
-.home-backup-time {
-  font-size: 11px; color: var(--teal-800); opacity: 0.85;
-  margin-top: 8px; padding-top: 8px;
-  border-top: 1px dashed rgba(15, 110, 86, 0.2);
-}
-.storage-meter {
-  background: var(--gray-50); border-radius: 10px; padding: 10px 12px;
-  font-size: 12px; color: var(--gray-600); margin-top: 8px;
-}
-.storage-meter-bar {
-  background: var(--gray-100); height: 6px; border-radius: 3px;
-  margin-top: 6px; overflow: hidden;
-}
-.storage-meter-fill {
-  background: var(--teal-600); height: 100%; transition: width 0.3s;
-}
-.storage-meter-fill.warning { background: var(--amber-400); }
-.storage-meter-fill.danger { background: var(--red-600); }
-.qty-val.negative { color: var(--red-600); }
-.product-qty.negative { color: var(--red-600); }
-.import-result.error { background: var(--red-50); color: var(--red-600); }
-.scan-next-hint {
-  background: var(--teal-50); border: 1px solid #b2ddd0;
-  border-radius: 10px; padding: 8px 12px;
-  font-size: 12px; color: var(--teal-800); text-align: center;
-  margin-bottom: 10px;
-}
-
-/* ── STAGE 2: SALES + MARKDOWN ── */
-.product-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
-.status-sale { background: #F3EEFB; color: #6B3FA0; }
-.filter-chip.sale-active { background: #6B3FA0; color: #fff; border-color: #6B3FA0; }
-.filter-row-label { font-size: 10px; color: var(--gray-400); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 2px; }
-
-.stock-line.has-markdown { border-color: #DCCEF2; background: #F3EEFB; }
-.stock-markdown-info { font-size: 11px; color: #6B3FA0; margin-top: 2px; font-weight: 500; }
-
-.sale-mode-tabs {
-  display: flex; gap: 8px; margin-bottom: 14px;
-  background: var(--gray-50); border-radius: 12px; padding: 4px;
-}
-.sale-mode-tab {
-  flex: 1; padding: 10px; border: none; background: none;
-  font-size: 13px; font-weight: 600; color: var(--gray-600);
-  border-radius: 8px; cursor: pointer; font-family: inherit;
-}
-.sale-mode-tab.active { background: #fff; color: var(--pink-600); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-
-.sell-scan-result {
-  background: var(--teal-50); border: 1px solid #b2ddd0;
-  border-radius: 12px; padding: 14px; margin-bottom: 12px;
-}
-.sell-scan-result.not-found {
-  background: var(--red-50); border-color: #f7c1c1;
-}
-.sell-found-name { font-size: 15px; font-weight: 700; color: var(--teal-800); }
-.sell-found-name.not-found { color: var(--red-600); }
-.sell-found-sub { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
-.sell-stock-line-pick {
-  background: #fff; border: 1px solid var(--gray-100); border-radius: 10px;
-  padding: 10px 12px; margin-top: 8px; cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-}
-.sell-stock-line-pick:active { background: var(--pink-50); border-color: var(--pink-200); }
-.sell-stock-line-pick.selected { background: var(--pink-50); border-color: var(--pink-400); }
-.sell-stock-line-info { flex: 1; min-width: 0; }
-.sell-stock-line-exp { font-size: 13px; font-weight: 600; }
-.sell-stock-line-meta { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
-.sell-stock-line-price { text-align: right; font-size: 12px; }
-.sell-stock-line-price .markdown { color: #6B3FA0; font-weight: 600; }
-.sell-stock-line-price .original { color: var(--gray-400); text-decoration: line-through; font-size: 10px; }
-
-.sale-summary-card {
-  background: var(--teal-50); border: 1px solid #b2ddd0;
-  border-radius: 14px; padding: 16px; margin-bottom: 14px; text-align: center;
-}
-.sale-summary-name { font-size: 16px; font-weight: 700; color: var(--teal-800); }
-.sale-summary-detail { font-size: 13px; color: var(--gray-600); margin-top: 6px; line-height: 1.5; }
-.sale-summary-total { font-size: 22px; font-weight: 700; color: var(--teal-600); margin-top: 10px; }
-
-.markdown-input-row { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--gray-100); }
-.markdown-input-row.visible { display: block; }
-.exp-item-prices { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
-.exp-item-prices .markdown-price { color: #6B3FA0; font-weight: 600; }
-.exp-item-actions { flex-wrap: wrap; }
-
-.btn-blue-outline { background: var(--blue-50); color: var(--blue-600); border: 1px solid #C8DDF1; }
-.btn-purple-outline { background: #F3EEFB; color: #6B3FA0; border: 1px solid #DCCEF2; }
-.btn-amber { background: var(--amber-400); color: #fff; }
-.btn-purple { background: #6B3FA0; color: #fff; }
-
-#sale-stock-line-list .sell-stock-line-pick { margin-top: 8px; }
-
-.sale-log-deleted-tag {
-  display: inline-block; font-size: 9px; font-weight: 600;
-  background: var(--gray-100); color: var(--gray-600);
-  padding: 1px 6px; border-radius: 10px; margin-left: 6px;
-  text-transform: uppercase; letter-spacing: 0.3px;
-}
-
-.sale-stock-info { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
-
-/* ── STAGE 3: ACTIVITY LOG + REPORTS ── */
-.report-section-tabs {
-  display: flex; gap: 6px; margin-bottom: 14px;
-  overflow-x: auto; padding-bottom: 2px;
-}
-.report-section-tab {
-  padding: 8px 14px; border: 1px solid var(--gray-100); background: #fff;
-  border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--gray-600);
-  cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit;
-}
-.report-section-tab.active { background: var(--pink-600); color: #fff; border-color: var(--pink-600); }
-
-.activity-toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
-.activity-toolbar .search-wrap { flex: 2; }
-.activity-toolbar .sort-select { flex: 1; }
-
-.activity-filter-chips {
-  display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px;
-}
-
-.activity-item {
-  background: #fff; border-radius: 12px; border: 1px solid var(--gray-100);
-  padding: 12px 14px; margin-bottom: 8px;
-}
-.activity-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.activity-type-badge {
-  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
-  text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0;
-}
-.activity-type-add { background: var(--teal-50); color: #0A5A45; }
-.activity-type-update { background: var(--blue-50); color: #115789; }
-.activity-type-sale { background: var(--pink-50); color: var(--pink-800); }
-.activity-type-markdown { background: #F3EEFB; color: #553080; }
-.activity-type-markdown-removed { background: var(--gray-100); color: var(--gray-700); }
-.activity-type-pulled { background: var(--red-50); color: #842323; }
-.activity-type-status { background: var(--amber-50); color: #704600; }
-.activity-type-delivery { background: var(--teal-50); color: #0A5A45; }
-.activity-type-transfer { background: var(--blue-50); color: #115789; }
-.activity-type-damaged { background: var(--red-50); color: #842323; }
-.activity-type-note { background: var(--gray-100); color: var(--gray-700); }
-.activity-type-other { background: var(--gray-100); color: var(--gray-700); }
-.activity-type-removed { background: var(--red-50); color: #842323; }
-.activity-type-edit { background: var(--amber-50); color: #704600; }
-.activity-type-check { background: var(--blue-50); color: #115789; }
-.activity-type-discrepancy { background: var(--red-50); color: #842323; }
-
-.activity-desc { font-size: 13px; color: var(--gray-800); margin-top: 6px; line-height: 1.5; }
-.activity-product { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
-.activity-date { font-size: 11px; color: var(--gray-400); }
-.activity-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
-
-.home-stats-3 {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px; padding: 8px 16px 0;
-}
-.home-stat .num.small { font-size: 15px; }
-.home-stat.teal .num { color: var(--teal-600); }
-.home-stat.blue .num { color: var(--blue-600); }
-
-/* ── STAGE 4: INVENTORY CHECK ── */
-.check-banner {
-  background: var(--amber-50); border: 1px solid var(--amber-100);
-  border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
-  display: flex; align-items: center; gap: 10px;
-}
-.check-banner .icon { font-size: 22px; flex-shrink: 0; }
-.check-banner .text { flex: 1; font-size: 12px; color: var(--amber-800); line-height: 1.4; }
-.check-banner-actions { display: flex; gap: 6px; flex-shrink: 0; }
-
-.check-card {
-  background: #fff; border: 1px solid var(--gray-100);
-  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
-}
-.check-card .name { font-size: 14px; font-weight: 600; }
-.check-card .sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
-.check-card-stockline {
-  background: var(--gray-50); border-radius: 10px;
-  padding: 10px 12px; margin-top: 8px;
-  display: flex; align-items: center; gap: 10px;
-}
-.check-card-stockline.checked { background: var(--teal-50); border: 1px solid var(--teal-100); }
-.check-card-stockline.discrepancy { background: var(--amber-50); border: 1px solid var(--amber-100); }
-.check-card-stockline .info { flex: 1; min-width: 0; }
-.check-card-stockline .exp { font-size: 13px; font-weight: 600; }
-.check-card-stockline .recorded { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
-.check-card-stockline .actual-input {
-  width: 70px; padding: 6px 8px; border-radius: 8px;
-  border: 1px solid var(--gray-100); text-align: center; font-size: 14px;
-  font-family: inherit; -webkit-appearance: none; appearance: none;
-  background: #fff;
-}
-.check-card-stockline .check-icon { font-size: 18px; color: var(--teal-600); }
-
-.check-summary-item {
-  background: var(--gray-50); border-radius: 10px; padding: 10px 12px;
-  margin-bottom: 6px;
-}
-.check-summary-item.discrepancy { background: var(--amber-50); border: 1px solid var(--amber-100); }
-.check-summary-item .name { font-size: 13px; font-weight: 600; }
-.check-summary-item .nums { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
-.check-summary-item .diff { font-size: 12px; font-weight: 600; margin-top: 3px; }
-.check-summary-item .diff.positive { color: var(--teal-600); }
-.check-summary-item .diff.negative { color: var(--red-600); }
-
-.check-history-item {
-  background: #fff; border: 1px solid var(--gray-100); border-radius: 12px;
-  padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
-}
-.check-history-item:active { background: var(--gray-50); }
-.check-history-item .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.check-history-item .date { font-size: 13px; font-weight: 600; }
-.check-history-item .meta { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
-.check-history-item .badge {
-  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px;
-  text-transform: uppercase; letter-spacing: 0.3px;
-}
-.check-history-item .badge.confirmed { background: var(--teal-50); color: var(--teal-600); }
-.check-history-item .badge.flagged { background: var(--amber-50); color: var(--amber-600); }
-
-.report-section-tab.discrepancy-alert {
-  position: relative;
-}
-.report-section-tab.discrepancy-alert::after {
-  content: ''; position: absolute; top: 6px; right: 6px;
-  width: 6px; height: 6px; background: var(--red-600); border-radius: 50%;
-}
-
-/* ── STAGE 5: LOGIN SCREEN ── */
-.login-page {
-  position: fixed; inset: 0; background: var(--pink-800);
-  z-index: 1000; display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.login-page.hidden { display: none; }
-.login-box {
-  background: #fff; border-radius: 20px; padding: 32px 24px;
-  width: 100%; max-width: 380px; text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-.login-logo { font-size: 48px; margin-bottom: 8px; }
-.login-title { font-size: 22px; font-weight: 700; color: var(--pink-800); margin-bottom: 4px; }
-.login-version { font-size: 12px; color: var(--gray-400); margin-bottom: 24px; }
-.login-field { margin-bottom: 14px; text-align: left; }
-.login-field label {
-  display: block; font-size: 12px; font-weight: 500; color: var(--gray-600);
-  margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px;
-}
-.login-field input {
-  width: 100%; padding: 12px 14px; border-radius: 10px;
-  border: 1px solid var(--gray-100); font-size: 16px;
-  background: var(--gray-50); outline: none; font-family: inherit;
-  -webkit-appearance: none; appearance: none;
-}
-.login-field input:focus { border-color: var(--pink-200); background: #fff; }
-.login-error {
-  background: var(--red-50); color: var(--red-600);
-  border-radius: 10px; padding: 10px 12px; font-size: 13px;
-  margin-bottom: 14px; display: none; text-align: center;
-}
-.login-error.visible { display: block; }
-.login-btn {
-  width: 100%; padding: 14px; border-radius: 12px;
-  background: var(--pink-600); color: #fff; border: none;
-  font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
-  margin-top: 8px;
-}
-.login-btn:active { opacity: 0.85; }
-.login-note {
-  font-size: 11px; color: var(--gray-400);
-  margin-top: 20px; line-height: 1.5;
-}
-
-/* Logout button on home header */
-.home-header { position: relative; }
-.logout-btn {
-  position: absolute; top: 12px; right: 12px;
-  background: rgba(255,255,255,0.15); border: none;
-  color: #fff; padding: 6px 12px; border-radius: 8px;
-  font-size: 11px; font-weight: 600; cursor: pointer;
-  font-family: inherit; display: flex; align-items: center; gap: 4px;
-}
-.logout-btn:active { background: rgba(255,255,255,0.25); }
-
-/* ── STAGE 5: PARTIAL PULL OUT + STOCK LINE STATES ── */
-.stock-line.pulled-out {
-  opacity: 0.55; background: var(--red-50);
-  border-color: var(--red-100);
-}
-.stock-line.pulled-out .stock-exp,
-.stock-line.pulled-out .stock-markdown-info {
-  text-decoration: line-through;
-}
-.stock-pulled-tag {
-  display: inline-block; font-size: 9px; font-weight: 600;
-  background: var(--red-100); color: var(--red-700);
-  padding: 2px 7px; border-radius: 10px;
-  text-transform: uppercase; letter-spacing: 0.3px;
-  margin-left: 6px;
-}
-.status-partial {
-  background: var(--gray-100); color: var(--gray-700);
-  font-size: 9px;
-}
-.partial-pullout-info {
-  font-size: 11px; color: var(--gray-500);
-  font-style: italic; margin-top: 2px;
-}
-</style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- ═══════════════ LOGIN SCREEN (STAGE 5) ═══════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• LOGIN SCREEN (STAGE 5) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="login-page" id="login-page">
   <div class="login-box">
-    <div class="login-logo">💄</div>
+    <div class="login-logo">ðŸ’„</div>
     <div class="login-title">Inventory System</div>
     <div class="login-version">v2.6.0</div>
     <div class="login-error" id="login-error">Incorrect username or password</div>
@@ -871,11 +31,11 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
-<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HOME PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="page active" id="page-home">
   <div class="home-header">
-    <button class="logout-btn" onclick="doLogout()">🔒 Sign Out</button>
-    <div class="home-logo">💄</div>
+    <button class="logout-btn" onclick="doLogout()">ðŸ”’ Sign Out</button>
+    <div class="home-logo">ðŸ’„</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
     <div class="home-version">v2.6.0</div>
@@ -883,12 +43,12 @@ input[type="file"] { display: none; }
 
   <div class="mode-selector">
     <div class="mode-btn coming-soon">
-      <div class="mode-icon">🛍️</div>
+      <div class="mode-icon">ðŸ›ï¸</div>
       <div class="mode-label">Shop</div>
       <div><span class="coming-soon-tag">Coming Soon</span></div>
     </div>
     <button class="mode-btn primary-mode" onclick="goToApp('scan')">
-      <div class="mode-icon">📋</div>
+      <div class="mode-icon">ðŸ“‹</div>
       <div class="mode-label">Manage Business</div>
       <div class="mode-desc">Inventory and sales</div>
     </button>
@@ -911,45 +71,45 @@ input[type="file"] { display: none; }
       <div class="lbl">Total Units</div>
     </div>
     <div class="home-stat teal">
-      <div class="num small" id="home-cost-value">₱0</div>
+      <div class="num small" id="home-cost-value">â‚±0</div>
       <div class="lbl">Cost Value</div>
     </div>
     <div class="home-stat blue">
-      <div class="num small" id="home-selling-value">₱0</div>
+      <div class="num small" id="home-selling-value">â‚±0</div>
       <div class="lbl">Selling Value</div>
     </div>
   </div>
 
   <div class="home-actions">
     <button class="home-action-btn" onclick="goToApp('scan')">
-      <span class="icon">📷</span>
+      <span class="icon">ðŸ“·</span>
       <div><div class="label">Scan Item</div><div class="desc">Add new item or update existing stock</div></div>
-      <span class="arrow">›</span>
+      <span class="arrow">â€º</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('inventory')">
-      <span class="icon">📦</span>
+      <span class="icon">ðŸ“¦</span>
       <div><div class="label">Inventory</div><div class="desc">View and manage all products</div></div>
-      <span class="arrow">›</span>
+      <span class="arrow">â€º</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('sales')">
-      <span class="icon">🧾</span>
+      <span class="icon">ðŸ§¾</span>
       <div><div class="label">Sales</div><div class="desc">Record sales by scan or manual</div></div>
-      <span class="arrow">›</span>
+      <span class="arrow">â€º</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('reports')">
-      <span class="icon">📊</span>
+      <span class="icon">ðŸ“Š</span>
       <div><div class="label">Reports</div><div class="desc">Sales log, activity log, history</div></div>
-      <span class="arrow">›</span>
+      <span class="arrow">â€º</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('export')">
-      <span class="icon">💾</span>
+      <span class="icon">ðŸ’¾</span>
       <div><div class="label">Data and Export</div><div class="desc">Backup, restore, version history</div></div>
-      <span class="arrow">›</span>
+      <span class="arrow">â€º</span>
     </button>
   </div>
 
   <div class="home-backup">
-    <span class="icon">💾</span>
+    <span class="icon">ðŸ’¾</span>
     <div style="flex:1">
       <div class="text" style="font-size:12px;color:var(--teal-800);line-height:1.4">Keep your data safe. Export a backup regularly.</div>
       <div class="home-backup-time" id="home-backup-time">No backup yet. Export one now.</div>
@@ -958,17 +118,17 @@ input[type="file"] { display: none; }
   </div>
 </div>
 
-<!-- ═══════════════ APP PAGE ═══════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• APP PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="page" id="page-app">
   <div class="app-header">
-    <button class="back-btn" onclick="goHome()">‹</button>
+    <button class="back-btn" onclick="goHome()">â€¹</button>
     <h2 id="app-header-title">Inventory</h2>
     <span class="hdr-right" id="app-header-sub"></span>
   </div>
 
   <!-- SCAN -->
   <div class="section active" id="tab-scan">
-    <div class="scan-hint">📷 Use this screen to <strong>add a new item</strong> or <strong>update stock</strong> for an existing product.</div>
+    <div class="scan-hint">ðŸ“· Use this screen to <strong>add a new item</strong> or <strong>update stock</strong> for an existing product.</div>
     <div class="scanner-box">
       <video id="preview" autoplay muted playsinline></video>
       <div class="scan-overlay">
@@ -1017,8 +177,8 @@ input[type="file"] { display: none; }
         <div class="field"><label>Description</label><textarea id="f-desc" placeholder="Shade, variant, size..."></textarea></div>
         <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Any additional notes..."></textarea></div>
         <div class="field-row">
-          <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
-          <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Cost Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
         </div>
         <div class="field">
           <label>Status</label>
@@ -1038,7 +198,7 @@ input[type="file"] { display: none; }
         <div class="field"><label>Storage Location</label><input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2"></div>
       </div>
       <button class="btn btn-primary" onclick="confirmSaveProduct(false)" style="margin-bottom:8px">Save to Inventory</button>
-      <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">💾 Save and Scan Next</button>
+      <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">ðŸ’¾ Save and Scan Next</button>
       <button class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
     </div>
   </div>
@@ -1052,7 +212,7 @@ input[type="file"] { display: none; }
       </div>
       <div class="summary-card clickable warn" onclick="openExpModal()">
         <div class="num" id="stat-expiring">0</div>
-        <div class="lbl">Expiring Soon ›</div>
+        <div class="lbl">Expiring Soon â€º</div>
       </div>
     </div>
     <div class="inv-toolbar">
@@ -1076,7 +236,7 @@ input[type="file"] { display: none; }
     <div class="filter-row-label">Sales Status</div>
     <div class="filter-row" id="filter-sale">
       <button class="filter-chip active" onclick="setSaleFilter('all',this)">All</button>
-      <button class="filter-chip" onclick="setSaleFilter('onsale',this)">💰 On Sale Only</button>
+      <button class="filter-chip" onclick="setSaleFilter('onsale',this)">ðŸ’° On Sale Only</button>
     </div>
     <div id="inventory-list"></div>
   </div>
@@ -1084,8 +244,8 @@ input[type="file"] { display: none; }
   <!-- SALES -->
   <div class="section" id="tab-sales">
     <div class="sale-mode-tabs">
-      <button class="sale-mode-tab active" id="sale-tab-scan" onclick="setSaleMode('scan',this)">📷 Scan to Sell</button>
-      <button class="sale-mode-tab" id="sale-tab-manual" onclick="setSaleMode('manual',this)">✏️ Manual Log</button>
+      <button class="sale-mode-tab active" id="sale-tab-scan" onclick="setSaleMode('scan',this)">ðŸ“· Scan to Sell</button>
+      <button class="sale-mode-tab" id="sale-tab-manual" onclick="setSaleMode('manual',this)">âœï¸ Manual Log</button>
     </div>
 
     <!-- SCAN TO SELL -->
@@ -1108,7 +268,7 @@ input[type="file"] { display: none; }
         <div class="sale-form-card">
           <h3>Confirm Sale Details</h3>
           <div class="field"><label>Qty Sold *</label><input type="number" id="sell-qty" min="1" value="1" inputmode="numeric"></div>
-          <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
           <div class="field"><label>Date of Sale</label><input type="date" id="sell-date"></div>
           <button class="btn btn-primary" onclick="confirmSellScan()">Record Sale</button>
         </div>
@@ -1130,7 +290,7 @@ input[type="file"] { display: none; }
           </div>
         </div>
         <div class="field"><label>Qty Sold *</label><input type="number" id="sale-qty" min="1" value="1" inputmode="numeric"></div>
-        <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
         <div class="field"><label>Date of Sale</label><input type="date" id="sale-date"></div>
         <button class="btn btn-primary" onclick="confirmLogSale()">Record Sale</button>
       </div>
@@ -1140,9 +300,9 @@ input[type="file"] { display: none; }
   <!-- REPORTS TAB (STAGE 3) -->
   <div class="section" id="tab-reports">
     <div class="report-section-tabs">
-      <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">📋 Activity</button>
-      <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">🧾 Sales</button>
-      <button class="report-section-tab" id="report-tab-check" onclick="setReportSection('check',this)">✅ Stock Check</button>
+      <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">ðŸ“‹ Activity</button>
+      <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">ðŸ§¾ Sales</button>
+      <button class="report-section-tab" id="report-tab-check" onclick="setReportSection('check',this)">âœ… Stock Check</button>
     </div>
 
     <!-- Activity Log -->
@@ -1202,7 +362,7 @@ input[type="file"] { display: none; }
     <div class="export-area">
       <button class="changelog-toggle" onclick="toggleChangelog(this)">
         <h3>Version History</h3>
-        <span class="changelog-arrow" id="changelog-arrow">▾</span>
+        <span class="changelog-arrow" id="changelog-arrow">â–¾</span>
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
@@ -1232,7 +392,7 @@ input[type="file"] { display: none; }
             <li>Full Inventory Check feature with two modes</li>
             <li>Scan Mode: scan items physically, app marks each as checked</li>
             <li>Manual Count: enter actual qty for each stock entry by hand</li>
-            <li>Auto-save check progress — resume if app is closed mid-check</li>
+            <li>Auto-save check progress â€” resume if app is closed mid-check</li>
             <li>Resume banner appears at top of Stock Check tab</li>
             <li>Duplicate scan handling: prompts Mark Again or Skip</li>
             <li>Check summary screen shows all discrepancies before applying</li>
@@ -1269,7 +429,7 @@ input[type="file"] { display: none; }
           <div class="version-num">Version 2.3.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
-            <li>Scan to Sell mode — cashier-style sales recording</li>
+            <li>Scan to Sell mode â€” cashier-style sales recording</li>
             <li>Manual sale log with stock line selection by expiry</li>
             <li>Sales automatically deduct from the selected stock line</li>
             <li>Oversell warning with option to Proceed Anyway</li>
@@ -1327,7 +487,7 @@ input[type="file"] { display: none; }
           <div class="version-num">Version 2.0.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
-            <li>Grouped inventory structure — products and stock lines are now separate</li>
+            <li>Grouped inventory structure â€” products and stock lines are now separate</li>
             <li>Same barcode scan now asks for expiry date and merges or creates new stock line</li>
             <li>Cost Price, Selling Price, and Notes fields added to product form</li>
             <li>Sales Log tab added for recording sales</li>
@@ -1359,25 +519,25 @@ input[type="file"] { display: none; }
   </div>
 
   <div class="bottom-nav">
-    <button class="bnav-btn active" id="bnav-scan" onclick="switchTab('scan',this)"><span class="bnav-icon">📷</span>Scan</button>
-    <button class="bnav-btn" id="bnav-inventory" onclick="switchTab('inventory',this)"><span class="bnav-icon">📦</span>Inventory</button>
-    <button class="bnav-btn" id="bnav-sales" onclick="switchTab('sales',this)"><span class="bnav-icon">🧾</span>Sales</button>
-    <button class="bnav-btn" id="bnav-reports" onclick="switchTab('reports',this)"><span class="bnav-icon">📊</span>Reports</button>
-    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">💾</span>Data</button>
+    <button class="bnav-btn active" id="bnav-scan" onclick="switchTab('scan',this)"><span class="bnav-icon">ðŸ“·</span>Scan</button>
+    <button class="bnav-btn" id="bnav-inventory" onclick="switchTab('inventory',this)"><span class="bnav-icon">ðŸ“¦</span>Inventory</button>
+    <button class="bnav-btn" id="bnav-sales" onclick="switchTab('sales',this)"><span class="bnav-icon">ðŸ§¾</span>Sales</button>
+    <button class="bnav-btn" id="bnav-reports" onclick="switchTab('reports',this)"><span class="bnav-icon">ðŸ“Š</span>Reports</button>
+    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">ðŸ’¾</span>Data</button>
   </div>
 </div>
 
-<!-- ═══════════════ MODALS ═══════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MODALS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 
 <div class="modal-backdrop" id="modal-whatsnew">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <h3>✨ What's New</h3>
-      <button class="modal-close" onclick="closeWhatsNew()">✕</button>
+      <h3>âœ¨ What's New</h3>
+      <button class="modal-close" onclick="closeWhatsNew()">âœ•</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.6.0 — May 2026</div>
+      <div class="whats-new-version">Version 2.6.0 â€” May 2026</div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Login screen now protects access. Sign in with your credentials.</div></div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Auto-logout after 30 minutes of inactivity for safety.</div></div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pull out a specific stock line by expiry, not the entire product.</div></div>
@@ -1394,7 +554,7 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Item Already Exists</h3>
-      <button class="modal-close" onclick="closeModal('modal-existing')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-existing')">âœ•</button>
     </div>
     <div class="modal-body">
       <div class="existing-product-card">
@@ -1415,7 +575,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">💾</div>
+      <div class="confirm-icon">ðŸ’¾</div>
       <div class="confirm-title">Save Product?</div>
       <div class="confirm-msg">Are you sure you want to save this product to your inventory?</div>
       <div class="confirm-btn-row">
@@ -1430,7 +590,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">✏️</div>
+      <div class="confirm-icon">âœï¸</div>
       <div class="confirm-title">Save Changes?</div>
       <div class="confirm-msg">Are you sure you want to save these changes?</div>
       <div class="confirm-btn-row">
@@ -1445,7 +605,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-icon">ðŸ—‘ï¸</div>
       <div class="confirm-title">Delete Product?</div>
       <div class="confirm-msg">This will permanently delete this product and all its stock entries. This cannot be undone.</div>
       <div class="confirm-btn-row">
@@ -1460,7 +620,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-icon">âš ï¸</div>
       <div class="confirm-title">Remove Stock Entry?</div>
       <div class="confirm-msg">Are you sure you want to remove this stock entry?</div>
       <div class="confirm-btn-row">
@@ -1475,7 +635,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-icon">âš ï¸</div>
       <div class="confirm-title">Remove Stock Entry?</div>
       <div class="confirm-msg">Are you sure you want to remove this stock entry from the expiry list?</div>
       <div class="confirm-btn-row">
@@ -1490,7 +650,7 @@ input[type="file"] { display: none; }
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-icon">ðŸ—‘ï¸</div>
       <div class="confirm-title">Clear All Data?</div>
       <div class="confirm-msg">This will permanently delete all inventory and sales data. This cannot be undone. Make sure you have a CSV backup first.</div>
       <div class="confirm-btn-row">
@@ -1504,7 +664,7 @@ input[type="file"] { display: none; }
 <!-- STAGE 2: Sale modals -->
 <div class="modal-backdrop" id="modal-confirm-sale">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">🧾</div>
+    <div class="confirm-icon">ðŸ§¾</div>
     <div class="confirm-title">Record Sale?</div>
     <div class="confirm-msg" id="confirm-sale-msg">Record this sale?</div>
     <div class="confirm-btn-row">
@@ -1516,7 +676,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-confirm-oversell">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-icon">âš ï¸</div>
     <div class="confirm-title">Oversell Warning</div>
     <div class="confirm-msg" id="oversell-msg"></div>
     <div class="confirm-btn-row">
@@ -1528,7 +688,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-sale-summary">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>✅ Sale Recorded</h3><button class="modal-close" onclick="closeModal('modal-sale-summary')">✕</button></div>
+    <div class="modal-header"><h3>âœ… Sale Recorded</h3><button class="modal-close" onclick="closeModal('modal-sale-summary')">âœ•</button></div>
     <div class="modal-body">
       <div class="sale-summary-card">
         <div class="sale-summary-name" id="summary-name"></div>
@@ -1542,7 +702,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-confirm-markdown">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">💰</div>
+    <div class="confirm-icon">ðŸ’°</div>
     <div class="confirm-title">Apply Markdown?</div>
     <div class="confirm-msg" id="markdown-confirm-msg"></div>
     <div class="confirm-btn-row">
@@ -1555,7 +715,7 @@ input[type="file"] { display: none; }
 <!-- STAGE 3: Activity Log modals -->
 <div class="modal-backdrop" id="modal-manual-log">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Add Manual Log Entry</h3><button class="modal-close" onclick="closeModal('modal-manual-log')">✕</button></div>
+    <div class="modal-header"><h3>Add Manual Log Entry</h3><button class="modal-close" onclick="closeModal('modal-manual-log')">âœ•</button></div>
     <div class="modal-body">
       <div class="field">
         <label>Type</label>
@@ -1583,7 +743,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-confirm-manual-log">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">📝</div>
+    <div class="confirm-icon">ðŸ“</div>
     <div class="confirm-title">Save Log Entry?</div>
     <div class="confirm-msg">Add this manual entry to the activity log?</div>
     <div class="confirm-btn-row">
@@ -1595,7 +755,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-edit-activity">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Edit Activity Entry</h3><button class="modal-close" onclick="closeModal('modal-edit-activity')">✕</button></div>
+    <div class="modal-header"><h3>Edit Activity Entry</h3><button class="modal-close" onclick="closeModal('modal-edit-activity')">âœ•</button></div>
     <div class="modal-body">
       <input type="hidden" id="edit-activity-id">
       <div class="field">
@@ -1628,7 +788,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-confirm-delete-activity">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-icon">ðŸ—‘ï¸</div>
     <div class="confirm-title">Delete Log Entry?</div>
     <div class="confirm-msg">Permanently delete this activity log entry?</div>
     <div class="confirm-btn-row">
@@ -1641,12 +801,12 @@ input[type="file"] { display: none; }
 <!-- STAGE 4: Inventory Check modals -->
 <div class="modal-backdrop" id="modal-start-check">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Start Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-start-check')">✕</button></div>
+    <div class="modal-header"><h3>Start Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-start-check')">âœ•</button></div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.5">Choose how you want to do this check.</p>
-      <button class="btn btn-primary" style="margin-bottom:10px" onclick="startCheck('scan')">📷 Scan Mode</button>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="startCheck('scan')">ðŸ“· Scan Mode</button>
       <p style="font-size:12px;color:var(--gray-400);margin:-4px 0 12px;text-align:center;line-height:1.4">Scan each item physically. Unscanned items will be flagged.</p>
-      <button class="btn btn-secondary" onclick="startCheck('manual')">✏️ Manual Count</button>
+      <button class="btn btn-secondary" onclick="startCheck('manual')">âœï¸ Manual Count</button>
       <p style="font-size:12px;color:var(--gray-400);margin:4px 0 0;text-align:center;line-height:1.4">Enter actual qty for each stock entry by hand.</p>
     </div>
   </div>
@@ -1654,7 +814,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-active-check">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3 id="check-title">Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-active-check')">✕</button></div>
+    <div class="modal-header"><h3 id="check-title">Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-active-check')">âœ•</button></div>
     <div class="modal-body">
       <div id="check-scan-area" style="display:none">
         <div class="scanner-box" style="margin-bottom:10px;max-width:280px">
@@ -1679,7 +839,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-check-summary">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Check Summary</h3><button class="modal-close" onclick="closeModal('modal-check-summary')">✕</button></div>
+    <div class="modal-header"><h3>Check Summary</h3><button class="modal-close" onclick="closeModal('modal-check-summary')">âœ•</button></div>
     <div class="modal-body">
       <div id="check-summary-content"></div>
       <div class="btn-row" style="margin-top:14px">
@@ -1694,14 +854,14 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-past-check">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3 id="past-check-title">Past Check</h3><button class="modal-close" onclick="closeModal('modal-past-check')">✕</button></div>
+    <div class="modal-header"><h3 id="past-check-title">Past Check</h3><button class="modal-close" onclick="closeModal('modal-past-check')">âœ•</button></div>
     <div class="modal-body" id="past-check-body"></div>
   </div>
 </div>
 
 <div class="modal-backdrop" id="modal-discard-check">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-icon">âš ï¸</div>
     <div class="confirm-title">Discard Check?</div>
     <div class="confirm-msg">Discard this inventory check? All progress will be lost.</div>
     <div class="confirm-btn-row">
@@ -1713,7 +873,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-duplicate-scan">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-icon">âš ï¸</div>
     <div class="confirm-title">Already Scanned</div>
     <div class="confirm-msg" id="duplicate-scan-msg"></div>
     <div class="confirm-btn-row">
@@ -1728,7 +888,7 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Edit Product</h3>
-      <button class="modal-close" onclick="closeModal('modal-edit-product')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-edit-product')">âœ•</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-record-id">
@@ -1746,8 +906,8 @@ input[type="file"] { display: none; }
       <div class="field"><label>Description</label><textarea id="edit-desc"></textarea></div>
       <div class="field"><label>Notes</label><textarea id="edit-notes"></textarea></div>
       <div class="field-row">
-        <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
-        <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Cost Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
       </div>
       <div class="field">
         <label>Status</label>
@@ -1763,7 +923,7 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Add Stock</h3>
-      <button class="modal-close" onclick="closeModal('modal-add-stock')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-add-stock')">âœ•</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="add-stock-record-id">
@@ -1788,7 +948,7 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Edit Stock Entry</h3>
-      <button class="modal-close" onclick="closeModal('modal-edit-stock')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-edit-stock')">âœ•</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-stock-id">
@@ -1801,7 +961,7 @@ input[type="file"] { display: none; }
 
 <div class="modal-backdrop" id="modal-confirm-edit-stock">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">✏️</div>
+    <div class="confirm-icon">âœï¸</div>
     <div class="confirm-title">Save Stock Changes?</div>
     <div class="confirm-msg">Update this stock entry?</div>
     <div class="confirm-btn-row">
@@ -1816,7 +976,7 @@ input[type="file"] { display: none; }
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Upcoming Expirations</h3>
-      <button class="modal-close" onclick="closeModal('modal-exp')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-exp')">âœ•</button>
     </div>
     <div class="modal-body">
       <div class="modal-filter-row">
@@ -1831,2733 +991,12 @@ input[type="file"] { display: none; }
 
 <div class="toast" id="toast"></div>
 
-<script>
-// ─────────────────────────────────────────
-// STAGE 5: LOGIN / AUTH SYSTEM
-// ─────────────────────────────────────────
-// NOTE: Client-side SHA-256 is a SOFT GATE, not real security.
-// Real auth comes in Phase 2.5 with Supabase. This is for casual prevention only.
-
-const VALID_USERNAME = 'admin';
-// SHA-256 of "amaya0827"
-const VALID_PASSWORD_HASH = 'fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e';
-const AUTO_LOGOUT_MS = 30 * 60 * 1000; // 30 minutes
-const AUTH_KEY = 'ci_auth_token';
-
-// SHA-256 implementation using SubtleCrypto (built into browsers)
-async function sha256(str) {
-  const buf = new TextEncoder().encode(str);
-  const hashBuf = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(hashBuf))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-function isAuthValid() {
-  try {
-    const raw = localStorage.getItem(AUTH_KEY);
-    if (!raw) return false;
-    const token = JSON.parse(raw);
-    if (!token || !token.expiresAt) return false;
-    if (Date.now() > token.expiresAt) return false;
-    return true;
-  } catch(e) { return false; }
-}
-
-function setAuthToken() {
-  try {
-    localStorage.setItem(AUTH_KEY, JSON.stringify({
-      user: VALID_USERNAME,
-      issuedAt: Date.now(),
-      expiresAt: Date.now() + AUTO_LOGOUT_MS,
-    }));
-  } catch(e) {}
-}
-
-function clearAuthToken() {
-  try { localStorage.removeItem(AUTH_KEY); } catch(e) {}
-}
-
-function refreshAuthToken() {
-  // Extend expiry on user activity
-  if (!isAuthValid()) return;
-  setAuthToken();
-}
-
-async function doLogin() {
-  const u = (document.getElementById('login-username').value || '').trim();
-  const p = document.getElementById('login-password').value || '';
-  const errEl = document.getElementById('login-error');
-  if (!u || !p) {
-    errEl.textContent = 'Please enter username and password';
-    errEl.classList.add('visible');
-    return;
-  }
-  try {
-    const ph = await sha256(p);
-    if (u === VALID_USERNAME && ph === VALID_PASSWORD_HASH) {
-      setAuthToken();
-      document.getElementById('login-password').value = '';
-      errEl.classList.remove('visible');
-      showApp();
-    } else {
-      errEl.textContent = 'Incorrect username or password';
-      errEl.classList.add('visible');
-      document.getElementById('login-password').value = '';
-    }
-  } catch(e) {
-    errEl.textContent = 'Login error: ' + e.message;
-    errEl.classList.add('visible');
-  }
-}
-
-function doLogout() {
-  clearAuthToken();
-  // Make sure user is on home page when logging out
-  document.getElementById('page-home').classList.add('active');
-  document.getElementById('page-app').classList.remove('active');
-  // Stop any cameras
-  try { if (codeReader) { codeReader.reset(); codeReader = null; } } catch(e) {}
-  try { if (typeof saleScannerReader !== 'undefined' && saleScannerReader) { saleScannerReader.reset(); saleScannerReader = null; } } catch(e) {}
-  try { if (typeof checkScannerReader !== 'undefined' && checkScannerReader) { checkScannerReader.reset(); checkScannerReader = null; } } catch(e) {}
-  showLogin();
-}
-
-function showLogin() {
-  document.getElementById('login-page').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  // Focus username after slight delay
-  setTimeout(() => {
-    const u = document.getElementById('login-username');
-    if (u && !u.value) u.focus();
-  }, 100);
-}
-
-function showApp() {
-  document.getElementById('login-page').classList.add('hidden');
-  document.body.style.overflow = '';
-  // Refresh UI
-  if (typeof updateCounts === 'function') updateCounts();
-  if (typeof initWhatsNew === 'function') initWhatsNew();
-}
-
-// Activity tracker - extends auth token on user interaction
-let lastActivityTs = Date.now();
-function trackActivity() {
-  if (!isAuthValid()) return;
-  const now = Date.now();
-  // Only refresh token if more than 1 minute since last refresh (avoid excessive writes)
-  if (now - lastActivityTs > 60000) {
-    refreshAuthToken();
-    lastActivityTs = now;
-  }
-}
-
-// Auto-logout checker - runs every minute
-function checkAuthExpiry() {
-  // Only act if currently logged in (token not yet expired)
-  // BUT: we need to detect when token EXPIRES and force show login
-  const loginVisible = !document.getElementById('login-page').classList.contains('hidden');
-  if (loginVisible) return; // already on login screen
-  if (!isAuthValid()) {
-    // Token expired
-    showToast('Session expired. Please sign in again.');
-    doLogout();
-  }
-}
-
-// Attach activity listeners (will be set after DOM ready in init)
-function setupAuthListeners() {
-  ['click','keydown','touchstart','scroll'].forEach(evt => {
-    document.addEventListener(evt, trackActivity, { passive: true });
-  });
-  // Check expiry every 60 seconds
-  setInterval(checkAuthExpiry, 60000);
-}
-
-// ─────────────────────────────────────────
-// FIX 1: Define all utility functions FIRST
-// before any code that calls them
-// ─────────────────────────────────────────
-const APP_VERSION = '2.6.0';
-
-function generateId(prefix) {
-  return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
-}
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function esc(str) {
-  // FIX L3: Properly escape all XSS-prone chars including single quote
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show';
-  if (t._tid) clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// FIX H1: Undo system for destructive actions
-let undoTimer = null;
-function showUndoToast(msg, undoFn) {
-  const t = document.getElementById('toast');
-  t.innerHTML = '<span>' + esc(msg) + '</span><button id="undo-btn">UNDO</button>';
-  t.className = 'toast toast-undo show';
-  const btn = document.getElementById('undo-btn');
-  if (btn) {
-    btn.onclick = function() {
-      try { undoFn(); } catch(e) { console.error(e); }
-      t.classList.remove('show');
-      if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
-    };
-  }
-  if (undoTimer) clearTimeout(undoTimer);
-  undoTimer = setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => { t.textContent = ''; t.className = 'toast'; }, 300);
-    undoTimer = null;
-  }, 6000);
-}
-
-// FIX H5: Storage size monitoring
-function getStorageInfo() {
-  let totalSize = 0;
-  try {
-    ['ci_products','ci_stocks','ci_sales','ci_activity','ci_checks','ci_active_check','cosmetics_inv'].forEach(k => {
-      const v = localStorage.getItem(k);
-      if (v) totalSize += v.length;
-    });
-  } catch(e) {}
-  const approxLimit = 5 * 1024 * 1024;
-  const pct = Math.min(100, Math.round((totalSize / approxLimit) * 100));
-  return { used: totalSize, pct };
-}
-
-function updateStorageMeter() {
-  const meter = document.getElementById('storage-meter');
-  if (!meter) return;
-  const info = getStorageInfo();
-  const cls = info.pct > 85 ? 'danger' : info.pct > 65 ? 'warning' : '';
-  meter.innerHTML =
-    '<div>Storage: <strong>' + (info.used / 1024).toFixed(1) + ' KB</strong> used (~' + info.pct + '%)</div>' +
-    '<div class="storage-meter-bar"><div class="storage-meter-fill ' + cls + '" style="width:' + Math.min(100, info.pct) + '%"></div></div>' +
-    (info.pct > 85 ? '<div style="color:var(--red-600);margin-top:6px">⚠️ Storage almost full. Export backup and clear old data.</div>' : '');
-}
-
-// Update last backup display
-function updateBackupDisplay() {
-  const el = document.getElementById('home-backup-time');
-  if (!el) return;
-  let lastBackup = null;
-  try { lastBackup = localStorage.getItem('ci_last_backup'); } catch(e) {}
-  if (lastBackup) {
-    const d = new Date(lastBackup);
-    el.textContent = 'Last backup: ' + d.toLocaleDateString() + ' at ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-  } else {
-    el.textContent = 'No backup yet. Export one now.';
-  }
-}
-
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-// ─────────────────────────────────────────
-// DATA — load from storage
-// ─────────────────────────────────────────
-let products = [];
-let stockLines = [];
-let sales = [];
-// STAGE 3: Activity log
-let activityLog = [];
-// STAGE 4: Inventory checks
-let inventoryChecks = [];
-let activeCheck = null;
-
-try { products = JSON.parse(localStorage.getItem('ci_products') || '[]'); } catch(e) {}
-try { stockLines = JSON.parse(localStorage.getItem('ci_stocks') || '[]'); } catch(e) {}
-try { sales = JSON.parse(localStorage.getItem('ci_sales') || '[]'); } catch(e) {}
-try { activityLog = JSON.parse(localStorage.getItem('ci_activity') || '[]'); } catch(e) {}
-try { inventoryChecks = JSON.parse(localStorage.getItem('ci_checks') || '[]'); } catch(e) {}
-try {
-  const ac = localStorage.getItem('ci_active_check');
-  if (ac) activeCheck = JSON.parse(ac);
-} catch(e) { activeCheck = null; }
-
-// FIX 2: Migration now runs AFTER utility functions are defined
-const oldData = localStorage.getItem('cosmetics_inv');
-if (oldData && products.length === 0) {
-  try {
-    const old = JSON.parse(oldData);
-    old.forEach(item => {
-      const pid = item.recordId || generateId('REC');
-      products.push({
-        recordId: pid,
-        barcode: item.barcode || '',
-        name: item.name || '',
-        brand: item.brand || '',
-        category: item.category || '',
-        desc: item.desc || '',
-        notes: item.notes || '',
-        cost: item.cost || item.price || '',
-        selling: item.selling || item.price || '',
-        status: item.status || 'active',
-        unit: item.unit || 'pcs',
-        location: item.location || '',
-        dateAdded: item.dateAdded || today(),
-      });
-      stockLines.push({
-        id: generateId('STK'),
-        productId: pid,
-        exp: item.exp || '',
-        qty: parseInt(item.qty) || 1,
-        dateAdded: item.dateAdded || today(),
-        markdownPrice: '',
-        pulledOut: false,
-      });
-    });
-  } catch(e) {}
-}
-
-// STAGE 2: Migrate stock lines to add markdownPrice field
-(function migrateStage2() {
-  let needsSave = false;
-  stockLines.forEach(s => {
-    if (s.markdownPrice === undefined) { s.markdownPrice = ''; needsSave = true; }
-  });
-  if (needsSave) {
-    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
-  }
-})();
-
-// STAGE 5: Migrate stock lines to add pulledOut field
-(function migrateStage5() {
-  let needsSave = false;
-  stockLines.forEach(s => {
-    if (s.pulledOut === undefined) { s.pulledOut = false; needsSave = true; }
-  });
-  if (needsSave) {
-    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
-  }
-})();
-
-// State vars
-let currentBarcode = '';
-let editingProductId = null;
-let deletingProductId = null;
-let removingStockId = null;
-let removingExpStockId = null;
-let existingBarcodeProductId = null;
-let activeStatusFilter = 'all';
-let activeExpFilter = 30;
-let codeReader = null;
-let openDetailsPanelId = null;
-// FIX Issue 1: Save and Scan Next flag
-let saveAndScanNext = false;
-// FIX Issue 3: Edit stock line state
-let editingStockId = null;
-// STAGE 2: Sales + markdown state
-let activeSaleFilter = 'all';
-let saleMode = 'scan';
-let saleScannerReader = null;
-let pendingSale = null;
-let pendingMarkdown = null;
-// STAGE 3: Activity log + reports state
-let activeReportSection = 'activity';
-let activityTypeFilter = 'all';
-let editingActivityId = null;
-let deletingActivityId = null;
-let pendingManualLog = null;
-// STAGE 4: Inventory check state
-let checkScannerReader = null;
-let pendingDuplicateScan = null;
-let viewingCheckId = null;
-
-// STAGE 3: Log activity helper (used by all actions)
-function logActivity(type, productId, productName, description) {
-  activityLog.unshift({
-    id: generateId('ACT'),
-    type: type,
-    productId: productId || '',
-    productName: productName || '',
-    description: description,
-    timestamp: new Date().toISOString(),
-    date: today(),
-  });
-  // Cap at 5000 entries to prevent storage bloat
-  if (activityLog.length > 5000) activityLog = activityLog.slice(0, 5000);
-}
-
-// STAGE 3: Calculate inventory values for home stats
-function calcInventoryValue() {
-  let cost = 0, sell = 0;
-  products.forEach(p => {
-    if (p.status === 'pulled') return;
-    const lines = stockLines.filter(s => s.productId === p.recordId);
-    lines.forEach(s => {
-      const qty = parseInt(s.qty) || 0;
-      if (qty <= 0) return;
-      const costPrice = parseFloat(p.cost) || 0;
-      const sellPrice = parseFloat(s.markdownPrice || p.selling) || 0;
-      cost += qty * costPrice;
-      sell += qty * sellPrice;
-    });
-  });
-  return { cost, sell };
-}
-
-function formatMoney(n) {
-  if (!n) return '₱0';
-  if (n >= 1000000) return '₱' + (n/1000000).toFixed(1) + 'M';
-  if (n >= 10000) return '₱' + (n/1000).toFixed(0) + 'K';
-  if (n >= 1000) return '₱' + n.toLocaleString(undefined, {maximumFractionDigits:0});
-  return '₱' + n.toFixed(n % 1 === 0 ? 0 : 2);
-}
-
-// FIX Issue 4: Auto out of stock when qty hits zero
-function checkAutoOutOfStock(productId) {
-  const p = products.find(x => x.recordId === productId);
-  if (!p) return;
-  if (p.status === 'pulled') return; // don't override pulled out (full product)
-  // STAGE 5: only count stock that is not pulled out
-  const total = stockLines.filter(s => s.productId === productId && !s.pulledOut).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
-  if (total <= 0 && p.status === 'active') {
-    p.status = 'out';
-    return true;
-  }
-  if (total > 0 && p.status === 'out') {
-    p.status = 'active';
-    return true;
-  }
-  return false;
-}
-
-// STAGE 2: Product has any markdown stock line (excluding pulled out)
-function productHasMarkdown(productId) {
-  return stockLines.some(s => s.productId === productId && s.markdownPrice && (parseInt(s.qty) || 0) > 0 && !s.pulledOut);
-}
-
-// STAGE 2: Auto-reset markdown when stock line hits zero
-function checkAutoMarkdownReset(stockLineId) {
-  const s = stockLines.find(x => x.id === stockLineId);
-  if (!s || !s.markdownPrice) return false;
-  if ((parseInt(s.qty) || 0) <= 0) {
-    s.markdownPrice = '';
-    return true;
-  }
-  return false;
-}
-
-// STAGE 5: Pull out state helpers
-function stockLinesForProduct(rid) {
-  return stockLines.filter(s => s.productId === rid);
-}
-function pulledOutCount(rid) {
-  return stockLines.filter(s => s.productId === rid && s.pulledOut).length;
-}
-function isFullyPulledOut(rid) {
-  const lines = stockLinesForProduct(rid);
-  if (lines.length === 0) return false;
-  return lines.every(s => s.pulledOut);
-}
-function isPartiallyPulledOut(rid) {
-  const lines = stockLinesForProduct(rid);
-  if (lines.length === 0) return false;
-  const pulled = lines.filter(s => s.pulledOut).length;
-  return pulled > 0 && pulled < lines.length;
-}
-
-// STAGE 5: Auto-sync product status with stock line pull out state
-function syncProductStatusFromStockLines(rid) {
-  const p = products.find(x => x.recordId === rid);
-  if (!p) return false;
-  const lines = stockLinesForProduct(rid);
-  if (lines.length === 0) return false;
-  const fullyPulled = isFullyPulledOut(rid);
-  if (fullyPulled && p.status !== 'pulled') {
-    const oldStatus = p.status;
-    p.status = 'pulled';
-    logActivity('status', rid, p.name, 'Auto status change: ' + oldStatus + ' → Pulled Out (all stock lines pulled out)');
-    return true;
-  }
-  if (!fullyPulled && p.status === 'pulled') {
-    // Was Pulled Out at product level, but not all stock lines are pulled now
-    // Check qty to decide active vs out
-    const total = productTotalQty(rid);
-    const newStatus = total > 0 ? 'active' : 'out';
-    p.status = newStatus;
-    logActivity('status', rid, p.name, 'Auto status change: Pulled Out → ' + (newStatus === 'active' ? 'Active' : 'Out of Stock'));
-    return true;
-  }
-  return false;
-}
-
-// ─────────────────────────────────────────
-// SAVE
-// ─────────────────────────────────────────
-function saveAll() {
-  // FIX C1: Validate arrays before writing to prevent data corruption
-  if (!Array.isArray(products)) products = [];
-  if (!Array.isArray(stockLines)) stockLines = [];
-  if (!Array.isArray(sales)) sales = [];
-  if (!Array.isArray(activityLog)) activityLog = [];
-  if (!Array.isArray(inventoryChecks)) inventoryChecks = [];
-  let storageError = false;
-  try { localStorage.setItem('ci_products', JSON.stringify(products)); } catch(e) { storageError = true; }
-  try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) { storageError = true; }
-  try { localStorage.setItem('ci_sales', JSON.stringify(sales)); } catch(e) { storageError = true; }
-  try { localStorage.setItem('ci_activity', JSON.stringify(activityLog)); } catch(e) { storageError = true; }
-  try { localStorage.setItem('ci_checks', JSON.stringify(inventoryChecks)); } catch(e) { storageError = true; }
-  try {
-    if (activeCheck) localStorage.setItem('ci_active_check', JSON.stringify(activeCheck));
-    else localStorage.removeItem('ci_active_check');
-  } catch(e) { storageError = true; }
-  if (storageError) {
-    showToast('⚠️ Storage error! Export backup now.');
-  }
-  updateStorageMeter();
-}
-
-function productTotalQty(productId) {
-  return stockLines.filter(s => s.productId === productId).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
-}
-
-// ─────────────────────────────────────────
-// COUNTS — FIX 3: safe element access
-// ─────────────────────────────────────────
-function updateCounts() {
-  const activeProds = products.filter(p => p.status === 'active').length;
-  const totalUnits = stockLines.reduce((s, l) => s + (parseInt(l.qty) || 0), 0);
-  const now = new Date(); now.setHours(0,0,0,0);
-  const in30 = new Date(now.getTime() + 30 * 86400000);
-  const expiring = stockLines.filter(s => {
-    if (!s.exp || (parseInt(s.qty) || 0) <= 0) return false;
-    const d = new Date(s.exp);
-    return d >= now && d <= in30;
-  }).length;
-
-  const setElVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setElVal('home-active', activeProds);
-  setElVal('home-total', totalUnits);
-  setElVal('home-expiring', expiring);
-  setElVal('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
-  setElVal('stat-expiring', expiring);
-  setElVal('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
-
-  // STAGE 3: Cost and selling value
-  const val = calcInventoryValue();
-  setElVal('home-cost-value', formatMoney(val.cost));
-  setElVal('home-selling-value', formatMoney(val.sell));
-}
-
-// ─────────────────────────────────────────
-// NAVIGATION
-// ─────────────────────────────────────────
-function goHome() {
-  document.getElementById('page-home').classList.add('active');
-  document.getElementById('page-app').classList.remove('active');
-  if (codeReader) { try { codeReader.reset(); } catch(e) {} codeReader = null; }
-  stopSellScanner();
-  stopCheckScanner();
-  updateCounts();
-}
-
-function goToApp(tab) {
-  document.getElementById('page-home').classList.remove('active');
-  document.getElementById('page-app').classList.add('active');
-  switchTab(tab, document.getElementById('bnav-' + tab));
-  updateCounts();
-}
-
-function switchTab(name, el) {
-  // Stop scanners when leaving their tabs
-  if (name !== 'scan') stopScanner();
-  if (name !== 'sales') stopSellScanner();
-
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (el) el.classList.add('active');
-  const titles = { scan:'Scan Item', inventory:'Inventory', sales:'Sales', reports:'Reports', export:'Data and Export' };
-  document.getElementById('app-header-title').textContent = titles[name] || name;
-  if (name === 'inventory') applyFilters();
-  if (name === 'sales') {
-    populateSaleProductSelect();
-    const dateEl = document.getElementById('sale-date');
-    if (dateEl) dateEl.value = today();
-    const sellDateEl = document.getElementById('sell-date');
-    if (sellDateEl) sellDateEl.value = today();
-  }
-  if (name === 'reports') renderReports();
-}
-
-// ─────────────────────────────────────────
-// WHAT'S NEW — FIX 4: safe storage check
-// ─────────────────────────────────────────
-function closeWhatsNew() {
-  closeModal('modal-whatsnew');
-  try { localStorage.setItem('ci_seen_version', APP_VERSION); } catch(e) {}
-}
-
-function initWhatsNew() {
-  let seen = '';
-  try { seen = localStorage.getItem('ci_seen_version') || ''; } catch(e) {}
-  if (seen !== APP_VERSION) {
-    openModal('modal-whatsnew');
-  }
-}
-
-// Close modal on backdrop tap (not whatsnew)
-document.querySelectorAll('.modal-backdrop').forEach(b => {
-  b.addEventListener('click', function(e) {
-    if (e.target === b && b.id !== 'modal-whatsnew') b.classList.remove('active');
-  });
-});
-
-// ─────────────────────────────────────────
-// CHANGELOG DROPDOWN
-// ─────────────────────────────────────────
-function toggleChangelog(btn) {
-  const body = document.getElementById('changelog-body');
-  const arrow = document.getElementById('changelog-arrow');
-  const open = body.classList.toggle('open');
-  arrow.classList.toggle('open', open);
-}
-
-// ─────────────────────────────────────────
-// CAMERA
-// ─────────────────────────────────────────
-async function startScanner() {
-  try {
-    document.getElementById('scan-status').textContent = 'Requesting camera access...';
-    document.getElementById('scan-status').className = 'scan-status';
-    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const allDevices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
-    if (videoDevices.length === 0) throw new Error('No camera found.');
-    const sel = document.getElementById('camera-select');
-    sel.innerHTML = '';
-    videoDevices.forEach((d, i) => {
-      const opt = document.createElement('option');
-      opt.value = d.deviceId;
-      opt.textContent = d.label || 'Camera ' + (i + 1);
-      sel.appendChild(opt);
-    });
-    if (videoDevices.length > 1) sel.style.display = 'block';
-    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
-    sel.value = backCam.deviceId;
-    codeReader = new ZXing.BrowserMultiFormatReader();
-    beginDecode(backCam.deviceId);
-    document.getElementById('start-btn').style.display = 'none';
-    document.getElementById('stop-btn').style.display = 'block';
-  } catch(e) {
-    document.getElementById('scan-status').textContent = 'Camera error: ' + e.message;
-    document.getElementById('scan-status').className = 'scan-status error';
-  }
-}
-
-function beginDecode(deviceId) {
-  document.getElementById('scan-status').textContent = 'Point camera at a barcode...';
-  document.getElementById('scan-status').className = 'scan-status';
-  codeReader.decodeFromVideoDevice(deviceId, 'preview', (result) => {
-    if (result) onBarcodeDetected(result.getText());
-  });
-}
-
-function switchCamera() {
-  const id = document.getElementById('camera-select').value;
-  if (!id || !codeReader) return;
-  codeReader.reset();
-  beginDecode(id);
-}
-
-function stopScanner() {
-  if (codeReader) { try { codeReader.reset(); } catch(e) {} codeReader = null; }
-  document.getElementById('start-btn').style.display = 'block';
-  document.getElementById('stop-btn').style.display = 'none';
-  document.getElementById('camera-select').style.display = 'none';
-  document.getElementById('scan-status').textContent = 'Camera stopped';
-  document.getElementById('scan-status').className = 'scan-status';
-}
-
-function onBarcodeDetected(raw) {
-  if (!raw || !raw.trim()) return;
-  const code = raw.trim();
-  if (codeReader) { try { codeReader.reset(); } catch(e) {} codeReader = null; }
-  document.getElementById('start-btn').style.display = 'block';
-  document.getElementById('stop-btn').style.display = 'none';
-  document.getElementById('camera-select').style.display = 'none';
-  document.getElementById('scan-status').textContent = 'Barcode detected: ' + code;
-  document.getElementById('scan-status').className = 'scan-status success';
-  handleBarcode(code);
-}
-
-function handleBarcode(code) {
-  const existing = products.find(p => p.barcode === code);
-  if (existing) {
-    showExistingProductModal(existing);
-  } else {
-    currentBarcode = code;
-    openNewProductForm(code);
-  }
-}
-
-// ─────────────────────────────────────────
-// MANUAL ENTRY
-// ─────────────────────────────────────────
-function toggleManualEntry() {
-  const el = document.getElementById('manual-entry');
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-
-function useManualBarcode() {
-  const code = document.getElementById('manual-barcode').value.trim();
-  if (!code) { showToast('Please enter a barcode number'); return; }
-  document.getElementById('manual-entry').style.display = 'none';
-  document.getElementById('manual-barcode').value = '';
-  handleBarcode(code);
-}
-
-function useNoBarcode() {
-  const existing = products.filter(p => /^NOBC-\d+$/.test(p.barcode));
-  const nums = existing.map(p => parseInt(p.barcode.replace('NOBC-', ''), 10));
-  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
-  const code = 'NOBC-' + String(next).padStart(3, '0');
-  currentBarcode = code;
-  document.getElementById('manual-entry').style.display = 'none';
-  document.getElementById('manual-barcode').value = '';
-  openNewProductForm(code);
-}
-
-// ─────────────────────────────────────────
-// EXISTING BARCODE MODAL
-// ─────────────────────────────────────────
-function showExistingProductModal(product) {
-  existingBarcodeProductId = product.recordId;
-  const totalQty = productTotalQty(product.recordId);
-  document.getElementById('existing-name').textContent = product.name;
-  document.getElementById('existing-sub').textContent = (product.brand || '') + (product.category ? ' | ' + product.category : '');
-  document.getElementById('existing-qty').textContent = 'Current total stock: ' + totalQty + ' ' + (product.unit || 'pcs');
-  document.getElementById('existing-exp-input').value = '';
-  document.getElementById('existing-qty-input').value = '1';
-  openModal('modal-existing');
-}
-
-function confirmAddToExisting() {
-  const exp = document.getElementById('existing-exp-input').value;
-  const qtyToAdd = parseInt(document.getElementById('existing-qty-input').value) || 0;
-  if (qtyToAdd < 1) { showToast('Please enter a valid quantity (at least 1)'); return; }
-
-  const product = products.find(p => p.recordId === existingBarcodeProductId);
-  if (!product) return;
-
-  const existingLine = stockLines.find(s => s.productId === existingBarcodeProductId && s.exp === exp);
-  if (existingLine) {
-    const oldQty = parseInt(existingLine.qty) || 0;
-    existingLine.qty = oldQty + qtyToAdd;
-    logActivity('update', product.recordId, product.name, 'Stock added: +' + qtyToAdd + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
-    showToast(qtyToAdd + ' unit(s) added to existing stock entry.');
-  } else {
-    stockLines.push({
-      id: generateId('STK'),
-      productId: existingBarcodeProductId,
-      exp,
-      qty: qtyToAdd,
-      dateAdded: today(),
-      markdownPrice: '',
-      pulledOut: false,
-    });
-    logActivity('add', product.recordId, product.name, 'New stock entry: ' + qtyToAdd + ' units (exp: ' + (exp || 'no expiry') + ')');
-    showToast('New stock entry added' + (exp ? ' for exp: ' + exp : '') + '.');
-  }
-
-  saveAll();
-  closeModal('modal-existing');
-  checkAutoOutOfStock(existingBarcodeProductId);
-  existingBarcodeProductId = null;
-  updateCounts();
-}
-
-// ─────────────────────────────────────────
-// NEW PRODUCT FORM
-// ─────────────────────────────────────────
-function openNewProductForm(barcode) {
-  const newId = generateId('REC');
-  document.getElementById('item-form').style.display = 'block';
-  document.getElementById('form-record-id').textContent = 'Record ID: ' + newId;
-  document.getElementById('form-record-id').dataset.rid = newId;
-  document.getElementById('form-barcode').textContent = barcode;
-  ['f-name','f-brand','f-desc','f-notes','f-cost','f-selling','f-loc'].forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('f-category').value = '';
-  document.getElementById('f-status').value = 'active';
-  document.getElementById('f-qty').value = '1';
-  document.getElementById('f-unit').value = 'pcs';
-  document.getElementById('f-exp').value = '';
-  setTimeout(() => document.getElementById('f-name').focus(), 100);
-}
-
-function cancelForm() {
-  document.getElementById('item-form').style.display = 'none';
-  currentBarcode = '';
-  document.getElementById('scan-status').textContent = 'Ready to scan';
-  document.getElementById('scan-status').className = 'scan-status';
-}
-
-function confirmSaveProduct(scanNext) {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { showToast('Product name is required'); document.getElementById('f-name').focus(); return; }
-  saveAndScanNext = !!scanNext;
-  openModal('modal-confirm-save');
-}
-
-function doSaveProduct() {
-  closeModal('modal-confirm-save');
-  const recordId = document.getElementById('form-record-id').dataset.rid;
-  const barcode = document.getElementById('form-barcode').textContent;
-  const qty = parseInt(document.getElementById('f-qty').value) || 1;
-
-  products.push({
-    recordId,
-    barcode,
-    name: document.getElementById('f-name').value.trim(),
-    brand: document.getElementById('f-brand').value.trim(),
-    category: document.getElementById('f-category').value,
-    desc: document.getElementById('f-desc').value.trim(),
-    notes: document.getElementById('f-notes').value.trim(),
-    cost: document.getElementById('f-cost').value.trim(),
-    selling: document.getElementById('f-selling').value.trim(),
-    status: document.getElementById('f-status').value,
-    unit: document.getElementById('f-unit').value,
-    location: document.getElementById('f-loc').value.trim(),
-    dateAdded: today(),
-  });
-
-  stockLines.push({
-    id: generateId('STK'),
-    productId: recordId,
-    exp: document.getElementById('f-exp').value,
-    qty,
-    dateAdded: today(),
-    markdownPrice: '',
-    pulledOut: false,
-  });
-
-  checkAutoOutOfStock(recordId);
-  logActivity('add', recordId, document.getElementById('f-name').value.trim(), 'New product added: ' + document.getElementById('f-name').value.trim() + ', initial qty: ' + qty + (document.getElementById('f-exp').value ? ', exp: ' + document.getElementById('f-exp').value : ''));
-  saveAll();
-  cancelForm();
-  showToast('Product saved!');
-  updateCounts();
-
-  // FIX Issue 1: Save and Scan Next
-  if (saveAndScanNext) {
-    saveAndScanNext = false;
-    setEl('scan-status', 'Ready to scan next item');
-    setTimeout(() => startScanner(), 300);
-  }
-}
-
-// Helper for safe DOM updates (used in counts)
-function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-
-// ─────────────────────────────────────────
-// INVENTORY LIST
-// ─────────────────────────────────────────
-function setStatusFilter(val, el) {
-  activeStatusFilter = val;
-  document.querySelectorAll('#filter-availability .filter-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  applyFilters();
-}
-
-// STAGE 2: Sales status filter
-function setSaleFilter(val, el) {
-  activeSaleFilter = val;
-  document.querySelectorAll('#filter-sale .filter-chip').forEach(c => {
-    c.classList.remove('active'); c.classList.remove('sale-active');
-  });
-  if (el) {
-    if (val === 'onsale') el.classList.add('sale-active');
-    else el.classList.add('active');
-  }
-  applyFilters();
-}
-
-function onSearch(input) {
-  document.getElementById('search-clear').style.display = input.value ? 'flex' : 'none';
-  applyFilters();
-}
-
-function clearSearch() {
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-clear').style.display = 'none';
-  applyFilters();
-}
-
-function applyFilters() {
-  const searchEl = document.getElementById('search-input');
-  const sortEl = document.getElementById('sort-select');
-  if (!searchEl || !sortEl) return;
-  const q = (searchEl.value || '').toLowerCase().trim();
-  const sort = sortEl.value;
-
-  let filtered = products.filter(p => {
-    const matchSearch = !q || (p.name || '').toLowerCase().includes(q) || (p.barcode || '').toLowerCase().includes(q);
-    const matchStatus = activeStatusFilter === 'all' || p.status === activeStatusFilter;
-    const matchSale = activeSaleFilter === 'all' || (activeSaleFilter === 'onsale' && productHasMarkdown(p.recordId));
-    return matchSearch && matchStatus && matchSale;
-  });
-
-  filtered.sort((a, b) => {
-    if (sort === 'name') return (a.name || '').localeCompare(b.name || '');
-    if (sort === 'barcode') return (a.barcode || '').localeCompare(b.barcode || '');
-    if (!a.dateAdded && !b.dateAdded) return 0;
-    if (!a.dateAdded) return 1;
-    if (!b.dateAdded) return -1;
-    return b.dateAdded.localeCompare(a.dateAdded);
-  });
-
-  renderList(filtered, q);
-  updateCounts();
-}
-
-function renderList(filtered, q) {
-  const list = document.getElementById('inventory-list');
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4E6;</div><p>' +
-      (products.length === 0 ? 'No products yet.<br>Go to Scan to add your first product.' : 'No results found.') +
-      '</p></div>';
-    return;
-  }
-
-  list.innerHTML = filtered.map(p => {
-    const totalQty = productTotalQty(p.recordId);
-    const statusLabel = { active:'Active', out:'Out of Stock', pulled:'Pulled Out' }[p.status] || 'Active';
-    const statusCls = { active:'status-active', out:'status-out', pulled:'status-pulled' }[p.status] || 'status-active';
-    const onSale = productHasMarkdown(p.recordId);
-    const rid = p.recordId;
-    const ridEsc = esc(rid);
-
-    const lines = stockLines.filter(s => s.productId === rid).sort((a, b) => {
-      if (!a.exp && !b.exp) return 0;
-      if (!a.exp) return 1;
-      if (!b.exp) return -1;
-      return a.exp.localeCompare(b.exp);
-    });
-
-    const stockHTML = lines.map(s => {
-      const sid = s.id;
-      const sidEsc = esc(sid);
-      const expLabel = getExpLabel(s.exp);
-      const expCls = getExpCls(s.exp);
-      const origQty = parseInt(s.qty) || 0;
-      const hasMarkdown = !!s.markdownPrice;
-      const isPulled = !!s.pulledOut;
-      const pulledTag = isPulled ? '<span class="stock-pulled-tag">Pulled Out</span>' : '';
-      return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + (isPulled ? ' pulled-out' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
-        '<div class="stock-line-top">' +
-          '<div>' +
-            '<div class="stock-exp-label">Expiry' + pulledTag + '</div>' +
-            '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
-            (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
-          '</div>' +
-          '<div class="qty-control">' +
-            '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">−</button>' +
-            '<div class="qty-val" id="qv-' + sidEsc + '">' + origQty + '</div>' +
-            '<button class="qty-ctrl-btn plus" onclick="changeStockQty(\'' + sidEsc + '\',1)">+</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="stock-save-row" id="ssr-' + sidEsc + '">' +
-          '<span class="stock-was" id="sw-' + sidEsc + '">was ' + origQty + '</span>' +
-          '<button class="stock-cancel-btn" onclick="cancelStockQty(\'' + sidEsc + '\')">Cancel</button>' +
-          '<button class="stock-save-btn" onclick="saveStockQty(\'' + sidEsc + '\',\'' + ridEsc + '\')">Save</button>' +
-        '</div>' +
-        '<div class="stock-actions">' +
-          '<button class="btn btn-secondary btn-sm" onclick="openEditStock(\'' + sidEsc + '\')">Edit</button>' +
-          (isPulled ?
-            '<button class="btn btn-teal-outline btn-sm" onclick="restoreStockLine(\'' + sidEsc + '\')">Restore</button>' :
-            '<button class="btn btn-amber-outline btn-sm" onclick="pullOutStockLine(\'' + sidEsc + '\')">Pull Out</button>'
-          ) +
-          '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStock(\'' + sidEsc + '\')">Remove</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-
-    const isOpen = openDetailsPanelId === rid;
-
-    const detailsHTML =
-      '<div class="product-details' + (isOpen ? ' open' : '') + '" id="pd-' + ridEsc + '">' +
-        '<div class="detail-row"><span class="detail-label">Barcode</span><span class="detail-value" style="font-family:monospace">' + esc(p.barcode) + '</span></div>' +
-        (p.category ? '<div class="detail-row"><span class="detail-label">Category</span><span class="detail-value">' + esc(p.category) + '</span></div>' : '') +
-        (p.desc ? '<div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">' + esc(p.desc) + '</span></div>' : '') +
-        (p.cost || p.selling ? '<div class="detail-row"><span class="detail-label">Price</span><span class="detail-value">' + (p.cost ? 'Cost: ₱' + esc(p.cost) : '') + (p.cost && p.selling ? '  |  ' : '') + (p.selling ? 'Selling: ₱' + esc(p.selling) : '') + '</span></div>' : '') +
-        (p.notes ? '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">' + esc(p.notes) + '</span></div>' : '') +
-        '<div class="stock-lines">' +
-          '<div class="stock-lines-title">Stock Entries (' + lines.length + ')</div>' +
-          (stockHTML || '<div style="font-size:13px;color:var(--gray-400);text-align:center;padding:8px">No stock entries</div>') +
-        '</div>' +
-        '<div class="product-actions">' +
-          '<button class="btn btn-secondary btn-sm" onclick="openEditProduct(\'' + ridEsc + '\')">Edit Product</button>' +
-          '<button class="btn btn-secondary btn-sm" onclick="openAddStock(\'' + ridEsc + '\')">Add Stock</button>' +
-          '<button class="btn btn-danger-outline btn-sm" onclick="confirmDeleteProduct(\'' + ridEsc + '\')">Delete Product</button>' +
-        '</div>' +
-      '</div>';
-
-    const partialPulled = isPartiallyPulledOut(rid);
-    const pulledLineCount = pulledOutCount(rid);
-    const totalLineCount = lines.length;
-
-    return '<div class="product-card">' +
-      '<div class="product-card-main">' +
-        '<div class="product-card-left">' +
-          '<div class="product-name">' + esc(p.name) + '</div>' +
-          (p.brand ? '<div class="product-brand">' + esc(p.brand) + '</div>' : '') +
-          '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + esc(p.unit || 'pcs') + '</span></div>' +
-          (partialPulled ? '<div class="partial-pullout-info">⚠ ' + pulledLineCount + ' of ' + totalLineCount + ' stock lines pulled out</div>' : '') +
-        '</div>' +
-        '<div class="product-badges">' +
-          '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
-          (onSale ? '<span class="status-badge status-sale">💰 On Sale</span>' : '') +
-          (partialPulled ? '<span class="status-badge status-partial">Partial Pull</span>' : '') +
-        '</div>' +
-      '</div>' +
-      '<button class="more-details-btn" onclick="toggleDetails(\'' + ridEsc + '\',this)">' +
-        '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? '▾' : '▸') + '</span> More Details' +
-      '</button>' +
-      detailsHTML +
-    '</div>';
-  }).join('');
-}
-
-function toggleDetails(rid, btn) {
-  const el = document.getElementById('pd-' + rid);
-  const icon = document.getElementById('mdb-icon-' + rid);
-  const open = el.classList.toggle('open');
-  icon.textContent = open ? '▾' : '▸';
-  openDetailsPanelId = open ? rid : null;
-}
-
-function getExpLabel(exp) {
-  if (!exp) return '';
-  const now = new Date(); now.setHours(0,0,0,0);
-  const diff = Math.ceil((new Date(exp) - now) / 86400000);
-  if (diff < 0) return ' (Expired)';
-  if (diff <= 30) return ' (Expiring soon)';
-  return '';
-}
-
-function getExpCls(exp) {
-  if (!exp) return '';
-  const now = new Date(); now.setHours(0,0,0,0);
-  const diff = Math.ceil((new Date(exp) - now) / 86400000);
-  if (diff < 0) return 'expired';
-  if (diff <= 30) return 'warning';
-  return '';
-}
-
-// ─────────────────────────────────────────
-// STOCK QTY CONTROLS — FIX 10: use data attr
-// ─────────────────────────────────────────
-function changeStockQty(sid, delta) {
-  const valEl = document.getElementById('qv-' + sid);
-  const saveRow = document.getElementById('ssr-' + sid);
-  const wasEl = document.getElementById('sw-' + sid);
-  const slEl = document.getElementById('sl-' + sid);
-
-  const current = parseInt(valEl.textContent) || 0;
-  const newVal = Math.max(0, current + delta);
-  valEl.textContent = newVal;
-
-  if (!saveRow.classList.contains('visible')) {
-    const origQty = parseInt(slEl.dataset.origQty) || 0;
-    wasEl.textContent = 'was ' + origQty;
-    saveRow.classList.add('visible');
-  }
-}
-
-// FIX 10: Cancel reads original qty from data attribute
-function cancelStockQty(sid) {
-  const slEl = document.getElementById('sl-' + sid);
-  const origQty = parseInt(slEl.dataset.origQty) || 0;
-  document.getElementById('qv-' + sid).textContent = origQty;
-  document.getElementById('ssr-' + sid).classList.remove('visible');
-}
-
-// FIX 13: After saving qty, re-render to keep panel open
-function saveStockQty(sid, rid) {
-  const stock = stockLines.find(s => s.id === sid);
-  if (!stock) return;
-  const product = products.find(p => p.recordId === rid);
-  const oldQty = parseInt(stock.qty) || 0;
-  const newQty = parseInt(document.getElementById('qv-' + sid).textContent) || 0;
-  stock.qty = newQty;
-  const slEl = document.getElementById('sl-' + sid);
-  if (slEl) slEl.dataset.origQty = newQty;
-  document.getElementById('ssr-' + sid).classList.remove('visible');
-  document.getElementById('sw-' + sid).textContent = 'was ' + newQty;
-  openDetailsPanelId = rid;
-  if (product) logActivity('update', rid, product.name, 'Qty manually adjusted (exp: ' + (stock.exp || 'no expiry') + '): ' + oldQty + ' → ' + newQty);
-  checkAutoMarkdownReset(sid);
-  checkAutoOutOfStock(rid);
-  saveAll();
-  showToast('Quantity updated!');
-  updateCounts();
-  applyFilters();
-}
-
-function confirmRemoveStock(sid) {
-  removingStockId = sid;
-  openModal('modal-confirm-remove-stock');
-}
-
-// FIX Issue 3: Edit individual stock line
-function openEditStock(sid) {
-  const s = stockLines.find(x => x.id === sid);
-  if (!s) return;
-  editingStockId = sid;
-  document.getElementById('edit-stock-id').value = sid;
-  document.getElementById('edit-stock-exp').value = s.exp || '';
-  document.getElementById('edit-stock-qty').value = s.qty || 0;
-  openModal('modal-edit-stock');
-}
-
-function confirmEditStock() {
-  openModal('modal-confirm-edit-stock');
-}
-
-function doEditStock() {
-  const s = stockLines.find(x => x.id === editingStockId);
-  if (!s) return;
-  const product = products.find(p => p.recordId === s.productId);
-  const oldExp = s.exp, oldQty = s.qty;
-  s.exp = document.getElementById('edit-stock-exp').value;
-  s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
-  if (product) {
-    const changes = [];
-    if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' → ' + (s.exp || 'none'));
-    if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' → ' + s.qty);
-    if (changes.length) logActivity('edit', product.recordId, product.name, 'Stock entry edited: ' + changes.join(', '));
-  }
-  openDetailsPanelId = s.productId;
-  checkAutoMarkdownReset(s.id);
-  checkAutoOutOfStock(s.productId);
-  saveAll();
-  closeModal('modal-confirm-edit-stock');
-  closeModal('modal-edit-stock');
-  applyFilters();
-  showToast('Stock entry updated');
-  editingStockId = null;
-}
-
-function doRemoveStock() {
-  const backup = stockLines.find(s => s.id === removingStockId);
-  if (!backup) { closeModal('modal-confirm-remove-stock'); return; }
-  const stockBackup = JSON.parse(JSON.stringify(backup));
-  const rid = backup.productId;
-  const product = products.find(p => p.recordId === rid);
-  stockLines = stockLines.filter(s => s.id !== removingStockId);
-  if (product) logActivity('removed', rid, product.name, 'Stock entry removed (exp: ' + (stockBackup.exp || 'no expiry') + ', qty was: ' + stockBackup.qty + ')');
-  checkAutoOutOfStock(rid);
-  saveAll();
-  closeModal('modal-confirm-remove-stock');
-  applyFilters();
-  showUndoToast('Stock entry removed', () => {
-    stockLines.push(stockBackup);
-    if (product) logActivity('edit', rid, product.name, 'Stock entry restore (undo)');
-    checkAutoOutOfStock(rid);
-    saveAll();
-    applyFilters();
-    showToast('Restored!');
-  });
-  removingStockId = null;
-}
-
-// ─────────────────────────────────────────
-// EDIT PRODUCT
-// ─────────────────────────────────────────
-function openEditProduct(rid) {
-  const p = products.find(x => x.recordId === rid);
-  if (!p) return;
-  editingProductId = rid;
-  document.getElementById('edit-record-id').value = rid;
-  document.getElementById('edit-name').value = p.name || '';
-  document.getElementById('edit-brand').value = p.brand || '';
-  document.getElementById('edit-category').value = p.category || '';
-  document.getElementById('edit-desc').value = p.desc || '';
-  document.getElementById('edit-notes').value = p.notes || '';
-  document.getElementById('edit-cost').value = p.cost || '';
-  document.getElementById('edit-selling').value = p.selling || '';
-  document.getElementById('edit-status').value = p.status || 'active';
-  openModal('modal-edit-product');
-}
-
-function confirmEditProduct() {
-  if (!document.getElementById('edit-name').value.trim()) { showToast('Product name is required'); return; }
-  openModal('modal-confirm-edit');
-}
-
-function doEditProduct() {
-  const p = products.find(x => x.recordId === editingProductId);
-  if (!p) return;
-  const oldStatus = p.status;
-  p.name = document.getElementById('edit-name').value.trim();
-  p.brand = document.getElementById('edit-brand').value.trim();
-  p.category = document.getElementById('edit-category').value;
-  p.desc = document.getElementById('edit-desc').value.trim();
-  p.notes = document.getElementById('edit-notes').value.trim();
-  p.cost = document.getElementById('edit-cost').value.trim();
-  p.selling = document.getElementById('edit-selling').value.trim();
-  p.status = document.getElementById('edit-status').value;
-  openDetailsPanelId = editingProductId;
-  logActivity('edit', p.recordId, p.name, 'Product edited' + (oldStatus !== p.status ? ' (status: ' + oldStatus + ' → ' + p.status + ')' : ''));
-  saveAll();
-  closeModal('modal-confirm-edit');
-  closeModal('modal-edit-product');
-  applyFilters();
-  showToast('Product updated!');
-}
-
-// ─────────────────────────────────────────
-// DELETE PRODUCT
-// ─────────────────────────────────────────
-function confirmDeleteProduct(rid) {
-  deletingProductId = rid;
-  openModal('modal-confirm-delete');
-}
-
-function doDeleteProduct() {
-  const p = products.find(x => x.recordId === deletingProductId);
-  if (!p) { closeModal('modal-confirm-delete'); return; }
-  const productBackup = JSON.parse(JSON.stringify(p));
-  const stockBackup = stockLines.filter(s => s.productId === deletingProductId).map(s => JSON.parse(JSON.stringify(s)));
-
-  products = products.filter(x => x.recordId !== deletingProductId);
-  stockLines = stockLines.filter(s => s.productId !== deletingProductId);
-  if (openDetailsPanelId === deletingProductId) openDetailsPanelId = null;
-  logActivity('removed', productBackup.recordId, productBackup.name, 'Product deleted: ' + productBackup.name);
-  saveAll();
-  closeModal('modal-confirm-delete');
-  applyFilters();
-  showUndoToast('Product deleted', () => {
-    products.push(productBackup);
-    stockBackup.forEach(s => stockLines.push(s));
-    logActivity('add', productBackup.recordId, productBackup.name, 'Product delete undone');
-    saveAll();
-    applyFilters();
-    showToast('Restored!');
-  });
-  deletingProductId = null;
-}
-
-// ─────────────────────────────────────────
-// ADD STOCK — FIX 13: keep panel open after
-// ─────────────────────────────────────────
-function openAddStock(rid) {
-  const p = products.find(x => x.recordId === rid);
-  if (!p) return;
-  document.getElementById('add-stock-record-id').value = rid;
-  document.getElementById('add-stock-product-name').textContent = 'Adding stock to: ' + p.name;
-  document.getElementById('add-stock-exp').value = '';
-  document.getElementById('add-stock-qty').value = '1';
-  document.getElementById('add-stock-unit').value = p.unit || 'pcs';
-  document.getElementById('add-stock-loc').value = p.location || '';
-  openModal('modal-add-stock');
-}
-
-function doAddStock() {
-  const rid = document.getElementById('add-stock-record-id').value;
-  const exp = document.getElementById('add-stock-exp').value;
-  const qty = parseInt(document.getElementById('add-stock-qty').value) || 0;
-  if (qty < 1) { showToast('Please enter a quantity of at least 1'); return; }
-  const p = products.find(x => x.recordId === rid);
-
-  const existingLine = stockLines.find(s => s.productId === rid && s.exp === exp);
-  if (existingLine) {
-    const oldQty = parseInt(existingLine.qty) || 0;
-    existingLine.qty = oldQty + qty;
-    if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
-    showToast(qty + ' unit(s) added to existing stock entry.');
-  } else {
-    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false });
-    if (p) logActivity('add', rid, p.name, 'New stock entry: ' + qty + ' units (exp: ' + (exp || 'no expiry') + ')');
-    showToast('New stock entry added.');
-  }
-
-  openDetailsPanelId = rid;
-  checkAutoOutOfStock(rid);
-  saveAll();
-  closeModal('modal-add-stock');
-  applyFilters();
-}
-
-// ─────────────────────────────────────────
-// EXPIRY MODAL — FIX 11: proper confirm modal
-// ─────────────────────────────────────────
-function openExpModal() {
-  activeExpFilter = 30;
-  document.querySelectorAll('#modal-exp .filter-chip').forEach((c, i) => c.classList.toggle('active', i === 0));
-  renderExpList();
-  openModal('modal-exp');
-}
-
-function setExpFilter(days, el) {
-  activeExpFilter = days;
-  document.querySelectorAll('#modal-exp .filter-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderExpList();
-}
-
-function renderExpList() {
-  const now = new Date(); now.setHours(0,0,0,0);
-  const cutoff = new Date(now.getTime() + activeExpFilter * 86400000);
-  const items = stockLines
-    .filter(s => s.exp && new Date(s.exp) <= cutoff && (parseInt(s.qty) || 0) > 0 && !s.pulledOut)
-    .sort((a, b) => a.exp.localeCompare(b.exp));
-
-  const list = document.getElementById('exp-modal-list');
-  if (items.length === 0) {
-    list.innerHTML = '<div class="empty-state" style="padding:24px"><div class="icon">✅</div><p>No items expiring within this period.</p></div>';
-    return;
-  }
-
-  list.innerHTML = items.map(s => {
-    const p = products.find(x => x.recordId === s.productId);
-    if (!p) return '';
-    const d = new Date(s.exp);
-    const diff = Math.ceil((d - now) / 86400000);
-    const isCritical = diff <= 30;
-    const daysLabel = diff < 0 ? 'Expired ' + Math.abs(diff) + ' day(s) ago' :
-      diff === 0 ? 'Expires today!' : 'Expires in ' + diff + ' day(s)';
-    const sidEsc = esc(s.id);
-    const ridEsc = esc(p.recordId);
-    return '<div class="exp-item' + (isCritical ? ' critical' : '') + '">' +
-      '<div class="exp-name">' + esc(p.name) + '</div>' +
-      '<div class="exp-sub">' + esc(p.barcode) + (p.brand ? ' | ' + esc(p.brand) : '') + ' | Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
-      '<div class="exp-days">' + daysLabel + ' (' + esc(s.exp) + ')</div>' +
-      '<div class="exp-item-prices">' +
-        (p.selling ? 'Selling: ₱' + esc(p.selling) : '') +
-        (s.markdownPrice ? ' <span class="markdown-price">| Marked down: ₱' + esc(s.markdownPrice) + '</span>' : '') +
-      '</div>' +
-      '<div class="exp-item-actions">' +
-        '<button class="btn btn-purple-outline btn-sm" onclick="openMarkdownInput(\'' + sidEsc + '\')">💰 ' + (s.markdownPrice ? 'Edit Markdown' : 'Mark Down') + '</button>' +
-        '<button class="btn btn-amber-outline btn-sm" onclick="pullOutStockLine(\'' + sidEsc + '\')">Pull Out</button>' +
-        '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStockFromExp(\'' + sidEsc + '\')">Remove</button>' +
-      '</div>' +
-      '<div class="markdown-input-row" id="mir-' + sidEsc + '">' +
-        '<div class="field" style="margin-top:8px"><label>New Markdown Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="mip-' + sidEsc + '" placeholder="0.00" min="0" step="0.01" inputmode="decimal" value="' + esc(s.markdownPrice || '') + '"></div></div>' +
-        '<div class="btn-row" style="margin-bottom:0">' +
-          '<button class="btn btn-secondary btn-sm" onclick="cancelMarkdownInput(\'' + sidEsc + '\')">Cancel</button>' +
-          (s.markdownPrice ? '<button class="btn btn-danger-outline btn-sm" onclick="removeMarkdown(\'' + sidEsc + '\')">Remove</button>' : '') +
-          '<button class="btn btn-primary btn-sm" onclick="confirmMarkdown(\'' + sidEsc + '\')">Apply</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-// STAGE 2: Markdown input UI
-function openMarkdownInput(sid) {
-  document.querySelectorAll('.markdown-input-row').forEach(r => r.classList.remove('visible'));
-  const row = document.getElementById('mir-' + sid);
-  if (row) row.classList.add('visible');
-}
-
-function cancelMarkdownInput(sid) {
-  const row = document.getElementById('mir-' + sid);
-  if (row) row.classList.remove('visible');
-}
-
-// STAGE 5: Markdown applies directly without separate modal
-function confirmMarkdown(sid) {
-  const inp = document.getElementById('mip-' + sid);
-  const price = inp.value.trim();
-  if (!price || parseFloat(price) <= 0) { showToast('Enter a valid price'); return; }
-  const s = stockLines.find(x => x.id === sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  const oldPrice = s.markdownPrice;
-  s.markdownPrice = price;
-  if (p) {
-    const verb = oldPrice ? 'updated from ₱' + oldPrice + ' to' : 'set to';
-    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' ₱' + price + ' (exp: ' + (s.exp || 'no expiry') + ')');
-  }
-  saveAll();
-  renderExpList();
-  applyFilters();
-  showToast('Markdown applied');
-  updateCounts();
-}
-
-// Kept for compatibility but no longer used since modal removed
-function doApplyMarkdown() {
-  if (!pendingMarkdown) return;
-  const s = stockLines.find(x => x.id === pendingMarkdown.sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  const oldPrice = s.markdownPrice;
-  s.markdownPrice = pendingMarkdown.price;
-  if (p) {
-    const verb = oldPrice ? 'updated from ₱' + oldPrice + ' to' : 'set to';
-    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' ₱' + pendingMarkdown.price + ' (exp: ' + (s.exp || 'no expiry') + ')');
-  }
-  saveAll();
-  closeModal('modal-confirm-markdown');
-  pendingMarkdown = null;
-  renderExpList();
-  applyFilters();
-  showToast('Markdown applied');
-  updateCounts();
-}
-
-function removeMarkdown(sid) {
-  const s = stockLines.find(x => x.id === sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  const old = s.markdownPrice;
-  s.markdownPrice = '';
-  if (p) logActivity('markdown-removed', p.recordId, p.name, 'Markdown removed (was ₱' + old + ', exp: ' + (s.exp || 'no expiry') + ')');
-  saveAll();
-  renderExpList();
-  applyFilters();
-  showToast('Markdown removed');
-  updateCounts();
-}
-
-// STAGE 5: Pull out a specific stock line (not the whole product)
-function pullOutStockLine(sid) {
-  const s = stockLines.find(x => x.id === sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  if (!p) return;
-  if (s.pulledOut) {
-    showToast('Already pulled out');
-    return;
-  }
-  s.pulledOut = true;
-  logActivity('pulled', p.recordId, p.name, 'Stock line pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
-  // Auto-sync product status if all lines are pulled out
-  syncProductStatusFromStockLines(p.recordId);
-  saveAll();
-  renderExpList();
-  applyFilters();
-  showToast('Stock line pulled out');
-}
-
-// STAGE 5: Restore a pulled-out stock line back to available
-function restoreStockLine(sid) {
-  const s = stockLines.find(x => x.id === sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  if (!p) return;
-  if (!s.pulledOut) return;
-  s.pulledOut = false;
-  logActivity('edit', p.recordId, p.name, 'Stock line restored from pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
-  syncProductStatusFromStockLines(p.recordId);
-  checkAutoOutOfStock(p.recordId);
-  saveAll();
-  applyFilters();
-  showToast('Stock line restored');
-}
-
-// Old function kept for backward compatibility but now pulls only the specific line
-function pullOutFromExp(sid) {
-  pullOutStockLine(sid);
-}
-
-// FIX 11: use modal instead of confirm()
-function confirmRemoveStockFromExp(sid) {
-  removingExpStockId = sid;
-  openModal('modal-confirm-remove-exp');
-}
-
-function doRemoveStockFromExp() {
-  const backup = stockLines.find(s => s.id === removingExpStockId);
-  if (!backup) { closeModal('modal-confirm-remove-exp'); return; }
-  const stockBackup = JSON.parse(JSON.stringify(backup));
-  const rid = backup.productId;
-  const product = products.find(p => p.recordId === rid);
-  stockLines = stockLines.filter(s => s.id !== removingExpStockId);
-  if (product) logActivity('removed', rid, product.name, 'Stock entry removed from expiry list (exp: ' + (stockBackup.exp || 'no expiry') + ', qty: ' + stockBackup.qty + ')');
-  checkAutoOutOfStock(rid);
-  saveAll();
-  closeModal('modal-confirm-remove-exp');
-  renderExpList();
-  applyFilters();
-  showUndoToast('Stock entry removed', () => {
-    stockLines.push(stockBackup);
-    if (product) logActivity('edit', rid, product.name, 'Stock entry restore from expiry (undo)');
-    checkAutoOutOfStock(rid);
-    saveAll();
-    renderExpList();
-    applyFilters();
-    showToast('Restored!');
-  });
-  removingExpStockId = null;
-}
-
-// ─────────────────────────────────────────
-// SALES LOG
-// ─────────────────────────────────────────
-// ═══════════════════════════════════════════
-// STAGE 2: SALES — Scan to Sell + Manual Log
-// ═══════════════════════════════════════════
-
-function setSaleMode(mode, el) {
-  saleMode = mode;
-  document.querySelectorAll('.sale-mode-tab').forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('sale-scan-mode').style.display = mode === 'scan' ? 'block' : 'none';
-  document.getElementById('sale-manual-mode').style.display = mode === 'manual' ? 'block' : 'none';
-  if (mode !== 'scan') stopSellScanner();
-}
-
-function populateSaleProductSelect() {
-  const sel = document.getElementById('sale-product-select');
-  if (!sel) return;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">-- Select Product --</option>';
-  products.filter(p => p.status !== 'pulled' || productHasMarkdown(p.recordId)).forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.recordId;
-    opt.textContent = p.name + (p.brand ? ' (' + p.brand + ')' : '');
-    sel.appendChild(opt);
-  });
-  if (current) sel.value = current;
-}
-
-function onSaleProductChange() {
-  const rid = document.getElementById('sale-product-select').value;
-  const picker = document.getElementById('sale-stock-line-picker');
-  const list = document.getElementById('sale-stock-line-list');
-  if (!rid) { picker.style.display = 'none'; return; }
-  const p = products.find(x => x.recordId === rid);
-  if (!p) return;
-
-  const lines = stockLines.filter(s => s.productId === rid && (parseInt(s.qty) || 0) > 0 && !s.pulledOut).sort((a, b) => {
-    if (!a.exp && !b.exp) return 0;
-    if (!a.exp) return 1;
-    if (!b.exp) return -1;
-    return a.exp.localeCompare(b.exp);
-  });
-
-  if (lines.length === 0) {
-    list.innerHTML = '<div style="font-size:13px;color:var(--red-600);padding:10px;background:var(--red-50);border-radius:8px">No available stock for this product (all stock lines may be pulled out)</div>';
-    picker.style.display = 'block';
-    return;
-  }
-
-  list.innerHTML = lines.map(s => {
-    const sidEsc = esc(s.id);
-    const ridEsc = esc(rid);
-    const priceUse = s.markdownPrice || p.selling || '';
-    const hasMarkdown = !!s.markdownPrice;
-    return '<div class="sell-stock-line-pick" id="ssp-' + sidEsc + '" onclick="selectManualStockLine(\'' + sidEsc + '\',\'' + ridEsc + '\')">' +
-      '<div class="sell-stock-line-info">' +
-        '<div class="sell-stock-line-exp">' + (s.exp ? 'Exp: ' + esc(s.exp) : 'No expiry') + '</div>' +
-        '<div class="sell-stock-line-meta">Qty available: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
-      '</div>' +
-      '<div class="sell-stock-line-price">' +
-        (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
-        '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-  picker.style.display = 'block';
-  // Reset selection
-  document.getElementById('sale-product-select').dataset.stockLineId = '';
-}
-
-function selectManualStockLine(sid, rid) {
-  document.querySelectorAll('#sale-stock-line-list .sell-stock-line-pick').forEach(el => el.classList.remove('selected'));
-  const picked = document.getElementById('ssp-' + sid);
-  if (picked) picked.classList.add('selected');
-  const s = stockLines.find(x => x.id === sid);
-  const p = products.find(x => x.recordId === rid);
-  if (s && p) {
-    const priceEl = document.getElementById('sale-price');
-    if (priceEl) priceEl.value = s.markdownPrice || p.selling || '';
-  }
-  document.getElementById('sale-product-select').dataset.stockLineId = sid;
-}
-
-// MANUAL SALE CONFIRMATION
-function confirmLogSale() {
-  const rid = document.getElementById('sale-product-select').value;
-  if (!rid) { showToast('Please select a product'); return; }
-  const sid = document.getElementById('sale-product-select').dataset.stockLineId;
-  if (!sid) { showToast('Please select a stock line by expiry date'); return; }
-  const qty = parseInt(document.getElementById('sale-qty').value) || 0;
-  if (qty < 1) { showToast('Qty must be at least 1'); return; }
-  const price = document.getElementById('sale-price').value.trim();
-  const date = document.getElementById('sale-date').value || today();
-  const p = products.find(x => x.recordId === rid);
-  const s = stockLines.find(x => x.id === sid);
-  if (!p || !s) return;
-
-  const isMarkdown = !!s.markdownPrice;
-  pendingSale = { productId: rid, stockLineId: sid, qty, price, isMarkdown, date, productName: p.name, brand: p.brand || '', exp: s.exp || '' };
-
-  const currentStockQty = parseInt(s.qty) || 0;
-  if (qty > currentStockQty) {
-    setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available in this stock line (exp: ' + (s.exp || 'no expiry') + '). Stock will go to ' + (currentStockQty - qty) + '. Continue?');
-    openModal('modal-confirm-oversell');
-  } else {
-    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
-    openModal('modal-confirm-sale');
-  }
-}
-
-function doRecordSaleAnyway() {
-  closeModal('modal-confirm-oversell');
-  if (!pendingSale) return;
-  setEl('confirm-sale-msg', 'Proceed with this oversell?');
-  openModal('modal-confirm-sale');
-}
-
-function doRecordSale() {
-  closeModal('modal-confirm-sale');
-  if (!pendingSale) return;
-  recordSaleInternal(pendingSale);
-  pendingSale = null;
-}
-
-function recordSaleInternal(sale) {
-  const s = stockLines.find(x => x.id === sale.stockLineId);
-  const p = products.find(x => x.recordId === sale.productId);
-  if (!s || !p) return;
-
-  const oldQty = parseInt(s.qty) || 0;
-  s.qty = oldQty - sale.qty;
-
-  sales.unshift({
-    id: generateId('SAL'),
-    productId: sale.productId,
-    productName: sale.productName,
-    brand: sale.brand,
-    stockLineId: sale.stockLineId,
-    exp: sale.exp,
-    qtySold: sale.qty,
-    price: sale.price,
-    isMarkdown: sale.isMarkdown,
-    timestamp: new Date().toISOString(),
-    date: sale.date,
-  });
-
-  // STAGE 3: Log the sale
-  const totalAmt = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
-  logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at ₱' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
-
-  checkAutoMarkdownReset(sale.stockLineId);
-  checkAutoOutOfStock(sale.productId);
-  saveAll();
-
-  // Reset forms
-  if (saleMode === 'manual') {
-    document.getElementById('sale-product-select').value = '';
-    document.getElementById('sale-product-select').dataset.stockLineId = '';
-    document.getElementById('sale-stock-line-picker').style.display = 'none';
-    document.getElementById('sale-qty').value = '1';
-    document.getElementById('sale-price').value = '';
-  } else {
-    // Scan to Sell - clear results
-    document.getElementById('sell-result').style.display = 'none';
-    document.getElementById('sell-entry').style.display = 'none';
-    setEl('sell-scan-status', 'Sale recorded! Tap Start Camera for next.');
-    document.getElementById('sell-scan-status').className = 'scan-status success';
-  }
-  renderSalesList();
-  applyFilters();
-
-  // Show summary
-  const total = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
-  setEl('summary-name', sale.productName);
-  document.getElementById('summary-detail').innerHTML = 'Qty: ' + sale.qty + ' × ₱' + esc(sale.price || '0') + (sale.isMarkdown ? '  <span style="color:#6B3FA0;font-weight:600">[Markdown]</span>' : '') + '<br>Exp: ' + esc(sale.exp || 'no expiry');
-  setEl('summary-total', total ? total + ' total' : '—');
-  openModal('modal-sale-summary');
-  updateCounts();
-}
-
-// SCAN TO SELL
-async function startSellScanner() {
-  try {
-    setEl('sell-scan-status', 'Requesting camera access...');
-    document.getElementById('sell-scan-status').className = 'scan-status';
-    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const allDevices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
-    if (videoDevices.length === 0) throw new Error('No camera found.');
-    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
-    saleScannerReader = new ZXing.BrowserMultiFormatReader();
-    setEl('sell-scan-status', 'Point camera at a barcode...');
-    saleScannerReader.decodeFromVideoDevice(backCam.deviceId, 'sell-preview', (result) => {
-      if (result) onSellBarcodeDetected(result.getText());
-    });
-    document.getElementById('sell-start-btn').style.display = 'none';
-    document.getElementById('sell-stop-btn').style.display = 'block';
-  } catch(e) {
-    setEl('sell-scan-status', 'Camera error: ' + e.message);
-    document.getElementById('sell-scan-status').className = 'scan-status error';
-  }
-}
-
-function stopSellScanner() {
-  if (saleScannerReader) { try { saleScannerReader.reset(); } catch(e) {} saleScannerReader = null; }
-  const sb = document.getElementById('sell-start-btn');
-  const eb = document.getElementById('sell-stop-btn');
-  if (sb) sb.style.display = 'block';
-  if (eb) eb.style.display = 'none';
-}
-
-function onSellBarcodeDetected(raw) {
-  if (!raw || !raw.trim()) return;
-  const code = raw.trim();
-  if (saleScannerReader) { try { saleScannerReader.reset(); } catch(e) {} saleScannerReader = null; }
-  document.getElementById('sell-start-btn').style.display = 'block';
-  document.getElementById('sell-stop-btn').style.display = 'none';
-
-  const p = products.find(x => x.barcode === code);
-  const resultEl = document.getElementById('sell-result');
-  resultEl.style.display = 'block';
-
-  if (!p) {
-    resultEl.innerHTML = '<div class="sell-scan-result not-found">' +
-      '<div class="sell-found-name not-found">Product not found</div>' +
-      '<div class="sell-found-sub">Barcode: ' + esc(code) + '</div>' +
-      '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Scan again</button>' +
-    '</div>';
-    setEl('sell-scan-status', 'Barcode not in inventory');
-    document.getElementById('sell-scan-status').className = 'scan-status error';
-    return;
-  }
-
-  const lines = stockLines.filter(s => s.productId === p.recordId && (parseInt(s.qty) || 0) > 0 && !s.pulledOut).sort((a,b) => {
-    if (!a.exp && !b.exp) return 0;
-    if (!a.exp) return 1;
-    if (!b.exp) return -1;
-    return a.exp.localeCompare(b.exp);
-  });
-
-  const ridEsc = esc(p.recordId);
-  let html = '<div class="sell-scan-result">' +
-    '<div class="sell-found-name">✅ ' + esc(p.name) + '</div>' +
-    '<div class="sell-found-sub">' + (p.brand ? esc(p.brand) + ' | ' : '') + 'Total: ' + productTotalQty(p.recordId) + ' ' + esc(p.unit || 'pcs') + '</div>';
-
-  if (lines.length === 0) {
-    html += '<div style="margin-top:10px;font-size:13px;color:var(--red-600)">No stock available</div>' +
-      '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Scan again</button>';
-  } else {
-    html += '<div style="margin-top:10px;font-size:12px;font-weight:600;color:var(--gray-600)">Select which stock line:</div>';
-    lines.forEach(s => {
-      const sidEsc = esc(s.id);
-      const priceUse = s.markdownPrice || p.selling || '';
-      const hasMarkdown = !!s.markdownPrice;
-      html += '<div class="sell-stock-line-pick" id="ssl-' + sidEsc + '" onclick="selectSellStockLine(\'' + sidEsc + '\',\'' + ridEsc + '\')">' +
-        '<div class="sell-stock-line-info">' +
-          '<div class="sell-stock-line-exp">' + (s.exp ? 'Exp: ' + esc(s.exp) : 'No expiry') + '</div>' +
-          '<div class="sell-stock-line-meta">Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
-        '</div>' +
-        '<div class="sell-stock-line-price">' +
-          (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
-          '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
-        '</div>' +
-      '</div>';
-    });
-    html += '<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="resetSellScan()">Cancel / Wrong Item</button>';
-  }
-
-  html += '</div>';
-  resultEl.innerHTML = html;
-  setEl('sell-scan-status', 'Product found — select stock line');
-  document.getElementById('sell-scan-status').className = 'scan-status success';
-}
-
-function selectSellStockLine(sid, rid) {
-  document.querySelectorAll('#sell-result .sell-stock-line-pick').forEach(el => el.classList.remove('selected'));
-  const picked = document.getElementById('ssl-' + sid);
-  if (picked) picked.classList.add('selected');
-
-  const s = stockLines.find(x => x.id === sid);
-  const p = products.find(x => x.recordId === rid);
-  if (!s || !p) return;
-
-  document.getElementById('sell-result').dataset.stockLineId = sid;
-  document.getElementById('sell-result').dataset.productId = rid;
-
-  document.getElementById('sell-entry').style.display = 'block';
-  document.getElementById('sell-qty').value = '1';
-  document.getElementById('sell-price').value = s.markdownPrice || p.selling || '';
-  document.getElementById('sell-date').value = today();
-}
-
-function confirmSellScan() {
-  const sid = document.getElementById('sell-result').dataset.stockLineId;
-  const rid = document.getElementById('sell-result').dataset.productId;
-  if (!sid || !rid) { showToast('Select a stock line'); return; }
-  const qty = parseInt(document.getElementById('sell-qty').value) || 0;
-  if (qty < 1) { showToast('Qty must be at least 1'); return; }
-  const price = document.getElementById('sell-price').value.trim();
-  const date = document.getElementById('sell-date').value || today();
-  const s = stockLines.find(x => x.id === sid);
-  const p = products.find(x => x.recordId === rid);
-  if (!s || !p) return;
-
-  const isMarkdown = !!s.markdownPrice;
-  pendingSale = { productId: rid, stockLineId: sid, qty, price, isMarkdown, date, productName: p.name, brand: p.brand || '', exp: s.exp || '' };
-
-  const currentStockQty = parseInt(s.qty) || 0;
-  if (qty > currentStockQty) {
-    setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available. Stock will go to ' + (currentStockQty - qty) + '. Continue?');
-    openModal('modal-confirm-oversell');
-  } else {
-    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
-    openModal('modal-confirm-sale');
-  }
-}
-
-function resetSellScan() {
-  document.getElementById('sell-result').style.display = 'none';
-  document.getElementById('sell-entry').style.display = 'none';
-  setEl('sell-scan-status', 'Ready to scan');
-  document.getElementById('sell-scan-status').className = 'scan-status';
-}
-
-// FIX 12: show all sales with a note when over 50
-function renderSalesList() {
-  const list = document.getElementById('sales-list');
-  if (!list) return;
-  if (sales.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">🧾</div><p>No sales recorded yet.</p></div>';
-    return;
-  }
-  const shown = sales.slice(0, 50);
-  list.innerHTML = shown.map(s => {
-    const total = s.price ? '₱' + (parseFloat(s.price) * s.qtySold).toFixed(2) : '';
-    // FIX L4: detect deleted product
-    const productExists = s.productId ? products.some(p => p.recordId === s.productId) : true;
-    const deletedTag = !productExists ? ' <span class="sale-log-deleted-tag">Product Removed</span>' : '';
-    const markdownTag = s.isMarkdown ? ' <span class="sale-log-deleted-tag" style="background:#F3EEFB;color:#6B3FA0">Markdown</span>' : '';
-    return '<div class="sale-log-item">' +
-      '<div class="sale-log-name">' + esc(s.productName) + (s.brand ? ' <span style="font-weight:400;color:var(--gray-400)">(' + esc(s.brand) + ')</span>' : '') + deletedTag + markdownTag + '</div>' +
-      '<div class="sale-log-meta">Qty: ' + s.qtySold + (s.price ? '  |  ₱' + esc(s.price) + ' each' : '') + '  |  ' + esc(s.date) + '</div>' +
-      (s.exp ? '<div class="sale-stock-info">Stock line: exp ' + esc(s.exp) + '</div>' : '') +
-      (total ? '<div class="sale-log-price">' + total + ' total</div>' : '') +
-    '</div>';
-  }).join('') + (sales.length > 50 ? '<div class="sales-note">Showing 50 most recent. Export CSV to see all ' + sales.length + ' sales.</div>' : '');
-}
-
-// ═══════════════════════════════════════════
-// STAGE 3: REPORTS TAB
-// ═══════════════════════════════════════════
-function setReportSection(name, el) {
-  activeReportSection = name;
-  document.querySelectorAll('.report-section-tab').forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('report-activity').style.display = name === 'activity' ? 'block' : 'none';
-  document.getElementById('report-sales').style.display = name === 'sales' ? 'block' : 'none';
-  document.getElementById('report-check').style.display = name === 'check' ? 'block' : 'none';
-  renderReports();
-}
-
-function renderReports() {
-  if (activeReportSection === 'activity') renderActivityLog();
-  if (activeReportSection === 'sales') renderSalesList();
-  if (activeReportSection === 'check') renderCheckHistory();
-}
-
-function setActivityTypeFilter(val, el) {
-  activityTypeFilter = val;
-  document.querySelectorAll('#activity-type-filter .filter-chip').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderActivityLog();
-}
-
-function renderActivityLog() {
-  const list = document.getElementById('activity-list');
-  if (!list) return;
-  const searchEl = document.getElementById('activity-search');
-  const dateFilterEl = document.getElementById('activity-date-filter');
-  const q = (searchEl ? searchEl.value : '').toLowerCase().trim();
-  const dateFilter = dateFilterEl ? dateFilterEl.value : 'all';
-
-  const now = new Date(); now.setHours(0,0,0,0);
-  const todayStr = today();
-  const weekStart = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0,10);
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
-
-  const manualTypes = ['delivery','transfer','damaged','note','other'];
-
-  let filtered = activityLog.filter(a => {
-    if (q) {
-      const text = ((a.description || '') + ' ' + (a.productName || '') + ' ' + (a.type || '')).toLowerCase();
-      if (!text.includes(q)) return false;
-    }
-    if (activityTypeFilter !== 'all') {
-      if (activityTypeFilter === 'manual') {
-        if (manualTypes.indexOf(a.type) === -1) return false;
-      } else if (a.type !== activityTypeFilter) return false;
-    }
-    if (dateFilter === 'today' && a.date !== todayStr) return false;
-    if (dateFilter === 'week' && a.date < weekStart) return false;
-    if (dateFilter === 'month' && a.date < monthStart) return false;
-    return true;
-  });
-
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No activity entries match your filters.</p></div>';
-    return;
-  }
-
-  const shown = filtered.slice(0, 200);
-  list.innerHTML = shown.map(a => {
-    const typeLabel = activityTypeLabel(a.type);
-    const typeCls = 'activity-type-' + a.type;
-    const aidEsc = esc(a.id);
-    const timeStr = a.timestamp ? new Date(a.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-    return '<div class="activity-item">' +
-      '<div class="activity-item-top">' +
-        '<span class="activity-date">' + esc(a.date || '') + (timeStr ? ' ' + timeStr : '') + '</span>' +
-        '<span class="activity-type-badge ' + typeCls + '">' + typeLabel + '</span>' +
-      '</div>' +
-      '<div class="activity-desc">' + esc(a.description || '') + '</div>' +
-      (a.productName ? '<div class="activity-product">📦 ' + esc(a.productName) + '</div>' : '') +
-      '<div class="activity-actions">' +
-        '<button class="btn btn-secondary btn-sm" onclick="openEditActivity(\'' + aidEsc + '\')">Edit</button>' +
-      '</div>' +
-    '</div>';
-  }).join('') + (filtered.length > 200 ? '<div class="sales-note">Showing 200 most recent of ' + filtered.length + '. Export CSV for full log.</div>' : '');
-}
-
-function activityTypeLabel(t) {
-  return {
-    'add':'Added','update':'Updated','sale':'Sale','markdown':'Markdown',
-    'markdown-removed':'Markdown Off','pulled':'Pulled Out','status':'Status',
-    'delivery':'Delivery','transfer':'Transfer','damaged':'Damaged','note':'Note',
-    'other':'Other','removed':'Removed','edit':'Edited','check':'Stock Check',
-    'discrepancy':'Discrepancy'
-  }[t] || t;
-}
-
-// ── MANUAL LOG ENTRY ──
-function openManualLogModal() {
-  document.getElementById('manual-log-type').value = 'note';
-  document.getElementById('manual-log-desc').value = '';
-  document.getElementById('manual-log-date').value = today();
-  // Populate product dropdown
-  const sel = document.getElementById('manual-log-product');
-  sel.innerHTML = '<option value="">-- None --</option>';
-  products.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.recordId;
-    opt.textContent = p.name + (p.brand ? ' (' + p.brand + ')' : '');
-    sel.appendChild(opt);
-  });
-  openModal('modal-manual-log');
-}
-
-function confirmManualLog() {
-  const desc = document.getElementById('manual-log-desc').value.trim();
-  if (!desc) { showToast('Description is required'); return; }
-  pendingManualLog = {
-    type: document.getElementById('manual-log-type').value,
-    productId: document.getElementById('manual-log-product').value,
-    description: desc,
-    date: document.getElementById('manual-log-date').value || today(),
-  };
-  openModal('modal-confirm-manual-log');
-}
-
-function doSaveManualLog() {
-  if (!pendingManualLog) return;
-  const m = pendingManualLog;
-  const p = m.productId ? products.find(x => x.recordId === m.productId) : null;
-  activityLog.unshift({
-    id: generateId('ACT'),
-    type: m.type,
-    productId: m.productId || '',
-    productName: p ? p.name : '',
-    description: m.description,
-    timestamp: new Date().toISOString(),
-    date: m.date,
-  });
-  saveAll();
-  closeModal('modal-confirm-manual-log');
-  closeModal('modal-manual-log');
-  renderActivityLog();
-  showToast('Log entry saved');
-  pendingManualLog = null;
-}
-
-// ── EDIT / DELETE ACTIVITY ──
-function openEditActivity(aid) {
-  const a = activityLog.find(x => x.id === aid);
-  if (!a) return;
-  editingActivityId = aid;
-  document.getElementById('edit-activity-id').value = aid;
-  document.getElementById('edit-activity-type').value = a.type;
-  document.getElementById('edit-activity-desc').value = a.description || '';
-  document.getElementById('edit-activity-product').value = a.productName || '';
-  document.getElementById('edit-activity-date').value = a.date || today();
-  openModal('modal-edit-activity');
-}
-
-function doEditActivity() {
-  const a = activityLog.find(x => x.id === editingActivityId);
-  if (!a) return;
-  a.type = document.getElementById('edit-activity-type').value;
-  a.description = document.getElementById('edit-activity-desc').value.trim();
-  a.productName = document.getElementById('edit-activity-product').value.trim();
-  a.date = document.getElementById('edit-activity-date').value || today();
-  saveAll();
-  closeModal('modal-edit-activity');
-  renderActivityLog();
-  showToast('Entry updated');
-  editingActivityId = null;
-}
-
-function confirmDeleteActivity() {
-  deletingActivityId = editingActivityId;
-  openModal('modal-confirm-delete-activity');
-}
-
-function doDeleteActivity() {
-  const backup = activityLog.find(x => x.id === deletingActivityId);
-  if (!backup) { closeModal('modal-confirm-delete-activity'); return; }
-  const backupCopy = JSON.parse(JSON.stringify(backup));
-  activityLog = activityLog.filter(x => x.id !== deletingActivityId);
-  saveAll();
-  closeModal('modal-confirm-delete-activity');
-  closeModal('modal-edit-activity');
-  renderActivityLog();
-  showUndoToast('Log entry deleted', () => {
-    activityLog.unshift(backupCopy);
-    saveAll();
-    renderActivityLog();
-    showToast('Restored!');
-  });
-  deletingActivityId = null;
-  editingActivityId = null;
-}
-
-// ═══════════════════════════════════════════
-// STAGE 4: INVENTORY CHECK
-// ═══════════════════════════════════════════
-
-// Render banner if there is an active check draft
-function renderCheckBanner() {
-  const area = document.getElementById('check-banner-area');
-  if (!area) return;
-  if (!activeCheck) { area.innerHTML = ''; return; }
-  area.innerHTML =
-    '<div class="check-banner">' +
-      '<span class="icon">⚠️</span>' +
-      '<div class="text"><strong>Unfinished check in progress</strong><br>Started ' + esc(new Date(activeCheck.startedAt).toLocaleString()) + ' (' + esc(activeCheck.mode) + ' mode)</div>' +
-      '<div class="check-banner-actions">' +
-        '<button class="btn btn-primary btn-sm" onclick="resumeCheck()">Resume</button>' +
-      '</div>' +
-    '</div>';
-}
-
-function renderCheckHistory() {
-  renderCheckBanner();
-  const list = document.getElementById('check-history-list');
-  if (!list) return;
-  if (inventoryChecks.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>No inventory checks yet.<br>Tap Start above to begin.</p></div>';
-    return;
-  }
-  const sorted = inventoryChecks.slice().sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || ''));
-  list.innerHTML = sorted.map(c => {
-    const cidEsc = esc(c.id);
-    const discrepancyCount = (c.items || []).filter(i => i.recordedQty != i.actualQty).length;
-    const badgeCls = c.status === 'flagged' ? 'flagged' : 'confirmed';
-    const badgeText = c.status === 'flagged' ? 'Flagged' : 'Confirmed';
-    return '<div class="check-history-item" onclick="viewPastCheck(\'' + cidEsc + '\')">' +
-      '<div class="header">' +
-        '<div>' +
-          '<div class="date">' + esc(new Date(c.completedAt).toLocaleString()) + '</div>' +
-          '<div class="meta">' + esc(c.mode) + ' mode | ' + (c.items || []).length + ' items checked' + (discrepancyCount > 0 ? ' | ' + discrepancyCount + ' discrepancies' : '') + '</div>' +
-        '</div>' +
-        '<span class="badge ' + badgeCls + '">' + badgeText + '</span>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function openStartCheckModal() {
-  if (activeCheck) {
-    showToast('Resume or discard the active check first');
-    return;
-  }
-  openModal('modal-start-check');
-}
-
-function startCheck(mode) {
-  closeModal('modal-start-check');
-  // Build items list from all stock entries with qty > 0 (and active or out products, not pulled out)
-  const items = [];
-  stockLines.forEach(s => {
-    const p = products.find(x => x.recordId === s.productId);
-    if (!p || p.status === 'pulled') return;
-    items.push({
-      stockLineId: s.id,
-      productId: s.productId,
-      productName: p.name,
-      brand: p.brand || '',
-      exp: s.exp || '',
-      recordedQty: parseInt(s.qty) || 0,
-      actualQty: mode === 'scan' ? null : parseInt(s.qty) || 0, // manual pre-fills with recorded
-      scanned: false,
-      scanCount: 0,
-    });
-  });
-  activeCheck = {
-    id: generateId('CHK'),
-    mode: mode,
-    startedAt: new Date().toISOString(),
-    items: items,
-  };
-  saveAll();
-  openActiveCheckModal();
-}
-
-function resumeCheck() {
-  if (!activeCheck) return;
-  openActiveCheckModal();
-}
-
-function openActiveCheckModal() {
-  if (!activeCheck) return;
-  setEl('check-title', activeCheck.mode === 'scan' ? '📷 Scan Mode Check' : '✏️ Manual Count Check');
-  document.getElementById('check-scan-area').style.display = activeCheck.mode === 'scan' ? 'block' : 'none';
-  renderCheckList();
-  openModal('modal-active-check');
-}
-
-function renderCheckList() {
-  if (!activeCheck) return;
-  const list = document.getElementById('check-list');
-  const progress = document.getElementById('check-progress');
-
-  if (activeCheck.mode === 'scan') {
-    const scannedCount = activeCheck.items.filter(i => i.scanned).length;
-    progress.textContent = scannedCount + ' / ' + activeCheck.items.length + ' items scanned';
-  } else {
-    progress.textContent = activeCheck.items.length + ' stock entries to count';
-  }
-
-  // Group by product
-  const byProduct = {};
-  activeCheck.items.forEach(i => {
-    if (!byProduct[i.productId]) byProduct[i.productId] = { name: i.productName, brand: i.brand, items: [] };
-    byProduct[i.productId].items.push(i);
-  });
-
-  const html = Object.keys(byProduct).map(pid => {
-    const grp = byProduct[pid];
-    const lines = grp.items.map(i => {
-      const sidEsc = esc(i.stockLineId);
-      const isChecked = activeCheck.mode === 'scan' && i.scanned;
-      const isDiscrepancy = activeCheck.mode === 'manual' && i.actualQty != null && i.actualQty != i.recordedQty;
-      const cls = isChecked ? ' checked' : (isDiscrepancy ? ' discrepancy' : '');
-      let rightContent = '';
-      if (activeCheck.mode === 'scan') {
-        rightContent = isChecked ?
-          '<div style="text-align:right"><span class="check-icon">✓</span><div style="font-size:11px;color:var(--teal-600)">Scanned ' + (i.scanCount || 1) + '×</div></div>' :
-          '<span style="font-size:11px;color:var(--gray-400)">Not scanned</span>';
-      } else {
-        rightContent = '<input type="number" class="actual-input" id="actual-' + sidEsc + '" value="' + (i.actualQty != null ? i.actualQty : '') + '" min="0" inputmode="numeric" onchange="updateActualQty(\'' + sidEsc + '\',this.value)">';
-      }
-      return '<div class="check-card-stockline' + cls + '">' +
-        '<div class="info">' +
-          '<div class="exp">' + (i.exp ? 'Exp: ' + esc(i.exp) : 'No expiry') + '</div>' +
-          '<div class="recorded">Recorded: ' + i.recordedQty + '</div>' +
-        '</div>' +
-        rightContent +
-      '</div>';
-    }).join('');
-    return '<div class="check-card">' +
-      '<div class="name">' + esc(grp.name) + '</div>' +
-      (grp.brand ? '<div class="sub">' + esc(grp.brand) + '</div>' : '') +
-      lines +
-    '</div>';
-  }).join('');
-
-  list.innerHTML = html || '<div class="empty-state"><p>No stock entries to check.</p></div>';
-}
-
-function updateActualQty(sid, val) {
-  if (!activeCheck) return;
-  const item = activeCheck.items.find(i => i.stockLineId === sid);
-  if (!item) return;
-  item.actualQty = parseInt(val);
-  if (isNaN(item.actualQty)) item.actualQty = null;
-  saveAll(); // auto-save draft
-  // Update class for discrepancy highlight without full re-render
-  const el = document.querySelector('#actual-' + sid);
-  if (el && el.parentElement) {
-    const parent = el.parentElement;
-    parent.classList.remove('discrepancy');
-    if (item.actualQty != null && item.actualQty != item.recordedQty) {
-      parent.classList.add('discrepancy');
-    }
-  }
-}
-
-// SCAN MODE CAMERA
-async function startCheckScanner() {
-  try {
-    setEl('check-scan-status', 'Requesting camera access...');
-    document.getElementById('check-scan-status').className = 'scan-status';
-    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const allDevices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = allDevices.filter(d => d.kind === 'videoinput');
-    if (videoDevices.length === 0) throw new Error('No camera found.');
-    const backCam = videoDevices.find(d => /back|rear|environment/i.test(d.label)) || videoDevices[videoDevices.length - 1];
-    checkScannerReader = new ZXing.BrowserMultiFormatReader();
-    setEl('check-scan-status', 'Point camera at a barcode...');
-    checkScannerReader.decodeFromVideoDevice(backCam.deviceId, 'check-preview', (result) => {
-      if (result) onCheckBarcodeDetected(result.getText());
-    });
-    document.getElementById('check-start-btn').style.display = 'none';
-    document.getElementById('check-stop-btn').style.display = 'block';
-  } catch(e) {
-    setEl('check-scan-status', 'Camera error: ' + e.message);
-    document.getElementById('check-scan-status').className = 'scan-status error';
-  }
-}
-
-function stopCheckScanner() {
-  if (checkScannerReader) { try { checkScannerReader.reset(); } catch(e) {} checkScannerReader = null; }
-  const sb = document.getElementById('check-start-btn');
-  const eb = document.getElementById('check-stop-btn');
-  if (sb) sb.style.display = 'block';
-  if (eb) eb.style.display = 'none';
-}
-
-let lastCheckScan = 0;
-function onCheckBarcodeDetected(raw) {
-  if (!raw || !raw.trim()) return;
-  // Debounce - same barcode within 1.5s ignored
-  const nowT = Date.now();
-  if (nowT - lastCheckScan < 1500) return;
-  lastCheckScan = nowT;
-
-  const code = raw.trim();
-  if (!activeCheck) return;
-  const product = products.find(p => p.barcode === code);
-  if (!product) {
-    setEl('check-scan-status', 'Not in inventory: ' + code);
-    document.getElementById('check-scan-status').className = 'scan-status error';
-    setTimeout(() => {
-      if (checkScannerReader) {
-        setEl('check-scan-status', 'Point camera at a barcode...');
-        document.getElementById('check-scan-status').className = 'scan-status';
-      }
-    }, 2000);
-    return;
-  }
-  // Find all stock entries for this product
-  const matchingItems = activeCheck.items.filter(i => i.productId === product.recordId);
-  if (matchingItems.length === 0) {
-    setEl('check-scan-status', product.name + ' has no stock to check');
-    document.getElementById('check-scan-status').className = 'scan-status error';
-    return;
-  }
-  // If any of them are already scanned, show duplicate prompt
-  const scannedExisting = matchingItems.find(i => i.scanned);
-  if (scannedExisting) {
-    pendingDuplicateScan = { productId: product.recordId, productName: product.name };
-    setEl('duplicate-scan-msg', product.name + ' was already scanned. Mark again or skip?');
-    openModal('modal-duplicate-scan');
-    return;
-  }
-  // Mark the first matching (sorted by exp) as scanned
-  const sorted = matchingItems.slice().sort((a, b) => {
-    if (!a.exp && !b.exp) return 0;
-    if (!a.exp) return 1;
-    if (!b.exp) return -1;
-    return a.exp.localeCompare(b.exp);
-  });
-  sorted[0].scanned = true;
-  sorted[0].scanCount = (sorted[0].scanCount || 0) + 1;
-  sorted[0].actualQty = sorted[0].recordedQty; // assume present means count matches
-  saveAll();
-  setEl('check-scan-status', '✓ ' + product.name + ' marked');
-  document.getElementById('check-scan-status').className = 'scan-status success';
-  renderCheckList();
-}
-
-function markScannedAgain() {
-  closeModal('modal-duplicate-scan');
-  if (!pendingDuplicateScan || !activeCheck) return;
-  const matchingItems = activeCheck.items.filter(i => i.productId === pendingDuplicateScan.productId && i.scanned);
-  if (matchingItems.length > 0) {
-    matchingItems[0].scanCount = (matchingItems[0].scanCount || 1) + 1;
-    saveAll();
-    setEl('check-scan-status', '✓ ' + pendingDuplicateScan.productName + ' marked again');
-    document.getElementById('check-scan-status').className = 'scan-status success';
-    renderCheckList();
-  }
-  pendingDuplicateScan = null;
-}
-
-function finishCheck() {
-  if (!activeCheck) return;
-  // Stop scanner if running
-  stopCheckScanner();
-  // For scan mode, unscanned items have actualQty = 0 (treat as missing)
-  if (activeCheck.mode === 'scan') {
-    activeCheck.items.forEach(i => {
-      if (!i.scanned) i.actualQty = 0;
-    });
-  }
-  closeModal('modal-active-check');
-  renderCheckSummary();
-  openModal('modal-check-summary');
-}
-
-function renderCheckSummary() {
-  if (!activeCheck) return;
-  const items = activeCheck.items;
-  const discrepancies = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
-  const ok = items.length - discrepancies.length;
-
-  let html = '<div style="margin-bottom:14px;padding:12px;background:var(--gray-50);border-radius:10px">' +
-    '<div style="font-size:14px;font-weight:600;margin-bottom:6px">Summary</div>' +
-    '<div style="font-size:12px;color:var(--gray-600);line-height:1.6">' +
-      'Items checked: <strong>' + items.length + '</strong><br>' +
-      'Matches recorded: <strong style="color:var(--teal-600)">' + ok + '</strong><br>' +
-      'Discrepancies: <strong style="color:' + (discrepancies.length > 0 ? 'var(--amber-600)' : 'var(--teal-600)') + '">' + discrepancies.length + '</strong>' +
-    '</div></div>';
-
-  if (discrepancies.length > 0) {
-    html += '<div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px">Discrepancies:</div>';
-    html += discrepancies.map(i => {
-      const diff = i.actualQty - i.recordedQty;
-      const cls = diff > 0 ? 'positive' : 'negative';
-      const sign = diff > 0 ? '+' : '';
-      return '<div class="check-summary-item discrepancy">' +
-        '<div class="name">' + esc(i.productName) + (i.brand ? ' (' + esc(i.brand) + ')' : '') + '</div>' +
-        '<div class="nums">Exp: ' + esc(i.exp || 'no expiry') + ' | Recorded: ' + i.recordedQty + ' | Actual: ' + i.actualQty + '</div>' +
-        '<div class="diff ' + cls + '">Difference: ' + sign + diff + '</div>' +
-      '</div>';
-    }).join('');
-  } else {
-    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts match recorded inventory!</div>';
-  }
-
-  setEl('check-summary-content', '');
-  document.getElementById('check-summary-content').innerHTML = html;
-}
-
-function continueCheck() {
-  closeModal('modal-check-summary');
-  openActiveCheckModal();
-}
-
-function flagDiscrepancies() {
-  if (!activeCheck) return;
-  const discrepancies = activeCheck.items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
-  // Log each discrepancy as activity
-  discrepancies.forEach(i => {
-    const diff = i.actualQty - i.recordedQty;
-    const sign = diff > 0 ? '+' : '';
-    logActivity('discrepancy', i.productId, i.productName, 'Discrepancy flagged: recorded ' + i.recordedQty + ' but counted ' + i.actualQty + ' (diff: ' + sign + diff + ', exp: ' + (i.exp || 'no expiry') + ')');
-  });
-  // Save the check as flagged
-  const completed = JSON.parse(JSON.stringify(activeCheck));
-  completed.completedAt = new Date().toISOString();
-  completed.status = 'flagged';
-  inventoryChecks.unshift(completed);
-  logActivity('check', '', '', 'Inventory check FLAGGED: ' + completed.items.length + ' items, ' + discrepancies.length + ' discrepancies (not applied)');
-
-  activeCheck = null;
-  saveAll();
-  closeModal('modal-check-summary');
-  renderCheckHistory();
-  showToast(discrepancies.length + ' discrepancies flagged in log');
-}
-
-function confirmCheck() {
-  if (!activeCheck) return;
-  const items = activeCheck.items;
-  const adjustments = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
-  // Apply each adjustment
-  adjustments.forEach(i => {
-    const s = stockLines.find(x => x.id === i.stockLineId);
-    if (!s) return;
-    s.qty = i.actualQty;
-    checkAutoMarkdownReset(s.id);
-    checkAutoOutOfStock(s.productId);
-  });
-  // Save the check as confirmed
-  const completed = JSON.parse(JSON.stringify(activeCheck));
-  completed.completedAt = new Date().toISOString();
-  completed.status = 'confirmed';
-  inventoryChecks.unshift(completed);
-  logActivity('check', '', '', 'Inventory check CONFIRMED: ' + items.length + ' items, ' + adjustments.length + ' adjustments applied');
-
-  activeCheck = null;
-  saveAll();
-  closeModal('modal-check-summary');
-  renderCheckHistory();
-  applyFilters();
-  updateCounts();
-  showToast('Check confirmed: ' + adjustments.length + ' adjustments applied');
-}
-
-function confirmDiscardCheck() {
-  openModal('modal-discard-check');
-}
-
-function doDiscardCheck() {
-  // Silently delete - reminder noted: future admin should log this
-  activeCheck = null;
-  saveAll();
-  closeModal('modal-discard-check');
-  closeModal('modal-active-check');
-  renderCheckHistory();
-  showToast('Check discarded');
-}
-
-function viewPastCheck(cid) {
-  const c = inventoryChecks.find(x => x.id === cid);
-  if (!c) return;
-  viewingCheckId = cid;
-  setEl('past-check-title', new Date(c.completedAt).toLocaleString());
-  const items = c.items || [];
-  const discrepancies = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);
-  const badgeCls = c.status === 'flagged' ? 'flagged' : 'confirmed';
-  const badgeText = c.status === 'flagged' ? 'Flagged (not applied)' : 'Confirmed (applied)';
-
-  let html =
-    '<div style="margin-bottom:14px;padding:12px;background:var(--gray-50);border-radius:10px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-        '<div style="font-size:14px;font-weight:600">' + esc(c.mode) + ' mode</div>' +
-        '<span class="badge ' + badgeCls + '" style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;text-transform:uppercase;background:' + (c.status === 'flagged' ? 'var(--amber-50);color:var(--amber-600)' : 'var(--teal-50);color:var(--teal-600)') + '">' + badgeText + '</span>' +
-      '</div>' +
-      '<div style="font-size:12px;color:var(--gray-600);line-height:1.6">' +
-        'Started: ' + esc(new Date(c.startedAt).toLocaleString()) + '<br>' +
-        'Items checked: <strong>' + items.length + '</strong><br>' +
-        'Discrepancies: <strong>' + discrepancies.length + '</strong>' +
-      '</div></div>';
-
-  if (discrepancies.length > 0) {
-    html += '<div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px">Discrepancies:</div>';
-    html += discrepancies.map(i => {
-      const diff = i.actualQty - i.recordedQty;
-      const cls = diff > 0 ? 'positive' : 'negative';
-      const sign = diff > 0 ? '+' : '';
-      return '<div class="check-summary-item discrepancy">' +
-        '<div class="name">' + esc(i.productName) + '</div>' +
-        '<div class="nums">Exp: ' + esc(i.exp || 'no expiry') + ' | Recorded: ' + i.recordedQty + ' | Actual: ' + i.actualQty + '</div>' +
-        '<div class="diff ' + cls + '">Difference: ' + sign + diff + '</div>' +
-      '</div>';
-    }).join('');
-  } else {
-    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts matched.</div>';
-  }
-
-  document.getElementById('past-check-body').innerHTML = html;
-  openModal('modal-past-check');
-}
-
-// ─────────────────────────────────────────
-// EXPORT / IMPORT — FIX 5: include sales
-// ─────────────────────────────────────────
-function exportCSV() {
-  if (products.length === 0 && sales.length === 0) { showToast('No data to export'); return; }
-
-  let csv = '';
-
-  // Products + stock sheet (STAGE 2: markdownPrice, STAGE 5: pulledOut)
-  if (products.length > 0) {
-    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price','Pulled Out'];
-    const prodRows = [];
-    products.forEach(p => {
-      const lines = stockLines.filter(s => s.productId === p.recordId);
-      if (lines.length === 0) {
-        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','','',''].map(csvCell));
-      } else {
-        lines.forEach(s => {
-          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||'',s.pulledOut?'yes':''].map(csvCell));
-        });
-      }
-    });
-    csv += '## INVENTORY\n' + prodHeaders.join(',') + '\n' + prodRows.map(r => r.join(',')).join('\n');
-  }
-
-  // Sales sheet (STAGE 2: includes productId, stockLineId, exp, isMarkdown)
-  if (sales.length > 0) {
-    const salesHeaders = ['Sale ID','Product ID','Product Name','Brand','Stock Line ID','Expiry','Qty Sold','Price','Is Markdown','Date','Timestamp'];
-    const salesRows = sales.map(s => [s.id, s.productId||'', s.productName, s.brand, s.stockLineId||'', s.exp||'', s.qtySold, s.price, s.isMarkdown?'yes':'', s.date, s.timestamp||''].map(csvCell));
-    csv += '\n\n## SALES\n' + salesHeaders.join(',') + '\n' + salesRows.map(r => r.join(',')).join('\n');
-  }
-
-  // STAGE 3: Activity log sheet
-  if (activityLog.length > 0) {
-    const actHeaders = ['Activity ID','Type','Product ID','Product Name','Description','Date','Timestamp'];
-    const actRows = activityLog.map(a => [a.id, a.type, a.productId||'', a.productName||'', a.description||'', a.date||'', a.timestamp||''].map(csvCell));
-    csv += '\n\n## ACTIVITY\n' + actHeaders.join(',') + '\n' + actRows.map(r => r.join(',')).join('\n');
-  }
-
-  // STAGE 4: Inventory checks sheet (one row per item per check)
-  if (inventoryChecks.length > 0) {
-    const checkHeaders = ['Check ID','Mode','Status','Started At','Completed At','Stock Line ID','Product ID','Product Name','Expiry','Recorded Qty','Actual Qty','Scanned'];
-    const checkRows = [];
-    inventoryChecks.forEach(c => {
-      (c.items || []).forEach(i => {
-        checkRows.push([c.id, c.mode, c.status, c.startedAt, c.completedAt, i.stockLineId, i.productId, i.productName, i.exp || '', i.recordedQty, i.actualQty != null ? i.actualQty : '', i.scanned ? 'yes' : ''].map(csvCell));
-      });
-    });
-    csv += '\n\n## CHECKS\n' + checkHeaders.join(',') + '\n' + checkRows.map(r => r.join(',')).join('\n');
-  }
-
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'cosmetics_inventory_' + today() + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-  try { localStorage.setItem('ci_last_backup', new Date().toISOString()); } catch(e) {}
-  updateBackupDisplay();
-  showToast('CSV downloaded!');
-}
-
-function csvCell(v) { return '"' + String(v || '').replace(/"/g, '""') + '"'; }
-
-// FIX 4 (import): handles new format, old flat format, and section headers
-function importCSV(input) {
-  const file = input.files[0];
-  if (!file) return;
-  // FIX Issue 16: Specific error messages
-  if (file.size === 0) {
-    showImportResult('File is empty.', 'error');
-    input.value = '';
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    showImportResult('File too large (over 10MB). This may not be a valid CSV.', 'error');
-    input.value = '';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onerror = function() {
-    showImportResult('Could not read the file. Try again.', 'error');
-    input.value = '';
-  };
-  reader.onload = function(e) {
-    const text = e.target.result;
-    if (!text || text.length < 10) { showImportResult('File appears empty or corrupted.', 'error'); input.value = ''; return; }
-    if (!text.includes(',')) { showImportResult('This does not appear to be a valid CSV file (no commas found).', 'error'); input.value = ''; return; }
-
-    // Split into sections if ## headers present
-    const inventorySection = extractSection(text, 'INVENTORY');
-    const salesSection = extractSection(text, 'SALES');
-    const activitySection = extractSection(text, 'ACTIVITY');
-    const checksSection = extractSection(text, 'CHECKS');
-
-    let addedProducts = 0, addedStocks = 0, addedSales = 0, addedActivity = 0, addedChecks = 0, skipped = 0;
-
-    // Import inventory
-    const invLines = (inventorySection || text).split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
-    if (invLines.length < 2) {
-      showImportResult('Inventory section has no data rows.', 'error');
-      input.value = '';
-      return;
-    }
-    const header = invLines[0].toLowerCase();
-    const isNewFormat = header.includes('stock id');
-
-    if (!header.includes('barcode') && !header.includes('record id')) {
-      showImportResult('Header row does not match expected format. Make sure this is an exported CSV from this app.', 'error');
-      input.value = '';
-      return;
-    }
-
-    invLines.slice(1).forEach(line => {
-      const c = parseCSVLine(line);
-      if (isNewFormat) {
-        const rid = (c[0] || '').trim();
-        if (!rid) { skipped++; return; }
-        if (!products.find(p => p.recordId === rid)) {
-          products.push({ recordId:rid, barcode:c[1]||'', name:c[2]||'', brand:c[3]||'', category:c[4]||'', desc:c[5]||'', notes:c[6]||'', cost:c[7]||'', selling:c[8]||'', status:c[9]||'active', unit:c[10]||'pcs', location:c[11]||'', dateAdded:c[12]||'' });
-          addedProducts++;
-        }
-        const sid = (c[13] || '').trim();
-        if (sid && !stockLines.find(s => s.id === sid)) {
-          // STAGE 2: c[17] is markdownPrice (new column)
-          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'', pulledOut:(c[18]||'').toLowerCase()==='yes' });
-          addedStocks++;
-        }
-      } else {
-        const barcode = (c[0] || '').trim();
-        if (!barcode) { skipped++; return; }
-        const rid = generateId('REC');
-        products.push({ recordId:rid, barcode, name:c[1]||'', brand:c[2]||'', category:c[3]||'', desc:c[4]||'', notes:'', cost:'', selling:'', status:'active', unit:c[6]||'pcs', location:c[9]||'', dateAdded:c[8]||'' });
-        stockLines.push({ id:generateId('STK'), productId:rid, exp:c[7]||'', qty:parseInt(c[5])||1, dateAdded:c[8]||'', markdownPrice:'', pulledOut:false });
-        addedProducts++;
-      }
-    });
-
-    // Import sales — auto-detect format by column count
-    if (salesSection) {
-      const sLines = salesSection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
-      if (sLines.length >= 2) {
-        const salesHeader = sLines[0].toLowerCase();
-        const newSaleFormat = salesHeader.includes('product id') || salesHeader.includes('stock line id');
-        sLines.slice(1).forEach(line => {
-          const c = parseCSVLine(line);
-          const sid = (c[0] || '').trim();
-          if (!sid || sales.find(s => s.id === sid)) return;
-          if (newSaleFormat) {
-            // New: Sale ID, Product ID, Product Name, Brand, Stock Line ID, Expiry, Qty, Price, Is Markdown, Date, Timestamp
-            sales.push({
-              id:sid, productId:c[1]||'', productName:c[2]||'', brand:c[3]||'',
-              stockLineId:c[4]||'', exp:c[5]||'', qtySold:parseInt(c[6])||1,
-              price:c[7]||'', isMarkdown:(c[8]||'').toLowerCase()==='yes',
-              date:c[9]||'', timestamp:c[10]||''
-            });
-          } else {
-            // Old: Sale ID, Product Name, Brand, Qty, Price, Date
-            sales.push({ id:sid, productName:c[1]||'', brand:c[2]||'', qtySold:parseInt(c[3])||1, price:c[4]||'', date:c[5]||'' });
-          }
-          addedSales++;
-        });
-      }
-    }
-
-    // STAGE 3: Import activity log
-    if (activitySection) {
-      const aLines = activitySection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
-      if (aLines.length >= 2) {
-        aLines.slice(1).forEach(line => {
-          const c = parseCSVLine(line);
-          const aid = (c[0] || '').trim();
-          if (!aid || activityLog.find(a => a.id === aid)) return;
-          activityLog.push({
-            id: aid, type: c[1] || 'note', productId: c[2] || '',
-            productName: c[3] || '', description: c[4] || '',
-            date: c[5] || '', timestamp: c[6] || ''
-          });
-          addedActivity++;
-        });
-        // Re-sort activity by timestamp descending
-        activityLog.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-      }
-    }
-
-    // STAGE 4: Import inventory checks (rows grouped by Check ID)
-    if (checksSection) {
-      const ckLines = checksSection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
-      if (ckLines.length >= 2) {
-        const byCheckId = {};
-        ckLines.slice(1).forEach(line => {
-          const c = parseCSVLine(line);
-          const cid = (c[0] || '').trim();
-          if (!cid) return;
-          if (inventoryChecks.find(x => x.id === cid)) return; // skip dupes
-          if (!byCheckId[cid]) {
-            byCheckId[cid] = {
-              id: cid, mode: c[1] || 'manual', status: c[2] || 'confirmed',
-              startedAt: c[3] || '', completedAt: c[4] || '',
-              items: []
-            };
-          }
-          byCheckId[cid].items.push({
-            stockLineId: c[5] || '', productId: c[6] || '',
-            productName: c[7] || '', exp: c[8] || '',
-            recordedQty: parseInt(c[9]) || 0,
-            actualQty: c[10] === '' ? null : parseInt(c[10]) || 0,
-            scanned: c[11] === 'yes',
-          });
-        });
-        Object.keys(byCheckId).forEach(k => {
-          inventoryChecks.push(byCheckId[k]);
-          addedChecks++;
-        });
-      }
-    }
-
-    saveAll();
-    input.value = '';
-    let msg = addedProducts + ' product(s)';
-    if (addedStocks) msg += ', ' + addedStocks + ' stock entries';
-    if (addedSales) msg += ', ' + addedSales + ' sale(s)';
-    if (addedActivity) msg += ', ' + addedActivity + ' activity entries';
-    if (addedChecks) msg += ', ' + addedChecks + ' check(s)';
-    msg += ' imported';
-    if (skipped) msg += ', ' + skipped + ' skipped (duplicate or missing ID)';
-    msg += '.';
-    showImportResult(msg, (addedProducts + addedSales + addedActivity + addedChecks) > 0 ? 'success' : 'info');
-    updateCounts();
-    applyFilters();
-  };
-  try { reader.readAsText(file); } catch(e) {
-    showImportResult('Failed to read file: ' + e.message, 'error');
-    input.value = '';
-  }
-}
-
-function extractSection(text, sectionName) {
-  const marker = '## ' + sectionName;
-  const start = text.indexOf(marker);
-  if (start === -1) return null;
-  const afterMarker = text.indexOf('\n', start) + 1;
-  const nextSection = text.indexOf('\n##', afterMarker);
-  return nextSection === -1 ? text.slice(afterMarker) : text.slice(afterMarker, nextSection);
-}
-
-function parseCSVLine(line) {
-  const result = []; let cur = '', inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
-    else cur += ch;
-  }
-  result.push(cur);
-  return result;
-}
-
-function showImportResult(msg, type) {
-  const el = document.getElementById('import-result');
-  el.textContent = msg;
-  el.className = 'import-result ' + type;
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 6000);
-}
-
-function doClearAll() {
-  products = []; stockLines = []; sales = [];
-  activityLog = []; inventoryChecks = []; activeCheck = null;
-  openDetailsPanelId = null;
-  saveAll();
-  closeModal('modal-confirm-clear');
-  applyFilters();
-  showToast('All data cleared');
-}
-
-// ─────────────────────────────────────────
-// INIT — runs last, after all functions defined
-// ─────────────────────────────────────────
-updateCounts();
-updateBackupDisplay();
-updateStorageMeter();
-applyFilters();
-
-// STAGE 5: Auth check - show login if not authenticated, else app
-setupAuthListeners();
-if (isAuthValid()) {
-  showApp();
-} else {
-  showLogin();
-}
-</script>
+<script src="js/auth.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/sales.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
