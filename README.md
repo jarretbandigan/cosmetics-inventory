@@ -8,7 +8,7 @@ Originally built for personal use. Long term goal is to release publicly on Goog
 
 ## Live App
 
-[Open the app](https://jarretbandigan.github.io/inventory) <!-- Update this link to match your actual GitHub Pages URL -->
+[Open the app](https://jarretbandigan.github.io/cosmetics-inventory/) <!-- Update this link to match your actual GitHub Pages URL -->
 
 ---
 
