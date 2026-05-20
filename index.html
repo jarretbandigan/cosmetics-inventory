@@ -764,17 +764,121 @@ input[type="file"] { display: none; }
   content: ''; position: absolute; top: 6px; right: 6px;
   width: 6px; height: 6px; background: var(--red-600); border-radius: 50%;
 }
+
+/* ── STAGE 5: LOGIN SCREEN ── */
+.login-page {
+  position: fixed; inset: 0; background: var(--pink-800);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.login-page.hidden { display: none; }
+.login-box {
+  background: #fff; border-radius: 20px; padding: 32px 24px;
+  width: 100%; max-width: 380px; text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.login-logo { font-size: 48px; margin-bottom: 8px; }
+.login-title { font-size: 22px; font-weight: 700; color: var(--pink-800); margin-bottom: 4px; }
+.login-version { font-size: 12px; color: var(--gray-400); margin-bottom: 24px; }
+.login-field { margin-bottom: 14px; text-align: left; }
+.login-field label {
+  display: block; font-size: 12px; font-weight: 500; color: var(--gray-600);
+  margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.login-field input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--gray-100); font-size: 16px;
+  background: var(--gray-50); outline: none; font-family: inherit;
+  -webkit-appearance: none; appearance: none;
+}
+.login-field input:focus { border-color: var(--pink-200); background: #fff; }
+.login-error {
+  background: var(--red-50); color: var(--red-600);
+  border-radius: 10px; padding: 10px 12px; font-size: 13px;
+  margin-bottom: 14px; display: none; text-align: center;
+}
+.login-error.visible { display: block; }
+.login-btn {
+  width: 100%; padding: 14px; border-radius: 12px;
+  background: var(--pink-600); color: #fff; border: none;
+  font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit;
+  margin-top: 8px;
+}
+.login-btn:active { opacity: 0.85; }
+.login-note {
+  font-size: 11px; color: var(--gray-400);
+  margin-top: 20px; line-height: 1.5;
+}
+
+/* Logout button on home header */
+.home-header { position: relative; }
+.logout-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(255,255,255,0.15); border: none;
+  color: #fff; padding: 6px 12px; border-radius: 8px;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  font-family: inherit; display: flex; align-items: center; gap: 4px;
+}
+.logout-btn:active { background: rgba(255,255,255,0.25); }
+
+/* ── STAGE 5: PARTIAL PULL OUT + STOCK LINE STATES ── */
+.stock-line.pulled-out {
+  opacity: 0.55; background: var(--red-50);
+  border-color: var(--red-100);
+}
+.stock-line.pulled-out .stock-exp,
+.stock-line.pulled-out .stock-markdown-info {
+  text-decoration: line-through;
+}
+.stock-pulled-tag {
+  display: inline-block; font-size: 9px; font-weight: 600;
+  background: var(--red-100); color: var(--red-700);
+  padding: 2px 7px; border-radius: 10px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+  margin-left: 6px;
+}
+.status-partial {
+  background: var(--gray-100); color: var(--gray-700);
+  font-size: 9px;
+}
+.partial-pullout-info {
+  font-size: 11px; color: var(--gray-500);
+  font-style: italic; margin-top: 2px;
+}
 </style>
 </head>
 <body>
 
+<!-- ═══════════════ LOGIN SCREEN (STAGE 5) ═══════════════ -->
+<div class="login-page" id="login-page">
+  <div class="login-box">
+    <div class="login-logo">💄</div>
+    <div class="login-title">Inventory System</div>
+    <div class="login-version">v2.6.0</div>
+    <div class="login-error" id="login-error">Incorrect username or password</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="login-username" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-note">
+      Local login for now.<br>Cloud account login coming in a future update.
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ HOME PAGE ═══════════════ -->
 <div class="page active" id="page-home">
   <div class="home-header">
+    <button class="logout-btn" onclick="doLogout()">🔒 Sign Out</button>
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.5.0</div>
+    <div class="home-version">v2.6.0</div>
   </div>
 
   <div class="mode-selector">
@@ -1102,6 +1206,26 @@ input[type="file"] { display: none; }
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.6.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Login screen with username and password (admin / amaya0827)</li>
+            <li>Auto-logout after 30 minutes of inactivity</li>
+            <li>Sign Out button on home screen</li>
+            <li>Pull out a specific stock line only (not the whole product)</li>
+            <li>Partial Pull badge shown when only some stock lines are pulled out</li>
+            <li>Pulled-out stock lines display visually distinct (greyed out, line-through)</li>
+            <li>Restore button on pulled-out stock lines to bring them back</li>
+            <li>Product status auto-syncs with stock line state (all pulled = Pulled Out)</li>
+            <li>Pulled-out lines excluded from Scan to Sell and Manual Sale</li>
+            <li>Pulled-out lines excluded from Expiring Soon popup</li>
+            <li>Markdown applies directly without extra confirmation modal</li>
+            <li>Pull Out button on each stock line in inventory More Details</li>
+            <li>CSV export and import include pulled-out state per stock line</li>
+          </ul>
+          <p style="font-size:11px;color:var(--gray-400);margin-top:8px;font-style:italic">Note: Login is a soft gate for casual access prevention. Real auth comes with Phase 2.5 (Supabase).</p>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.5.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -1253,14 +1377,13 @@ input[type="file"] { display: none; }
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.5.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Full Inventory Check feature: Scan Mode or Manual Count.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Scan items physically and the app marks them as checked.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Summary shows discrepancies. Review before applying adjustments.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Three actions: Continue, Flag (log only), or Confirm (apply changes).</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Resume unfinished checks if you close the app mid-count.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Full check history in Reports tab with all discrepancy details.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Inventory checks included in CSV backup.</div></div>
+      <div class="whats-new-version">Version 2.6.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Login screen now protects access. Sign in with your credentials.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Auto-logout after 30 minutes of inactivity for safety.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pull out a specific stock line by expiry, not the entire product.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Visual distinction when only some stock lines are pulled out.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restore button to undo a stock line pull out.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Markdown applies directly without an extra confirmation step.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
@@ -1710,10 +1833,153 @@ input[type="file"] { display: none; }
 
 <script>
 // ─────────────────────────────────────────
+// STAGE 5: LOGIN / AUTH SYSTEM
+// ─────────────────────────────────────────
+// NOTE: Client-side SHA-256 is a SOFT GATE, not real security.
+// Real auth comes in Phase 2.5 with Supabase. This is for casual prevention only.
+
+const VALID_USERNAME = 'admin';
+// SHA-256 of "amaya0827"
+const VALID_PASSWORD_HASH = 'fba447b7c72af7dbd2482b4bc07352abbb8292df3b28956d91692e65eaafde2e';
+const AUTO_LOGOUT_MS = 30 * 60 * 1000; // 30 minutes
+const AUTH_KEY = 'ci_auth_token';
+
+// SHA-256 implementation using SubtleCrypto (built into browsers)
+async function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hashBuf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function isAuthValid() {
+  try {
+    const raw = localStorage.getItem(AUTH_KEY);
+    if (!raw) return false;
+    const token = JSON.parse(raw);
+    if (!token || !token.expiresAt) return false;
+    if (Date.now() > token.expiresAt) return false;
+    return true;
+  } catch(e) { return false; }
+}
+
+function setAuthToken() {
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify({
+      user: VALID_USERNAME,
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + AUTO_LOGOUT_MS,
+    }));
+  } catch(e) {}
+}
+
+function clearAuthToken() {
+  try { localStorage.removeItem(AUTH_KEY); } catch(e) {}
+}
+
+function refreshAuthToken() {
+  // Extend expiry on user activity
+  if (!isAuthValid()) return;
+  setAuthToken();
+}
+
+async function doLogin() {
+  const u = (document.getElementById('login-username').value || '').trim();
+  const p = document.getElementById('login-password').value || '';
+  const errEl = document.getElementById('login-error');
+  if (!u || !p) {
+    errEl.textContent = 'Please enter username and password';
+    errEl.classList.add('visible');
+    return;
+  }
+  try {
+    const ph = await sha256(p);
+    if (u === VALID_USERNAME && ph === VALID_PASSWORD_HASH) {
+      setAuthToken();
+      document.getElementById('login-password').value = '';
+      errEl.classList.remove('visible');
+      showApp();
+    } else {
+      errEl.textContent = 'Incorrect username or password';
+      errEl.classList.add('visible');
+      document.getElementById('login-password').value = '';
+    }
+  } catch(e) {
+    errEl.textContent = 'Login error: ' + e.message;
+    errEl.classList.add('visible');
+  }
+}
+
+function doLogout() {
+  clearAuthToken();
+  // Make sure user is on home page when logging out
+  document.getElementById('page-home').classList.add('active');
+  document.getElementById('page-app').classList.remove('active');
+  // Stop any cameras
+  try { if (codeReader) { codeReader.reset(); codeReader = null; } } catch(e) {}
+  try { if (typeof saleScannerReader !== 'undefined' && saleScannerReader) { saleScannerReader.reset(); saleScannerReader = null; } } catch(e) {}
+  try { if (typeof checkScannerReader !== 'undefined' && checkScannerReader) { checkScannerReader.reset(); checkScannerReader = null; } } catch(e) {}
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById('login-page').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  // Focus username after slight delay
+  setTimeout(() => {
+    const u = document.getElementById('login-username');
+    if (u && !u.value) u.focus();
+  }, 100);
+}
+
+function showApp() {
+  document.getElementById('login-page').classList.add('hidden');
+  document.body.style.overflow = '';
+  // Refresh UI
+  if (typeof updateCounts === 'function') updateCounts();
+  if (typeof initWhatsNew === 'function') initWhatsNew();
+}
+
+// Activity tracker - extends auth token on user interaction
+let lastActivityTs = Date.now();
+function trackActivity() {
+  if (!isAuthValid()) return;
+  const now = Date.now();
+  // Only refresh token if more than 1 minute since last refresh (avoid excessive writes)
+  if (now - lastActivityTs > 60000) {
+    refreshAuthToken();
+    lastActivityTs = now;
+  }
+}
+
+// Auto-logout checker - runs every minute
+function checkAuthExpiry() {
+  // Only act if currently logged in (token not yet expired)
+  // BUT: we need to detect when token EXPIRES and force show login
+  const loginVisible = !document.getElementById('login-page').classList.contains('hidden');
+  if (loginVisible) return; // already on login screen
+  if (!isAuthValid()) {
+    // Token expired
+    showToast('Session expired. Please sign in again.');
+    doLogout();
+  }
+}
+
+// Attach activity listeners (will be set after DOM ready in init)
+function setupAuthListeners() {
+  ['click','keydown','touchstart','scroll'].forEach(evt => {
+    document.addEventListener(evt, trackActivity, { passive: true });
+  });
+  // Check expiry every 60 seconds
+  setInterval(checkAuthExpiry, 60000);
+}
+
+// ─────────────────────────────────────────
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.6.0';
 
 function generateId(prefix) {
   return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -1850,6 +2116,8 @@ if (oldData && products.length === 0) {
         exp: item.exp || '',
         qty: parseInt(item.qty) || 1,
         dateAdded: item.dateAdded || today(),
+        markdownPrice: '',
+        pulledOut: false,
       });
     });
   } catch(e) {}
@@ -1860,6 +2128,17 @@ if (oldData && products.length === 0) {
   let needsSave = false;
   stockLines.forEach(s => {
     if (s.markdownPrice === undefined) { s.markdownPrice = ''; needsSave = true; }
+  });
+  if (needsSave) {
+    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
+  }
+})();
+
+// STAGE 5: Migrate stock lines to add pulledOut field
+(function migrateStage5() {
+  let needsSave = false;
+  stockLines.forEach(s => {
+    if (s.pulledOut === undefined) { s.pulledOut = false; needsSave = true; }
   });
   if (needsSave) {
     try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
@@ -1943,8 +2222,9 @@ function formatMoney(n) {
 function checkAutoOutOfStock(productId) {
   const p = products.find(x => x.recordId === productId);
   if (!p) return;
-  if (p.status === 'pulled') return; // don't override pulled out
-  const total = productTotalQty(productId);
+  if (p.status === 'pulled') return; // don't override pulled out (full product)
+  // STAGE 5: only count stock that is not pulled out
+  const total = stockLines.filter(s => s.productId === productId && !s.pulledOut).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
   if (total <= 0 && p.status === 'active') {
     p.status = 'out';
     return true;
@@ -1956,9 +2236,9 @@ function checkAutoOutOfStock(productId) {
   return false;
 }
 
-// STAGE 2: Product has any markdown stock line
+// STAGE 2: Product has any markdown stock line (excluding pulled out)
 function productHasMarkdown(productId) {
-  return stockLines.some(s => s.productId === productId && s.markdownPrice && (parseInt(s.qty) || 0) > 0);
+  return stockLines.some(s => s.productId === productId && s.markdownPrice && (parseInt(s.qty) || 0) > 0 && !s.pulledOut);
 }
 
 // STAGE 2: Auto-reset markdown when stock line hits zero
@@ -1967,6 +2247,50 @@ function checkAutoMarkdownReset(stockLineId) {
   if (!s || !s.markdownPrice) return false;
   if ((parseInt(s.qty) || 0) <= 0) {
     s.markdownPrice = '';
+    return true;
+  }
+  return false;
+}
+
+// STAGE 5: Pull out state helpers
+function stockLinesForProduct(rid) {
+  return stockLines.filter(s => s.productId === rid);
+}
+function pulledOutCount(rid) {
+  return stockLines.filter(s => s.productId === rid && s.pulledOut).length;
+}
+function isFullyPulledOut(rid) {
+  const lines = stockLinesForProduct(rid);
+  if (lines.length === 0) return false;
+  return lines.every(s => s.pulledOut);
+}
+function isPartiallyPulledOut(rid) {
+  const lines = stockLinesForProduct(rid);
+  if (lines.length === 0) return false;
+  const pulled = lines.filter(s => s.pulledOut).length;
+  return pulled > 0 && pulled < lines.length;
+}
+
+// STAGE 5: Auto-sync product status with stock line pull out state
+function syncProductStatusFromStockLines(rid) {
+  const p = products.find(x => x.recordId === rid);
+  if (!p) return false;
+  const lines = stockLinesForProduct(rid);
+  if (lines.length === 0) return false;
+  const fullyPulled = isFullyPulledOut(rid);
+  if (fullyPulled && p.status !== 'pulled') {
+    const oldStatus = p.status;
+    p.status = 'pulled';
+    logActivity('status', rid, p.name, 'Auto status change: ' + oldStatus + ' → Pulled Out (all stock lines pulled out)');
+    return true;
+  }
+  if (!fullyPulled && p.status === 'pulled') {
+    // Was Pulled Out at product level, but not all stock lines are pulled now
+    // Check qty to decide active vs out
+    const total = productTotalQty(rid);
+    const newStatus = total > 0 ? 'active' : 'out';
+    p.status = newStatus;
+    logActivity('status', rid, p.name, 'Auto status change: Pulled Out → ' + (newStatus === 'active' ? 'Active' : 'Out of Stock'));
     return true;
   }
   return false;
@@ -2244,6 +2568,8 @@ function confirmAddToExisting() {
       exp,
       qty: qtyToAdd,
       dateAdded: today(),
+      markdownPrice: '',
+      pulledOut: false,
     });
     logActivity('add', product.recordId, product.name, 'New stock entry: ' + qtyToAdd + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added' + (exp ? ' for exp: ' + exp : '') + '.');
@@ -2316,6 +2642,8 @@ function doSaveProduct() {
     exp: document.getElementById('f-exp').value,
     qty,
     dateAdded: today(),
+    markdownPrice: '',
+    pulledOut: false,
   });
 
   checkAutoOutOfStock(recordId);
@@ -2428,10 +2756,12 @@ function renderList(filtered, q) {
       const expCls = getExpCls(s.exp);
       const origQty = parseInt(s.qty) || 0;
       const hasMarkdown = !!s.markdownPrice;
-      return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
+      const isPulled = !!s.pulledOut;
+      const pulledTag = isPulled ? '<span class="stock-pulled-tag">Pulled Out</span>' : '';
+      return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + (isPulled ? ' pulled-out' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
         '<div class="stock-line-top">' +
           '<div>' +
-            '<div class="stock-exp-label">Expiry</div>' +
+            '<div class="stock-exp-label">Expiry' + pulledTag + '</div>' +
             '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
             (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
           '</div>' +
@@ -2448,6 +2778,10 @@ function renderList(filtered, q) {
         '</div>' +
         '<div class="stock-actions">' +
           '<button class="btn btn-secondary btn-sm" onclick="openEditStock(\'' + sidEsc + '\')">Edit</button>' +
+          (isPulled ?
+            '<button class="btn btn-teal-outline btn-sm" onclick="restoreStockLine(\'' + sidEsc + '\')">Restore</button>' :
+            '<button class="btn btn-amber-outline btn-sm" onclick="pullOutStockLine(\'' + sidEsc + '\')">Pull Out</button>'
+          ) +
           '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStock(\'' + sidEsc + '\')">Remove</button>' +
         '</div>' +
       '</div>';
@@ -2473,16 +2807,22 @@ function renderList(filtered, q) {
         '</div>' +
       '</div>';
 
+    const partialPulled = isPartiallyPulledOut(rid);
+    const pulledLineCount = pulledOutCount(rid);
+    const totalLineCount = lines.length;
+
     return '<div class="product-card">' +
       '<div class="product-card-main">' +
         '<div class="product-card-left">' +
           '<div class="product-name">' + esc(p.name) + '</div>' +
           (p.brand ? '<div class="product-brand">' + esc(p.brand) + '</div>' : '') +
           '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + esc(p.unit || 'pcs') + '</span></div>' +
+          (partialPulled ? '<div class="partial-pullout-info">⚠ ' + pulledLineCount + ' of ' + totalLineCount + ' stock lines pulled out</div>' : '') +
         '</div>' +
         '<div class="product-badges">' +
           '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
           (onSale ? '<span class="status-badge status-sale">💰 On Sale</span>' : '') +
+          (partialPulled ? '<span class="status-badge status-partial">Partial Pull</span>' : '') +
         '</div>' +
       '</div>' +
       '<button class="more-details-btn" onclick="toggleDetails(\'' + ridEsc + '\',this)">' +
@@ -2742,7 +3082,7 @@ function doAddStock() {
     if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qty + ' unit(s) added to existing stock entry.');
   } else {
-    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today() });
+    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false });
     if (p) logActivity('add', rid, p.name, 'New stock entry: ' + qty + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added.');
   }
@@ -2775,7 +3115,7 @@ function renderExpList() {
   const now = new Date(); now.setHours(0,0,0,0);
   const cutoff = new Date(now.getTime() + activeExpFilter * 86400000);
   const items = stockLines
-    .filter(s => s.exp && new Date(s.exp) <= cutoff && (parseInt(s.qty) || 0) > 0)
+    .filter(s => s.exp && new Date(s.exp) <= cutoff && (parseInt(s.qty) || 0) > 0 && !s.pulledOut)
     .sort((a, b) => a.exp.localeCompare(b.exp));
 
   const list = document.getElementById('exp-modal-list');
@@ -2804,7 +3144,7 @@ function renderExpList() {
       '</div>' +
       '<div class="exp-item-actions">' +
         '<button class="btn btn-purple-outline btn-sm" onclick="openMarkdownInput(\'' + sidEsc + '\')">💰 ' + (s.markdownPrice ? 'Edit Markdown' : 'Mark Down') + '</button>' +
-        '<button class="btn btn-amber-outline btn-sm" onclick="pullOutFromExp(\'' + ridEsc + '\')">Pull Out</button>' +
+        '<button class="btn btn-amber-outline btn-sm" onclick="pullOutStockLine(\'' + sidEsc + '\')">Pull Out</button>' +
         '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStockFromExp(\'' + sidEsc + '\')">Remove</button>' +
       '</div>' +
       '<div class="markdown-input-row" id="mir-' + sidEsc + '">' +
@@ -2831,6 +3171,7 @@ function cancelMarkdownInput(sid) {
   if (row) row.classList.remove('visible');
 }
 
+// STAGE 5: Markdown applies directly without separate modal
 function confirmMarkdown(sid) {
   const inp = document.getElementById('mip-' + sid);
   const price = inp.value.trim();
@@ -2838,11 +3179,20 @@ function confirmMarkdown(sid) {
   const s = stockLines.find(x => x.id === sid);
   if (!s) return;
   const p = products.find(x => x.recordId === s.productId);
-  pendingMarkdown = { sid, price };
-  setEl('markdown-confirm-msg', 'Mark down ' + (p ? p.name : 'this item') + ' (exp: ' + (s.exp || 'no expiry') + ') to ₱' + price + '?');
-  openModal('modal-confirm-markdown');
+  const oldPrice = s.markdownPrice;
+  s.markdownPrice = price;
+  if (p) {
+    const verb = oldPrice ? 'updated from ₱' + oldPrice + ' to' : 'set to';
+    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' ₱' + price + ' (exp: ' + (s.exp || 'no expiry') + ')');
+  }
+  saveAll();
+  renderExpList();
+  applyFilters();
+  showToast('Markdown applied');
+  updateCounts();
 }
 
+// Kept for compatibility but no longer used since modal removed
 function doApplyMarkdown() {
   if (!pendingMarkdown) return;
   const s = stockLines.find(x => x.id === pendingMarkdown.sid);
@@ -2877,16 +3227,45 @@ function removeMarkdown(sid) {
   updateCounts();
 }
 
-function pullOutFromExp(rid) {
-  const p = products.find(x => x.recordId === rid);
+// STAGE 5: Pull out a specific stock line (not the whole product)
+function pullOutStockLine(sid) {
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) return;
+  const p = products.find(x => x.recordId === s.productId);
   if (!p) return;
-  const old = p.status;
-  p.status = 'pulled';
-  logActivity('pulled', rid, p.name, p.name + ' marked as Pulled Out (was ' + old + ')');
+  if (s.pulledOut) {
+    showToast('Already pulled out');
+    return;
+  }
+  s.pulledOut = true;
+  logActivity('pulled', p.recordId, p.name, 'Stock line pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
+  // Auto-sync product status if all lines are pulled out
+  syncProductStatusFromStockLines(p.recordId);
   saveAll();
   renderExpList();
   applyFilters();
-  showToast(p.name + ' marked as Pulled Out');
+  showToast('Stock line pulled out');
+}
+
+// STAGE 5: Restore a pulled-out stock line back to available
+function restoreStockLine(sid) {
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) return;
+  const p = products.find(x => x.recordId === s.productId);
+  if (!p) return;
+  if (!s.pulledOut) return;
+  s.pulledOut = false;
+  logActivity('edit', p.recordId, p.name, 'Stock line restored from pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
+  syncProductStatusFromStockLines(p.recordId);
+  checkAutoOutOfStock(p.recordId);
+  saveAll();
+  applyFilters();
+  showToast('Stock line restored');
+}
+
+// Old function kept for backward compatibility but now pulls only the specific line
+function pullOutFromExp(sid) {
+  pullOutStockLine(sid);
 }
 
 // FIX 11: use modal instead of confirm()
@@ -2958,7 +3337,7 @@ function onSaleProductChange() {
   const p = products.find(x => x.recordId === rid);
   if (!p) return;
 
-  const lines = stockLines.filter(s => s.productId === rid && (parseInt(s.qty) || 0) > 0).sort((a, b) => {
+  const lines = stockLines.filter(s => s.productId === rid && (parseInt(s.qty) || 0) > 0 && !s.pulledOut).sort((a, b) => {
     if (!a.exp && !b.exp) return 0;
     if (!a.exp) return 1;
     if (!b.exp) return -1;
@@ -2966,7 +3345,7 @@ function onSaleProductChange() {
   });
 
   if (lines.length === 0) {
-    list.innerHTML = '<div style="font-size:13px;color:var(--red-600);padding:10px;background:var(--red-50);border-radius:8px">No stock available for this product</div>';
+    list.innerHTML = '<div style="font-size:13px;color:var(--red-600);padding:10px;background:var(--red-50);border-radius:8px">No available stock for this product (all stock lines may be pulled out)</div>';
     picker.style.display = 'block';
     return;
   }
@@ -3155,7 +3534,7 @@ function onSellBarcodeDetected(raw) {
     return;
   }
 
-  const lines = stockLines.filter(s => s.productId === p.recordId && (parseInt(s.qty) || 0) > 0).sort((a,b) => {
+  const lines = stockLines.filter(s => s.productId === p.recordId && (parseInt(s.qty) || 0) > 0 && !s.pulledOut).sort((a,b) => {
     if (!a.exp && !b.exp) return 0;
     if (!a.exp) return 1;
     if (!b.exp) return -1;
@@ -3895,17 +4274,17 @@ function exportCSV() {
 
   let csv = '';
 
-  // Products + stock sheet (STAGE 2: includes markdownPrice column)
+  // Products + stock sheet (STAGE 2: markdownPrice, STAGE 5: pulledOut)
   if (products.length > 0) {
-    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price'];
+    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price','Pulled Out'];
     const prodRows = [];
     products.forEach(p => {
       const lines = stockLines.filter(s => s.productId === p.recordId);
       if (lines.length === 0) {
-        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','',''].map(csvCell));
+        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','','',''].map(csvCell));
       } else {
         lines.forEach(s => {
-          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||''].map(csvCell));
+          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||'',s.pulledOut?'yes':''].map(csvCell));
         });
       }
     });
@@ -4013,7 +4392,7 @@ function importCSV(input) {
         const sid = (c[13] || '').trim();
         if (sid && !stockLines.find(s => s.id === sid)) {
           // STAGE 2: c[17] is markdownPrice (new column)
-          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'' });
+          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'', pulledOut:(c[18]||'').toLowerCase()==='yes' });
           addedStocks++;
         }
       } else {
@@ -4021,7 +4400,7 @@ function importCSV(input) {
         if (!barcode) { skipped++; return; }
         const rid = generateId('REC');
         products.push({ recordId:rid, barcode, name:c[1]||'', brand:c[2]||'', category:c[3]||'', desc:c[4]||'', notes:'', cost:'', selling:'', status:'active', unit:c[6]||'pcs', location:c[9]||'', dateAdded:c[8]||'' });
-        stockLines.push({ id:generateId('STK'), productId:rid, exp:c[7]||'', qty:parseInt(c[5])||1, dateAdded:c[8]||'', markdownPrice:'' });
+        stockLines.push({ id:generateId('STK'), productId:rid, exp:c[7]||'', qty:parseInt(c[5])||1, dateAdded:c[8]||'', markdownPrice:'', pulledOut:false });
         addedProducts++;
       }
     });
@@ -4168,10 +4547,17 @@ function doClearAll() {
 // INIT — runs last, after all functions defined
 // ─────────────────────────────────────────
 updateCounts();
-initWhatsNew();
 updateBackupDisplay();
 updateStorageMeter();
 applyFilters();
+
+// STAGE 5: Auth check - show login if not authenticated, else app
+setupAuthListeners();
+if (isAuthValid()) {
+  showApp();
+} else {
+  showLogin();
+}
 </script>
 </body>
 </html>
