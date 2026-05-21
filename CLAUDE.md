@@ -1,92 +1,128 @@
-# Cosmetics Inventory App — Claude Context
-
-## What This Is
-A mobile-first cosmetics inventory management app for a small Philippine boutique. Runs in any phone browser, deployed on GitHub Pages. Long-term goal: release on Google Play and App Store as a free alternative to tools like BoxHero.
-
-**Live app:** https://jarretbandigan.github.io/cosmetics-inventory/
+# INVENTORY SYSTEM - Claude Code Instructions
+App Version: v2.6.0 | Updated: May 2026
 
 ---
 
-## Current File Structure (as of post-QA cleanup)
-- `index.html` — HTML structure only, 990 lines
-- `css/style.css` — all styling, 839 lines
-- `js/auth.js` — login, logout, auto-logout timer, 149 lines
-- `js/scanner.js` — ZXing barcode scanning, camera, 154 lines
-- `js/inventory.js` — inventory list, render, search, filter, sort, stock controls, 612 lines
-- `js/sales.js` — scan to sell, manual sale log, oversell, 350 lines
-- `js/reports.js` — activity log, reports tab, inventory check, 616 lines
-- `js/data.js` — CSV export, import, storage meter, migrations, saveAll, 434 lines
-- `js/app.js` — app init, navigation, utilities, What's New, product form, 393 lines
+## TIER 1: RULES - READ FIRST EVERY SESSION
 
-Script load order: `auth.js` → `scanner.js` → `inventory.js` → `sales.js` → `reports.js` → `data.js` → `app.js`
+These are non-negotiable. Follow them before touching any file.
+
+### Before Every Task
+1. Is the task unambiguous? Is it trivial? (under 3 steps, single file, no architectural decisions)
+2. If YES to both - proceed directly.
+3. If NO to either - state your plan first and wait for confirmation before coding.
+
+### Hard Rules
+- Never delete or overwrite user data. Data must always migrate safely.
+- Never push directly to main for new features. Create a branch first.
+- Everything must be free or have a free tier. Flag anything that costs money.
+- Every update gets a version number bump and a What's New entry inside the app.
+- If a feature causes instability, remove it and ship clean. Add it back next update.
+- Always test syntax balance after any code change before delivering.
+- Do not start the next phase until confirmed complete and tested on a real phone.
+- Single file structure is now split. Never merge files back together.
+
+### Data Protection - CRITICAL
+There are now real beta users on this app. Data lives in localStorage only.
+There is no backend or backup system yet. If data is lost it cannot be recovered.
+
+Before any update that touches data structures:
+1. List every localStorage key that will be affected
+2. Write a migration that carries old data forward to the new structure
+3. Test the migration with existing data before touching anything else
+4. Never rename, remove, or restructure a localStorage key without a migration
+5. Never clear, reset, or overwrite localStorage except through the explicit user-facing Clear Data button
+6. If unsure whether a change is safe for existing data, stop and ask first
 
 ---
 
-## Tech Stack
-- Vanilla HTML/CSS/JavaScript — no frameworks, no build step
-- Barcode scanning: ZXing pinned to v0.21.0 (CDN)
-- Storage: localStorage + CSV export/import
+## TIER 2: PROJECT CONTEXT
+
+### About
+A mobile cosmetics inventory management app deployed on GitHub Pages. Built for personal use by the project owner's girlfriend to manage a small cosmetics store. Long term goal is Google Play and App Store release, targeting Philippine boutiques and small resellers as a free alternative to BoxHero ($18 to $49/month). Currently has 3 real beta users. Data lives in localStorage only with no backend yet.
+
+### Repo
+https://github.com/jarretbandigan/cosmetics-inventory
+
+### Tech Stack
+- Frontend: Vanilla HTML, CSS, JavaScript. No frameworks.
+- Barcode Scanning: ZXing pinned to v0.21.0
+- Storage now: localStorage + CSV export and import
+- Storage future: Supabase free tier
 - Hosting: GitHub Pages
-- Future backend: Supabase (Phase 2.5)
-- Future packaging: Capacitor for Android and iOS (Phase 3)
+- Mobile Packaging future: Capacitor for Android and iOS
 
 ---
 
-## Current Version: v2.6.0
-All Phase 1 stages complete. Phase 2 (Go Mobile-Ready) is next.
+## TIER 3: FILE STRUCTURE
 
-| Stage | Version | What changed |
-|-------|---------|-------------|
-| 5 | v2.6.0 | Login screen, SHA-256 auth, auto-logout 30 min, pull out per stock line |
-| 4 | v2.5.0 | Inventory Check, manual + scan mode, discrepancy summary, check history |
-| 3 | v2.4.0 | Activity Log, Reports tab, home cost and selling value stats |
-| 2 | v2.3.0 | Sales overhaul, Scan to Sell, price markdown, dual status, oversell warning |
-| 1 | v2.2.0 | Foundation fixes, ZXing pinned, data protection, undo on delete, storage meter |
+- index.html - HTML structure only, 990 lines
+- css/style.css - all styling, 839 lines
+- js/auth.js - login, logout, auto-logout timer, 149 lines
+- js/scanner.js - ZXing barcode scanning, camera, 154 lines
+- js/inventory.js - inventory list, render, search, filter, sort, stock controls, 612 lines
+- js/sales.js - scan to sell, manual sale log, oversell, 350 lines
+- js/reports.js - activity log, reports tab, inventory check, 616 lines
+- js/data.js - CSV export, import, storage meter, migrations, saveAll, 434 lines
+- js/app.js - app init, navigation, utilities, What's New, product form, 393 lines
 
----
-
-## Data Model (localStorage keys)
-| Key | Contents |
-|-----|----------|
-| `ci_products` | Record ID, barcode, name, brand, category, desc, notes, cost, selling, status, unit, location, dateAdded |
-| `ci_stocks` | Stock lines — id, productId, exp, qty, dateAdded, markdownPrice, pulledOut |
-| `ci_sales` | Sale records linked to product + stock line |
-| `ci_activity` | Auto-logged and manual activity log entries |
-| `ci_checks` | Completed inventory check sessions |
-| `ci_active_check` | In-progress check draft (cleared on confirm/discard) |
-| `ci_auth_token` | Session token with expiry timestamp |
-| `ci_last_backup` | Timestamp of last CSV export |
-| `ci_seen_version` | Last version the user saw the What's New modal for |
-
-Default login: username `admin`, password `amaya0827`
+Script load order: auth.js, scanner.js, inventory.js, sales.js, reports.js, data.js, app.js
 
 ---
 
-## Rules for Every Session
-1. **Never delete or overwrite user data.** Any schema change needs a migration. Never wipe a localStorage key.
-2. **Single file until explicitly told to split.** All CSS, HTML, and JS stays in the organized file structure above — do not add new files without being asked.
-3. **Everything must be free or have a free tier.** Flag anything that costs money before using it.
-4. **Every update gets a version bump and a What's New entry** inside the app. Increment `APP_VERSION` in `js/app.js` and add a bullet to the What's New modal in `index.html`.
-5. **If a feature causes instability, remove it and ship clean.** A broken app is worse than a missing feature.
-6. **Always test syntax balance** (braces, brackets, parens) before delivering. No build step means a syntax error breaks everything.
-7. **Do not start the next phase until confirmed complete and tested on a real phone.**
+## TIER 4: CURRENT APP STATE - v2.6.0
+
+Default login: username admin, password amaya0827
+
+What is working:
+- Barcode scanning via phone camera (ZXing v0.21.0)
+- Grouped inventory: Products and Stock Lines separate. One product, multiple stock lines by expiry date.
+- Product fields: Record ID, Barcode, Name, Brand, Category, Description, Cost Price, Selling Price, Notes, Status
+- Stock line fields: Expiry Date, Qty, Unit, Date Added, Storage Location, Batch Number, Markdown Price
+- Dual status: Availability (Active, Out of Stock, Pulled Out) and Sales Status (None, On Sale)
+- Scan to Sell: scan barcode, select stock line, confirm, deducts qty
+- Manual Sale Log: pick product and stock line, enter qty and price, confirm
+- Oversell warning with override option
+- Price Markdown per stock line with auto-removal on zero stock
+- Expiring Soon popup with 30, 90, 180 day filters
+- Pull out per individual stock line with partial pull badge and restore
+- Login with SHA-256 hashing and auto-logout after 30 minutes
+- App Mode selector: Shop (Coming Soon) and Manage Business
+- What's New modal on first open after update
+- Version History under Data tab
+- Activity Log with auto-logging and manual entries
+- Reports tab with Sales and Activity Log
+- Inventory Check with manual and scan mode, discrepancy summary, check history
+- CSV export and import covers all data
+- Data protection: undo on delete (6 seconds), storage meter, saveAll validates before writing
+- Bottom nav: Scan, Inventory, Sales, Reports, Data
 
 ---
 
-## Roadmap
-- Phase 1: Polish and Stabilize — COMPLETE
-- Phase 2: Go Mobile-Ready — NEXT — layout fixes, real phone testing, no new features
-- Phase 2.5: Backend and Database (Supabase) — PENDING
-- Phase 3: Package as Mobile App (Capacitor) — PENDING
-- Phase 3.5: PH Market Features — PENDING
-- Phase 4: Test and Prepare for Launch — PENDING
-- Phase 5: Launch to App Stores — PENDING
-- Phase 6: AI Features (Claude API) — PENDING
-- Phase 7: International Expansion — PENDING
+## TIER 5: DATA MODEL
+
+Five localStorage keys:
+- products - product records
+- stockLines - stock entries per product
+- sales - sale records
+- activityLog - all app actions logged
+- inventoryChecks - inventory check sessions
 
 ---
 
-## PH Market Features Planned (Phase 3.5)
+## TIER 6: ROADMAP
+
+- Phase 1: Polish and Stabilize - COMPLETE
+- Phase 2: Go Mobile-Ready - NEXT - layout fixes on real phone, no new features
+- Phase 2.5: Backend and Database (Supabase) - PENDING
+- Phase 3: Package as Mobile App (Capacitor) - PENDING
+- Phase 3.5: PH Market Features - PENDING
+- Phase 4: Test and Prepare for Launch - PENDING
+- Phase 5: Launch to App Stores - PENDING
+- Phase 6: AI Features (Claude API) - PENDING
+- Phase 7: International Expansion - PENDING
+
+### PH Market Features (Phase 3.5)
 - GCash and Maya payment method field on sales log
 - Low stock alerts with minimum qty per product
 - Supplier tracking field per product
@@ -95,20 +131,41 @@ Default login: username `admin`, password `amaya0827`
 - Staff mode with limited access
 - Manual Shopee and Lazada stock deduction
 
----
-
-## AI Features Planned (Phase 6)
+### AI Features (Phase 6)
 - AI assistant using Claude API for plain language inventory queries
 - Smart restock suggestions from sales patterns
-- Sales insights summary in plain language
+- Sales insights in plain language
 - Expiry management advice
 - Auto-categorization on product add
 - Goal: present to Connectt.io as portfolio piece
 
+### International Expansion (Phase 7)
+- Multi-currency support
+- TikTok Shop integration
+- Language toggle including Filipino
+- Tax calculation per sale
+- Shopee and Lazada API integration for real-time stock sync
+
 ---
 
-## Notes
+## TIER 7: VERSION HISTORY
+
+- v2.6.0 - QA cleanup, post-split audit, EXPIRY_WARNING_DAYS constant, dead code removed, auth improvements
+- v2.6.0 - Login screen, SHA-256 auth, auto-logout 30 mins, pull out per stock line, partial pull badge
+- v2.5.0 - Inventory Check, manual and scan mode, draft auto-save, discrepancy summary, check history
+- v2.4.0 - Activity Log, auto-logging, manual entries, Reports tab, home stats
+- v2.3.0 - Sales overhaul, Scan to Sell, Manual Sale Log, price markdown, dual status, oversell warning
+- v2.2.0 - Foundation fixes, ZXing pinned, data protection, undo on delete, storage meter
+- v2.1.0 - Grouped inventory, Cost Price, Selling Price, Notes, Sales Log, App Mode selector, What's New
+- v2.0.0 - Major rebuild. Record IDs, Home page, status system, duplicate barcode flow, bottom nav
+- v1.0.0 - Initial MVP. Barcode scanning, product form, CSV export and import
+
+---
+
+## NOTES
 - Assistant Claude for this project is named Amaya
+- Next version is v2.7.0
 - App targets Philippine boutiques and small cosmetics resellers
-- Free alternative to BoxHero which costs $18 to $49 per month
-- Future Shop mode is customer-facing store locator and product browser
+- There are 3 real beta users. Treat data safety as the highest priority.
+- Future Shop mode is a customer-facing store locator and product browser
+- Present to Connectt.io as portfolio piece when AI features are built
