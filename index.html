@@ -35,23 +35,11 @@
 <div class="page active" id="page-home">
   <div class="home-header">
     <button class="logout-btn" onclick="doLogout()">🔒 Sign Out</button>
+    <button class="logout-btn" onclick="showModeSelector(false)" style="right:auto;left:12px;">⚙️ Mode</button>
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
     <div class="home-version">v2.7.0</div>
-  </div>
-
-  <div class="mode-selector">
-    <div class="mode-btn coming-soon">
-      <div class="mode-icon">🛍️</div>
-      <div class="mode-label">Shop</div>
-      <div><span class="coming-soon-tag">Coming Soon</span></div>
-    </div>
-    <button class="mode-btn primary-mode" onclick="goToApp('scan')">
-      <div class="mode-icon">📋</div>
-      <div class="mode-label">Manage Business</div>
-      <div class="mode-desc">Inventory and sales</div>
-    </button>
   </div>
 
   <div class="home-stats">
@@ -123,6 +111,7 @@
 <div class="page" id="page-app">
   <div class="app-header">
     <button class="back-btn" onclick="goHome()">🏠</button>
+    <button class="back-btn" onclick="showModeSelector(false)" title="Switch Mode">⚙️</button>
     <h2 id="app-header-title">Inventory</h2>
     <span class="hdr-right" id="app-header-sub"></span>
   </div>
@@ -976,6 +965,48 @@
         <button class="filter-chip" onclick="setExpFilter(180,this)">6 Months</button>
       </div>
       <div id="exp-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 1: Mode Selector Modal -->
+<div class="modal-backdrop" id="modal-mode-selector">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3>Select Mode</h3>
+      <button class="modal-close" id="mode-selector-close" onclick="closeModeSelector()" style="display:none">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;text-align:center;line-height:1.5">Choose how you want to use the app.</p>
+      <div class="mode-selector" style="padding:0;margin-bottom:0">
+        <div class="mode-btn coming-soon">
+          <div class="mode-icon">🛍️</div>
+          <div class="mode-label">Shop</div>
+          <div><span class="coming-soon-tag">Coming Soon</span></div>
+        </div>
+        <button class="mode-btn primary-mode" onclick="selectManageBusiness()">
+          <div class="mode-icon">📋</div>
+          <div class="mode-label">Manage Business</div>
+          <div class="mode-desc">Inventory and sales</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 1: Mode Selector Logout Confirm -->
+<div class="modal-backdrop" id="modal-mode-logout-confirm">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">🔒</div>
+      <div class="confirm-title">Sign Out?</div>
+      <div class="confirm-msg">Are you sure you want to sign out?</div>
+      <div class="confirm-btn-row">
+        <button class="btn btn-secondary" onclick="hideModeLogoutConfirm()">No</button>
+        <button class="btn btn-danger-outline" onclick="doLogout()">Yes</button>
+      </div>
     </div>
   </div>
 </div>
