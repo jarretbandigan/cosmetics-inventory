@@ -1,6 +1,6 @@
-﻿// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // CAMERA
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 async function startScanner() {
   try {
     document.getElementById('scan-status').textContent = 'Requesting camera access...';
@@ -76,9 +76,9 @@ function handleBarcode(code) {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // MANUAL ENTRY
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function toggleManualEntry() {
   const el = document.getElementById('manual-entry');
   el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -103,9 +103,9 @@ function useNoBarcode() {
   openNewProductForm(code);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // EXISTING BARCODE MODAL
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function showExistingProductModal(product) {
   existingBarcodeProductId = product.recordId;
   const totalQty = productTotalQty(product.recordId);
@@ -129,7 +129,7 @@ function confirmAddToExisting() {
   if (existingLine) {
     const oldQty = parseInt(existingLine.qty) || 0;
     existingLine.qty = oldQty + qtyToAdd;
-    logActivity('update', product.recordId, product.name, 'Stock added: +' + qtyToAdd + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' â†’ ' + existingLine.qty);
+    logActivity('update', product.recordId, product.name, 'Stock added: +' + qtyToAdd + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qtyToAdd + ' unit(s) added to existing stock entry.');
   } else {
     stockLines.push({

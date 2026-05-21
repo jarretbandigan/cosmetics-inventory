@@ -1,7 +1,7 @@
-﻿// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 const APP_VERSION = '2.6.0';
 const EXPIRY_WARNING_DAYS = 30;
 
@@ -107,11 +107,11 @@ function calcInventoryValue() {
 }
 
 function formatMoney(n) {
-  if (!n) return 'â‚±0';
-  if (n >= 1000000) return 'â‚±' + (n/1000000).toFixed(1) + 'M';
-  if (n >= 10000) return 'â‚±' + (n/1000).toFixed(0) + 'K';
-  if (n >= 1000) return 'â‚±' + n.toLocaleString(undefined, {maximumFractionDigits:0});
-  return 'â‚±' + n.toFixed(n % 1 === 0 ? 0 : 2);
+  if (!n) return '₱0';
+  if (n >= 1000000) return '₱' + (n/1000000).toFixed(1) + 'M';
+  if (n >= 10000) return '₱' + (n/1000).toFixed(0) + 'K';
+  if (n >= 1000) return '₱' + n.toLocaleString(undefined, {maximumFractionDigits:0});
+  return '₱' + n.toFixed(n % 1 === 0 ? 0 : 2);
 }
 
 // FIX Issue 4: Auto out of stock when qty hits zero
@@ -177,7 +177,7 @@ function syncProductStatusFromStockLines(rid) {
   if (fullyPulled && p.status !== 'pulled') {
     const oldStatus = p.status;
     p.status = 'pulled';
-    logActivity('status', rid, p.name, 'Auto status change: ' + oldStatus + ' â†’ Pulled Out (all stock lines pulled out)');
+    logActivity('status', rid, p.name, 'Auto status change: ' + oldStatus + ' → Pulled Out (all stock lines pulled out)');
     return true;
   }
   if (!fullyPulled && p.status === 'pulled') {
@@ -186,7 +186,7 @@ function syncProductStatusFromStockLines(rid) {
     const total = productTotalQty(rid);
     const newStatus = total > 0 ? 'active' : 'out';
     p.status = newStatus;
-    logActivity('status', rid, p.name, 'Auto status change: Pulled Out â†’ ' + (newStatus === 'active' ? 'Active' : 'Out of Stock'));
+    logActivity('status', rid, p.name, 'Auto status change: Pulled Out → ' + (newStatus === 'active' ? 'Active' : 'Out of Stock'));
     return true;
   }
   return false;
@@ -196,9 +196,9 @@ function productTotalQty(productId) {
   return stockLines.filter(s => s.productId === productId).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// COUNTS â€” FIX 3: safe element access
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// COUNTS — FIX 3: safe element access
+// ─────────────────────────────────────────
 function updateCounts() {
   const activeProds = products.filter(p => p.status === 'active').length;
   const totalUnits = stockLines.reduce((s, l) => s + (parseInt(l.qty) || 0), 0);
@@ -223,9 +223,9 @@ function updateCounts() {
   setEl('home-selling-value', formatMoney(val.sell));
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // NAVIGATION
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function goHome() {
   document.getElementById('page-home').classList.add('active');
   document.getElementById('page-app').classList.remove('active');
@@ -264,9 +264,9 @@ function switchTab(name, el) {
   if (name === 'reports') renderReports();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// WHAT'S NEW â€” FIX 4: safe storage check
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// WHAT'S NEW — FIX 4: safe storage check
+// ─────────────────────────────────────────
 function closeWhatsNew() {
   closeModal('modal-whatsnew');
   try { localStorage.setItem('ci_seen_version', APP_VERSION); } catch(e) {}
@@ -287,9 +287,9 @@ document.querySelectorAll('.modal-backdrop').forEach(b => {
   });
 });
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // CHANGELOG DROPDOWN
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function toggleChangelog(btn) {
   const body = document.getElementById('changelog-body');
   const arrow = document.getElementById('changelog-arrow');
@@ -297,9 +297,9 @@ function toggleChangelog(btn) {
   arrow.classList.toggle('open', open);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // NEW PRODUCT FORM
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function openNewProductForm(barcode) {
   const newId = generateId('REC');
   document.getElementById('item-form').style.display = 'block';
@@ -376,9 +376,9 @@ function doSaveProduct() {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// INIT â€” runs last, after all functions defined
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// INIT — runs last, after all functions defined
+// ─────────────────────────────────────────
 updateCounts();
 updateBackupDisplay();
 updateStorageMeter();

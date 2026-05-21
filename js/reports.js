@@ -1,6 +1,6 @@
-﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════
 // STAGE 3: REPORTS TAB
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════
 function setReportSection(name, el) {
   activeReportSection = name;
   document.querySelectorAll('.report-section-tab').forEach(t => t.classList.remove('active'));
@@ -56,7 +56,7 @@ function renderActivityLog() {
   });
 
   if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">ðŸ“‹</div><p>No activity entries match your filters.</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No activity entries match your filters.</p></div>';
     return;
   }
 
@@ -72,7 +72,7 @@ function renderActivityLog() {
         '<span class="activity-type-badge ' + typeCls + '">' + typeLabel + '</span>' +
       '</div>' +
       '<div class="activity-desc">' + esc(a.description || '') + '</div>' +
-      (a.productName ? '<div class="activity-product">ðŸ“¦ ' + esc(a.productName) + '</div>' : '') +
+      (a.productName ? '<div class="activity-product">📦 ' + esc(a.productName) + '</div>' : '') +
       '<div class="activity-actions">' +
         '<button class="btn btn-secondary btn-sm" onclick="openEditActivity(\'' + aidEsc + '\')">Edit</button>' +
       '</div>' +
@@ -90,7 +90,7 @@ function activityTypeLabel(t) {
   }[t] || t;
 }
 
-// â”€â”€ MANUAL LOG ENTRY â”€â”€
+// ── MANUAL LOG ENTRY ──
 function openManualLogModal() {
   document.getElementById('manual-log-type').value = 'note';
   document.getElementById('manual-log-desc').value = '';
@@ -140,7 +140,7 @@ function doSaveManualLog() {
   pendingManualLog = null;
 }
 
-// â”€â”€ EDIT / DELETE ACTIVITY â”€â”€
+// ── EDIT / DELETE ACTIVITY ──
 function openEditActivity(aid) {
   const a = activityLog.find(x => x.id === aid);
   if (!a) return;
@@ -191,9 +191,9 @@ function doDeleteActivity() {
   editingActivityId = null;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════
 // STAGE 4: INVENTORY CHECK
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════
 
 // Render banner if there is an active check draft
 function renderCheckBanner() {
@@ -202,7 +202,7 @@ function renderCheckBanner() {
   if (!activeCheck) { area.innerHTML = ''; return; }
   area.innerHTML =
     '<div class="check-banner">' +
-      '<span class="icon">âš ï¸</span>' +
+      '<span class="icon">⚠️</span>' +
       '<div class="text"><strong>Unfinished check in progress</strong><br>Started ' + esc(new Date(activeCheck.startedAt).toLocaleString()) + ' (' + esc(activeCheck.mode) + ' mode)</div>' +
       '<div class="check-banner-actions">' +
         '<button class="btn btn-primary btn-sm" onclick="resumeCheck()">Resume</button>' +
@@ -215,7 +215,7 @@ function renderCheckHistory() {
   const list = document.getElementById('check-history-list');
   if (!list) return;
   if (inventoryChecks.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">âœ…</div><p>No inventory checks yet.<br>Tap Start above to begin.</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>No inventory checks yet.<br>Tap Start above to begin.</p></div>';
     return;
   }
   const sorted = inventoryChecks.slice().sort((a, b) => (b.completedAt || '').localeCompare(a.completedAt || ''));
@@ -280,7 +280,7 @@ function resumeCheck() {
 
 function openActiveCheckModal() {
   if (!activeCheck) return;
-  setEl('check-title', activeCheck.mode === 'scan' ? 'ðŸ“· Scan Mode Check' : 'âœï¸ Manual Count Check');
+  setEl('check-title', activeCheck.mode === 'scan' ? '📷 Scan Mode Check' : '✏️ Manual Count Check');
   document.getElementById('check-scan-area').style.display = activeCheck.mode === 'scan' ? 'block' : 'none';
   renderCheckList();
   openModal('modal-active-check');
@@ -315,7 +315,7 @@ function renderCheckList() {
       let rightContent = '';
       if (activeCheck.mode === 'scan') {
         rightContent = isChecked ?
-          '<div style="text-align:right"><span class="check-icon">âœ“</span><div style="font-size:11px;color:var(--teal-600)">Scanned ' + (i.scanCount || 1) + 'Ã—</div></div>' :
+          '<div style="text-align:right"><span class="check-icon">✓</span><div style="font-size:11px;color:var(--teal-600)">Scanned ' + (i.scanCount || 1) + '×</div></div>' :
           '<span style="font-size:11px;color:var(--gray-400)">Not scanned</span>';
       } else {
         rightContent = '<input type="number" class="actual-input" id="actual-' + sidEsc + '" value="' + (i.actualQty != null ? i.actualQty : '') + '" min="0" inputmode="numeric" onchange="updateActualQty(\'' + sidEsc + '\',this.value)">';
@@ -435,7 +435,7 @@ function onCheckBarcodeDetected(raw) {
   sorted[0].scanCount = (sorted[0].scanCount || 0) + 1;
   sorted[0].actualQty = sorted[0].recordedQty; // assume present means count matches
   saveAll();
-  setEl('check-scan-status', 'âœ“ ' + product.name + ' marked');
+  setEl('check-scan-status', '✓ ' + product.name + ' marked');
   document.getElementById('check-scan-status').className = 'scan-status success';
   renderCheckList();
 }
@@ -447,7 +447,7 @@ function markScannedAgain() {
   if (matchingItems.length > 0) {
     matchingItems[0].scanCount = (matchingItems[0].scanCount || 1) + 1;
     saveAll();
-    setEl('check-scan-status', 'âœ“ ' + pendingDuplicateScan.productName + ' marked again');
+    setEl('check-scan-status', '✓ ' + pendingDuplicateScan.productName + ' marked again');
     document.getElementById('check-scan-status').className = 'scan-status success';
     renderCheckList();
   }
@@ -496,7 +496,7 @@ function renderCheckSummary() {
       '</div>';
     }).join('');
   } else {
-    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">âœ“ All counts match recorded inventory!</div>';
+    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts match recorded inventory!</div>';
   }
 
   setEl('check-summary-content', '');
@@ -607,7 +607,7 @@ function viewPastCheck(cid) {
       '</div>';
     }).join('');
   } else {
-    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">âœ“ All counts matched.</div>';
+    html += '<div style="text-align:center;color:var(--teal-600);font-size:13px;font-weight:600;padding:14px">✓ All counts matched.</div>';
   }
 
   document.getElementById('past-check-body').innerHTML = html;

@@ -1,4 +1,4 @@
-﻿* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
   --pink-50: #FBEAF0;
@@ -38,7 +38,7 @@ body {
 .page { display: none; min-height: 100vh; }
 .page.active { display: block; }
 
-/* â”€â”€ HOME â”€â”€ */
+/* ── HOME ── */
 .home-header {
   background: var(--pink-800);
   padding: 36px 24px 28px;
@@ -126,7 +126,7 @@ body {
   font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit;
 }
 
-/* â”€â”€ APP HEADER â”€â”€ */
+/* ── APP HEADER ── */
 .app-header {
   background: var(--pink-800); color: #fff;
   padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100;
@@ -140,7 +140,7 @@ body {
 .app-header h2 { font-size: 17px; font-weight: 600; flex: 1; }
 .app-header .hdr-right { font-size: 12px; opacity: 0.75; }
 
-/* â”€â”€ BOTTOM NAV â”€â”€ */
+/* ── BOTTOM NAV ── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: #fff; border-top: 1px solid var(--gray-100);
@@ -156,11 +156,11 @@ body {
 .bnav-btn .bnav-icon { font-size: 20px; line-height: 1; }
 .bnav-btn.active { color: var(--pink-600); }
 
-/* â”€â”€ SECTIONS â”€â”€ */
+/* ── SECTIONS ── */
 .section { display: none; padding: 16px; }
 .section.active { display: block; }
 
-/* â”€â”€ SCANNER â”€â”€ */
+/* ── SCANNER ── */
 .scanner-box {
   background: #000; border-radius: 16px; overflow: hidden;
   position: relative; aspect-ratio: 1; max-width: 360px; margin: 0 auto 14px;
@@ -198,7 +198,7 @@ body {
 .scan-status.success { color: var(--teal-600); font-weight: 500; }
 .scan-status.error { color: var(--red-600); font-weight: 500; }
 
-/* â”€â”€ BUTTONS â”€â”€ */
+/* ── BUTTONS ── */
 .btn {
   display: block; width: 100%; padding: 13px; border-radius: 12px;
   font-size: 15px; font-weight: 600; cursor: pointer; border: none;
@@ -228,7 +228,7 @@ body {
   font-size: 13px; cursor: pointer; text-decoration: underline; padding: 4px; font-family: inherit;
 }
 
-/* â”€â”€ FORM â”€â”€ */
+/* ── FORM ── */
 .form-card {
   background: #fff; border-radius: 16px;
   border: 1px solid var(--gray-100); padding: 16px; margin-bottom: 12px;
@@ -270,7 +270,7 @@ body {
   color: var(--pink-800); font-family: monospace; letter-spacing: 1px; word-break: break-all;
 }
 
-/* â”€â”€ INVENTORY â”€â”€ */
+/* ── INVENTORY ── */
 .inv-toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
 .search-wrap { position: relative; flex: 1; min-width: 0; }
 .search-bar {
@@ -309,7 +309,7 @@ body {
 .summary-card .lbl { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
 .summary-card.warn .num { color: var(--amber-400); }
 
-/* â”€â”€ PRODUCT CARD â”€â”€ */
+/* ── PRODUCT CARD ── */
 .product-card {
   background: #fff; border-radius: 16px;
   border: 1px solid var(--gray-100); margin-bottom: 10px; overflow: hidden;
@@ -386,7 +386,7 @@ body {
 .stock-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
 .product-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
-/* â”€â”€ SALES â”€â”€ */
+/* ── SALES ── */
 .sale-form-card {
   background: #fff; border-radius: 16px;
   border: 1px solid var(--gray-100); padding: 16px; margin-bottom: 12px;
@@ -404,7 +404,7 @@ body {
 .sale-log-price { font-size: 14px; font-weight: 600; color: var(--teal-600); margin-top: 4px; }
 .sales-note { font-size: 12px; color: var(--gray-400); text-align: center; padding: 8px; }
 
-/* â”€â”€ EXPORT â”€â”€ */
+/* ── EXPORT ── */
 .export-area {
   background: #fff; border: 1px solid var(--gray-100);
   border-radius: 16px; padding: 16px; margin-bottom: 12px;
@@ -421,7 +421,7 @@ body {
 
 input[type="file"] { display: none; }
 
-/* â”€â”€ CHANGELOG DROPDOWN â”€â”€ */
+/* ── CHANGELOG DROPDOWN ── */
 .changelog-toggle {
   width: 100%; background: none; border: none; padding: 0;
   display: flex; align-items: center; justify-content: space-between;
@@ -440,7 +440,7 @@ input[type="file"] { display: none; }
 .version-changes { padding-left: 14px; }
 .version-changes li { font-size: 12px; color: var(--gray-700); margin-bottom: 3px; line-height: 1.5; list-style: disc; }
 
-/* â”€â”€ MODALS â”€â”€ */
+/* ── MODALS ── */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   z-index: 500; display: none; align-items: flex-end; justify-content: center;
@@ -499,12 +499,12 @@ input[type="file"] { display: none; }
 .confirm-btn-row { display: flex; gap: 10px; }
 .confirm-btn-row .btn { flex: 1; }
 
-/* â”€â”€ EMPTY STATE â”€â”€ */
+/* ── EMPTY STATE ── */
 .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
 .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
 .empty-state p { font-size: 14px; line-height: 1.5; }
 
-/* â”€â”€ TOAST â”€â”€ */
+/* ── TOAST ── */
 .toast {
   position: fixed; bottom: 85px; left: 50%;
   transform: translateX(-50%) translateY(20px);
@@ -515,7 +515,7 @@ input[type="file"] { display: none; }
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* â”€â”€ STAGE 1 ADDITIONS â”€â”€ */
+/* ── STAGE 1 ADDITIONS ── */
 .toast-undo {
   background: var(--gray-900); color: #fff;
   display: flex; align-items: center; gap: 14px;
@@ -556,7 +556,7 @@ input[type="file"] { display: none; }
   margin-bottom: 10px;
 }
 
-/* â”€â”€ STAGE 2: SALES + MARKDOWN â”€â”€ */
+/* ── STAGE 2: SALES + MARKDOWN ── */
 .product-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
 .status-sale { background: #F3EEFB; color: #6B3FA0; }
 .filter-chip.sale-active { background: #6B3FA0; color: #fff; border-color: #6B3FA0; }
@@ -630,7 +630,7 @@ input[type="file"] { display: none; }
 
 .sale-stock-info { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
 
-/* â”€â”€ STAGE 3: ACTIVITY LOG + REPORTS â”€â”€ */
+/* ── STAGE 3: ACTIVITY LOG + REPORTS ── */
 .report-section-tabs {
   display: flex; gap: 6px; margin-bottom: 14px;
   overflow-x: auto; padding-bottom: 2px;
@@ -689,7 +689,7 @@ input[type="file"] { display: none; }
 .home-stat.teal .num { color: var(--teal-600); }
 .home-stat.blue .num { color: var(--blue-600); }
 
-/* â”€â”€ STAGE 4: INVENTORY CHECK â”€â”€ */
+/* ── STAGE 4: INVENTORY CHECK ── */
 .check-banner {
   background: var(--amber-50); border: 1px solid var(--amber-100);
   border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
@@ -757,7 +757,7 @@ input[type="file"] { display: none; }
   width: 6px; height: 6px; background: var(--red-600); border-radius: 50%;
 }
 
-/* â”€â”€ STAGE 5: LOGIN SCREEN â”€â”€ */
+/* ── STAGE 5: LOGIN SCREEN ── */
 .login-page {
   position: fixed; inset: 0; background: var(--pink-800);
   z-index: 1000; display: flex; align-items: center; justify-content: center;
@@ -813,7 +813,7 @@ input[type="file"] { display: none; }
 }
 .logout-btn:active { background: rgba(255,255,255,0.25); }
 
-/* â”€â”€ STAGE 5: PARTIAL PULL OUT + STOCK LINE STATES â”€â”€ */
+/* ── STAGE 5: PARTIAL PULL OUT + STOCK LINE STATES ── */
 .stock-line.pulled-out {
   opacity: 0.55; background: var(--red-50);
   border-color: var(--red-100);

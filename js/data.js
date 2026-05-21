@@ -1,4 +1,4 @@
-﻿// ─────────────────────────────────────────
+// ─────────────────────────────────────────
 // DATA — storage meter, data load, migrations, save, export/import
 // generateId and today defined here: needed by migrations at parse time,
 // and data.js loads before the inline script so they are globally available.
@@ -34,7 +34,7 @@ function updateStorageMeter() {
   meter.innerHTML =
     '<div>Storage: <strong>' + (info.used / 1024).toFixed(1) + ' KB</strong> used (~' + info.pct + '%)</div>' +
     '<div class="storage-meter-bar"><div class="storage-meter-fill ' + cls + '" style="width:' + Math.min(100, info.pct) + '%"></div></div>' +
-    (info.pct > 85 ? '<div style="color:var(--red-600);margin-top:6px">âš ï¸ Storage almost full. Export backup and clear old data.</div>' : '');
+    (info.pct > 85 ? '<div style="color:var(--red-600);margin-top:6px">⚠️ Storage almost full. Export backup and clear old data.</div>' : '');
 }
 
 // Update last backup display
@@ -51,9 +51,9 @@ function updateBackupDisplay() {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// DATA â€” load from storage
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// DATA — load from storage
+// ─────────────────────────────────────────
 let products = [];
 let stockLines = [];
 let sales = [];
@@ -130,9 +130,9 @@ if (oldData && products.length === 0) {
   }
 })();
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // SAVE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function saveAll() {
   // FIX C1: Validate arrays before writing to prevent data corruption
   if (!Array.isArray(products)) products = [];
@@ -151,14 +151,14 @@ function saveAll() {
     else localStorage.removeItem('ci_active_check');
   } catch(e) { storageError = true; }
   if (storageError) {
-    showToast('âš ï¸ Storage error! Export backup now.');
+    showToast('⚠️ Storage error! Export backup now.');
   }
   updateStorageMeter();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// EXPORT / IMPORT â€” FIX 5: include sales
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// EXPORT / IMPORT — FIX 5: include sales
+// ─────────────────────────────────────────
 function exportCSV() {
   if (products.length === 0 && sales.length === 0) { showToast('No data to export'); return; }
 
@@ -295,7 +295,7 @@ function importCSV(input) {
       }
     });
 
-    // Import sales â€” auto-detect format by column count
+    // Import sales — auto-detect format by column count
     if (salesSection) {
       const sLines = salesSection.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('##'));
       if (sLines.length >= 2) {

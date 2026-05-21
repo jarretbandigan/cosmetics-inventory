@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -9,10 +9,10 @@
 </head>
 <body>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• LOGIN SCREEN (STAGE 5) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ LOGIN SCREEN (STAGE 5) ═══════════════ -->
 <div class="login-page" id="login-page">
   <div class="login-box">
-    <div class="login-logo">ðŸ’„</div>
+    <div class="login-logo">💄</div>
     <div class="login-title">Inventory System</div>
     <div class="login-version">v2.6.0</div>
     <div class="login-error" id="login-error">Incorrect username or password</div>
@@ -31,11 +31,11 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HOME PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
 <div class="page active" id="page-home">
   <div class="home-header">
-    <button class="logout-btn" onclick="doLogout()">ðŸ”’ Sign Out</button>
-    <div class="home-logo">ðŸ’„</div>
+    <button class="logout-btn" onclick="doLogout()">🔒 Sign Out</button>
+    <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
     <div class="home-version">v2.6.0</div>
@@ -43,12 +43,12 @@
 
   <div class="mode-selector">
     <div class="mode-btn coming-soon">
-      <div class="mode-icon">ðŸ›ï¸</div>
+      <div class="mode-icon">🛍️</div>
       <div class="mode-label">Shop</div>
       <div><span class="coming-soon-tag">Coming Soon</span></div>
     </div>
     <button class="mode-btn primary-mode" onclick="goToApp('scan')">
-      <div class="mode-icon">ðŸ“‹</div>
+      <div class="mode-icon">📋</div>
       <div class="mode-label">Manage Business</div>
       <div class="mode-desc">Inventory and sales</div>
     </button>
@@ -71,45 +71,45 @@
       <div class="lbl">Total Units</div>
     </div>
     <div class="home-stat teal">
-      <div class="num small" id="home-cost-value">â‚±0</div>
+      <div class="num small" id="home-cost-value">₱0</div>
       <div class="lbl">Cost Value</div>
     </div>
     <div class="home-stat blue">
-      <div class="num small" id="home-selling-value">â‚±0</div>
+      <div class="num small" id="home-selling-value">₱0</div>
       <div class="lbl">Selling Value</div>
     </div>
   </div>
 
   <div class="home-actions">
     <button class="home-action-btn" onclick="goToApp('scan')">
-      <span class="icon">ðŸ“·</span>
+      <span class="icon">📷</span>
       <div><div class="label">Scan Item</div><div class="desc">Add new item or update existing stock</div></div>
-      <span class="arrow">â€º</span>
+      <span class="arrow">›</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('inventory')">
-      <span class="icon">ðŸ“¦</span>
+      <span class="icon">📦</span>
       <div><div class="label">Inventory</div><div class="desc">View and manage all products</div></div>
-      <span class="arrow">â€º</span>
+      <span class="arrow">›</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('sales')">
-      <span class="icon">ðŸ§¾</span>
+      <span class="icon">🧾</span>
       <div><div class="label">Sales</div><div class="desc">Record sales by scan or manual</div></div>
-      <span class="arrow">â€º</span>
+      <span class="arrow">›</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('reports')">
-      <span class="icon">ðŸ“Š</span>
+      <span class="icon">📊</span>
       <div><div class="label">Reports</div><div class="desc">Sales log, activity log, history</div></div>
-      <span class="arrow">â€º</span>
+      <span class="arrow">›</span>
     </button>
     <button class="home-action-btn" onclick="goToApp('export')">
-      <span class="icon">ðŸ’¾</span>
+      <span class="icon">💾</span>
       <div><div class="label">Data and Export</div><div class="desc">Backup, restore, version history</div></div>
-      <span class="arrow">â€º</span>
+      <span class="arrow">›</span>
     </button>
   </div>
 
   <div class="home-backup">
-    <span class="icon">ðŸ’¾</span>
+    <span class="icon">💾</span>
     <div style="flex:1">
       <div class="text" style="font-size:12px;color:var(--teal-800);line-height:1.4">Keep your data safe. Export a backup regularly.</div>
       <div class="home-backup-time" id="home-backup-time">No backup yet. Export one now.</div>
@@ -118,17 +118,17 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• APP PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ APP PAGE ═══════════════ -->
 <div class="page" id="page-app">
   <div class="app-header">
-    <button class="back-btn" onclick="goHome()">â€¹</button>
+    <button class="back-btn" onclick="goHome()">‹</button>
     <h2 id="app-header-title">Inventory</h2>
     <span class="hdr-right" id="app-header-sub"></span>
   </div>
 
   <!-- SCAN -->
   <div class="section active" id="tab-scan">
-    <div class="scan-hint">ðŸ“· Use this screen to <strong>add a new item</strong> or <strong>update stock</strong> for an existing product.</div>
+    <div class="scan-hint">📷 Use this screen to <strong>add a new item</strong> or <strong>update stock</strong> for an existing product.</div>
     <div class="scanner-box">
       <video id="preview" autoplay muted playsinline></video>
       <div class="scan-overlay">
@@ -177,8 +177,8 @@
         <div class="field"><label>Description</label><textarea id="f-desc" placeholder="Shade, variant, size..."></textarea></div>
         <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Any additional notes..."></textarea></div>
         <div class="field-row">
-          <div class="field"><label>Cost Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
-          <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
         </div>
         <div class="field">
           <label>Status</label>
@@ -198,7 +198,7 @@
         <div class="field"><label>Storage Location</label><input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2"></div>
       </div>
       <button class="btn btn-primary" onclick="confirmSaveProduct(false)" style="margin-bottom:8px">Save to Inventory</button>
-      <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">ðŸ’¾ Save and Scan Next</button>
+      <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">💾 Save and Scan Next</button>
       <button class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
     </div>
   </div>
@@ -212,7 +212,7 @@
       </div>
       <div class="summary-card clickable warn" onclick="openExpModal()">
         <div class="num" id="stat-expiring">0</div>
-        <div class="lbl">Expiring Soon â€º</div>
+        <div class="lbl">Expiring Soon ›</div>
       </div>
     </div>
     <div class="inv-toolbar">
@@ -236,7 +236,7 @@
     <div class="filter-row-label">Sales Status</div>
     <div class="filter-row" id="filter-sale">
       <button class="filter-chip active" onclick="setSaleFilter('all',this)">All</button>
-      <button class="filter-chip" onclick="setSaleFilter('onsale',this)">ðŸ’° On Sale Only</button>
+      <button class="filter-chip" onclick="setSaleFilter('onsale',this)">💰 On Sale Only</button>
     </div>
     <div id="inventory-list"></div>
   </div>
@@ -244,8 +244,8 @@
   <!-- SALES -->
   <div class="section" id="tab-sales">
     <div class="sale-mode-tabs">
-      <button class="sale-mode-tab active" id="sale-tab-scan" onclick="setSaleMode('scan',this)">ðŸ“· Scan to Sell</button>
-      <button class="sale-mode-tab" id="sale-tab-manual" onclick="setSaleMode('manual',this)">âœï¸ Manual Log</button>
+      <button class="sale-mode-tab active" id="sale-tab-scan" onclick="setSaleMode('scan',this)">📷 Scan to Sell</button>
+      <button class="sale-mode-tab" id="sale-tab-manual" onclick="setSaleMode('manual',this)">✏️ Manual Log</button>
     </div>
 
     <!-- SCAN TO SELL -->
@@ -268,7 +268,7 @@
         <div class="sale-form-card">
           <h3>Confirm Sale Details</h3>
           <div class="field"><label>Qty Sold *</label><input type="number" id="sell-qty" min="1" value="1" inputmode="numeric"></div>
-          <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+          <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
           <div class="field"><label>Date of Sale</label><input type="date" id="sell-date"></div>
           <button class="btn btn-primary" onclick="confirmSellScan()">Record Sale</button>
         </div>
@@ -290,7 +290,7 @@
           </div>
         </div>
         <div class="field"><label>Qty Sold *</label><input type="number" id="sale-qty" min="1" value="1" inputmode="numeric"></div>
-        <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="sale-price" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
         <div class="field"><label>Date of Sale</label><input type="date" id="sale-date"></div>
         <button class="btn btn-primary" onclick="confirmLogSale()">Record Sale</button>
       </div>
@@ -300,9 +300,9 @@
   <!-- REPORTS TAB (STAGE 3) -->
   <div class="section" id="tab-reports">
     <div class="report-section-tabs">
-      <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">ðŸ“‹ Activity</button>
-      <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">ðŸ§¾ Sales</button>
-      <button class="report-section-tab" id="report-tab-check" onclick="setReportSection('check',this)">âœ… Stock Check</button>
+      <button class="report-section-tab active" id="report-tab-activity" onclick="setReportSection('activity',this)">📋 Activity</button>
+      <button class="report-section-tab" id="report-tab-sales" onclick="setReportSection('sales',this)">🧾 Sales</button>
+      <button class="report-section-tab" id="report-tab-check" onclick="setReportSection('check',this)">✅ Stock Check</button>
     </div>
 
     <!-- Activity Log -->
@@ -362,7 +362,7 @@
     <div class="export-area">
       <button class="changelog-toggle" onclick="toggleChangelog(this)">
         <h3>Version History</h3>
-        <span class="changelog-arrow" id="changelog-arrow">â–¾</span>
+        <span class="changelog-arrow" id="changelog-arrow">▾</span>
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
@@ -392,7 +392,7 @@
             <li>Full Inventory Check feature with two modes</li>
             <li>Scan Mode: scan items physically, app marks each as checked</li>
             <li>Manual Count: enter actual qty for each stock entry by hand</li>
-            <li>Auto-save check progress â€” resume if app is closed mid-check</li>
+            <li>Auto-save check progress — resume if app is closed mid-check</li>
             <li>Resume banner appears at top of Stock Check tab</li>
             <li>Duplicate scan handling: prompts Mark Again or Skip</li>
             <li>Check summary screen shows all discrepancies before applying</li>
@@ -429,7 +429,7 @@
           <div class="version-num">Version 2.3.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
-            <li>Scan to Sell mode â€” cashier-style sales recording</li>
+            <li>Scan to Sell mode — cashier-style sales recording</li>
             <li>Manual sale log with stock line selection by expiry</li>
             <li>Sales automatically deduct from the selected stock line</li>
             <li>Oversell warning with option to Proceed Anyway</li>
@@ -487,7 +487,7 @@
           <div class="version-num">Version 2.0.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
-            <li>Grouped inventory structure â€” products and stock lines are now separate</li>
+            <li>Grouped inventory structure — products and stock lines are now separate</li>
             <li>Same barcode scan now asks for expiry date and merges or creates new stock line</li>
             <li>Cost Price, Selling Price, and Notes fields added to product form</li>
             <li>Sales Log tab added for recording sales</li>
@@ -519,25 +519,25 @@
   </div>
 
   <div class="bottom-nav">
-    <button class="bnav-btn active" id="bnav-scan" onclick="switchTab('scan',this)"><span class="bnav-icon">ðŸ“·</span>Scan</button>
-    <button class="bnav-btn" id="bnav-inventory" onclick="switchTab('inventory',this)"><span class="bnav-icon">ðŸ“¦</span>Inventory</button>
-    <button class="bnav-btn" id="bnav-sales" onclick="switchTab('sales',this)"><span class="bnav-icon">ðŸ§¾</span>Sales</button>
-    <button class="bnav-btn" id="bnav-reports" onclick="switchTab('reports',this)"><span class="bnav-icon">ðŸ“Š</span>Reports</button>
-    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">ðŸ’¾</span>Data</button>
+    <button class="bnav-btn active" id="bnav-scan" onclick="switchTab('scan',this)"><span class="bnav-icon">📷</span>Scan</button>
+    <button class="bnav-btn" id="bnav-inventory" onclick="switchTab('inventory',this)"><span class="bnav-icon">📦</span>Inventory</button>
+    <button class="bnav-btn" id="bnav-sales" onclick="switchTab('sales',this)"><span class="bnav-icon">🧾</span>Sales</button>
+    <button class="bnav-btn" id="bnav-reports" onclick="switchTab('reports',this)"><span class="bnav-icon">📊</span>Reports</button>
+    <button class="bnav-btn" id="bnav-export" onclick="switchTab('export',this)"><span class="bnav-icon">💾</span>Data</button>
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MODALS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ MODALS ═══════════════ -->
 
 <div class="modal-backdrop" id="modal-whatsnew">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <h3>âœ¨ What's New</h3>
-      <button class="modal-close" onclick="closeWhatsNew()">âœ•</button>
+      <h3>✨ What's New</h3>
+      <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.6.0 â€” May 2026</div>
+      <div class="whats-new-version">Version 2.6.0 — May 2026</div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Login screen now protects access. Sign in with your credentials.</div></div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Auto-logout after 30 minutes of inactivity for safety.</div></div>
       <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pull out a specific stock line by expiry, not the entire product.</div></div>
@@ -554,7 +554,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Item Already Exists</h3>
-      <button class="modal-close" onclick="closeModal('modal-existing')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('modal-existing')">✕</button>
     </div>
     <div class="modal-body">
       <div class="existing-product-card">
@@ -575,7 +575,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">ðŸ’¾</div>
+      <div class="confirm-icon">💾</div>
       <div class="confirm-title">Save Product?</div>
       <div class="confirm-msg">Are you sure you want to save this product to your inventory?</div>
       <div class="confirm-btn-row">
@@ -590,7 +590,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">âœï¸</div>
+      <div class="confirm-icon">✏️</div>
       <div class="confirm-title">Save Changes?</div>
       <div class="confirm-msg">Are you sure you want to save these changes?</div>
       <div class="confirm-btn-row">
@@ -605,7 +605,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">ðŸ—‘ï¸</div>
+      <div class="confirm-icon">🗑️</div>
       <div class="confirm-title">Delete Product?</div>
       <div class="confirm-msg">This will permanently delete this product and all its stock entries. This cannot be undone.</div>
       <div class="confirm-btn-row">
@@ -620,7 +620,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">âš ï¸</div>
+      <div class="confirm-icon">⚠️</div>
       <div class="confirm-title">Remove Stock Entry?</div>
       <div class="confirm-msg">Are you sure you want to remove this stock entry?</div>
       <div class="confirm-btn-row">
@@ -635,7 +635,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">âš ï¸</div>
+      <div class="confirm-icon">⚠️</div>
       <div class="confirm-title">Remove Stock Entry?</div>
       <div class="confirm-msg">Are you sure you want to remove this stock entry from the expiry list?</div>
       <div class="confirm-btn-row">
@@ -650,7 +650,7 @@
   <div class="modal confirm-modal">
     <div class="modal-handle"></div>
     <div class="modal-body">
-      <div class="confirm-icon">ðŸ—‘ï¸</div>
+      <div class="confirm-icon">🗑️</div>
       <div class="confirm-title">Clear All Data?</div>
       <div class="confirm-msg">This will permanently delete all inventory and sales data. This cannot be undone. Make sure you have a CSV backup first.</div>
       <div class="confirm-btn-row">
@@ -664,7 +664,7 @@
 <!-- STAGE 2: Sale modals -->
 <div class="modal-backdrop" id="modal-confirm-sale">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">ðŸ§¾</div>
+    <div class="confirm-icon">🧾</div>
     <div class="confirm-title">Record Sale?</div>
     <div class="confirm-msg" id="confirm-sale-msg">Record this sale?</div>
     <div class="confirm-btn-row">
@@ -676,7 +676,7 @@
 
 <div class="modal-backdrop" id="modal-confirm-oversell">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">âš ï¸</div>
+    <div class="confirm-icon">⚠️</div>
     <div class="confirm-title">Oversell Warning</div>
     <div class="confirm-msg" id="oversell-msg"></div>
     <div class="confirm-btn-row">
@@ -688,7 +688,7 @@
 
 <div class="modal-backdrop" id="modal-sale-summary">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>âœ… Sale Recorded</h3><button class="modal-close" onclick="closeModal('modal-sale-summary')">âœ•</button></div>
+    <div class="modal-header"><h3>✅ Sale Recorded</h3><button class="modal-close" onclick="closeModal('modal-sale-summary')">✕</button></div>
     <div class="modal-body">
       <div class="sale-summary-card">
         <div class="sale-summary-name" id="summary-name"></div>
@@ -703,7 +703,7 @@
 <!-- STAGE 3: Activity Log modals -->
 <div class="modal-backdrop" id="modal-manual-log">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Add Manual Log Entry</h3><button class="modal-close" onclick="closeModal('modal-manual-log')">âœ•</button></div>
+    <div class="modal-header"><h3>Add Manual Log Entry</h3><button class="modal-close" onclick="closeModal('modal-manual-log')">✕</button></div>
     <div class="modal-body">
       <div class="field">
         <label>Type</label>
@@ -731,7 +731,7 @@
 
 <div class="modal-backdrop" id="modal-confirm-manual-log">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">ðŸ“</div>
+    <div class="confirm-icon">📝</div>
     <div class="confirm-title">Save Log Entry?</div>
     <div class="confirm-msg">Add this manual entry to the activity log?</div>
     <div class="confirm-btn-row">
@@ -743,7 +743,7 @@
 
 <div class="modal-backdrop" id="modal-edit-activity">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Edit Activity Entry</h3><button class="modal-close" onclick="closeModal('modal-edit-activity')">âœ•</button></div>
+    <div class="modal-header"><h3>Edit Activity Entry</h3><button class="modal-close" onclick="closeModal('modal-edit-activity')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="edit-activity-id">
       <div class="field">
@@ -776,7 +776,7 @@
 
 <div class="modal-backdrop" id="modal-confirm-delete-activity">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">ðŸ—‘ï¸</div>
+    <div class="confirm-icon">🗑️</div>
     <div class="confirm-title">Delete Log Entry?</div>
     <div class="confirm-msg">Permanently delete this activity log entry?</div>
     <div class="confirm-btn-row">
@@ -789,12 +789,12 @@
 <!-- STAGE 4: Inventory Check modals -->
 <div class="modal-backdrop" id="modal-start-check">
   <div class="modal"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Start Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-start-check')">âœ•</button></div>
+    <div class="modal-header"><h3>Start Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-start-check')">✕</button></div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.5">Choose how you want to do this check.</p>
-      <button class="btn btn-primary" style="margin-bottom:10px" onclick="startCheck('scan')">ðŸ“· Scan Mode</button>
+      <button class="btn btn-primary" style="margin-bottom:10px" onclick="startCheck('scan')">📷 Scan Mode</button>
       <p style="font-size:12px;color:var(--gray-400);margin:-4px 0 12px;text-align:center;line-height:1.4">Scan each item physically. Unscanned items will be flagged.</p>
-      <button class="btn btn-secondary" onclick="startCheck('manual')">âœï¸ Manual Count</button>
+      <button class="btn btn-secondary" onclick="startCheck('manual')">✏️ Manual Count</button>
       <p style="font-size:12px;color:var(--gray-400);margin:4px 0 0;text-align:center;line-height:1.4">Enter actual qty for each stock entry by hand.</p>
     </div>
   </div>
@@ -802,7 +802,7 @@
 
 <div class="modal-backdrop" id="modal-active-check">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3 id="check-title">Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-active-check')">âœ•</button></div>
+    <div class="modal-header"><h3 id="check-title">Inventory Check</h3><button class="modal-close" onclick="closeModal('modal-active-check')">✕</button></div>
     <div class="modal-body">
       <div id="check-scan-area" style="display:none">
         <div class="scanner-box" style="margin-bottom:10px;max-width:280px">
@@ -827,7 +827,7 @@
 
 <div class="modal-backdrop" id="modal-check-summary">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3>Check Summary</h3><button class="modal-close" onclick="closeModal('modal-check-summary')">âœ•</button></div>
+    <div class="modal-header"><h3>Check Summary</h3><button class="modal-close" onclick="closeModal('modal-check-summary')">✕</button></div>
     <div class="modal-body">
       <div id="check-summary-content"></div>
       <div class="btn-row" style="margin-top:14px">
@@ -842,14 +842,14 @@
 
 <div class="modal-backdrop" id="modal-past-check">
   <div class="modal" style="max-height:95vh"><div class="modal-handle"></div>
-    <div class="modal-header"><h3 id="past-check-title">Past Check</h3><button class="modal-close" onclick="closeModal('modal-past-check')">âœ•</button></div>
+    <div class="modal-header"><h3 id="past-check-title">Past Check</h3><button class="modal-close" onclick="closeModal('modal-past-check')">✕</button></div>
     <div class="modal-body" id="past-check-body"></div>
   </div>
 </div>
 
 <div class="modal-backdrop" id="modal-discard-check">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">âš ï¸</div>
+    <div class="confirm-icon">⚠️</div>
     <div class="confirm-title">Discard Check?</div>
     <div class="confirm-msg">Discard this inventory check? All progress will be lost.</div>
     <div class="confirm-btn-row">
@@ -861,7 +861,7 @@
 
 <div class="modal-backdrop" id="modal-duplicate-scan">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">âš ï¸</div>
+    <div class="confirm-icon">⚠️</div>
     <div class="confirm-title">Already Scanned</div>
     <div class="confirm-msg" id="duplicate-scan-msg"></div>
     <div class="confirm-btn-row">
@@ -876,7 +876,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Edit Product</h3>
-      <button class="modal-close" onclick="closeModal('modal-edit-product')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('modal-edit-product')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-record-id">
@@ -894,8 +894,8 @@
       <div class="field"><label>Description</label><textarea id="edit-desc"></textarea></div>
       <div class="field"><label>Notes</label><textarea id="edit-notes"></textarea></div>
       <div class="field-row">
-        <div class="field"><label>Cost Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
-        <div class="field"><label>Selling Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
+        <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
       </div>
       <div class="field">
         <label>Status</label>
@@ -911,7 +911,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Add Stock</h3>
-      <button class="modal-close" onclick="closeModal('modal-add-stock')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('modal-add-stock')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="add-stock-record-id">
@@ -936,7 +936,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Edit Stock Entry</h3>
-      <button class="modal-close" onclick="closeModal('modal-edit-stock')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('modal-edit-stock')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-stock-id">
@@ -949,7 +949,7 @@
 
 <div class="modal-backdrop" id="modal-confirm-edit-stock">
   <div class="modal confirm-modal"><div class="modal-handle"></div><div class="modal-body">
-    <div class="confirm-icon">âœï¸</div>
+    <div class="confirm-icon">✏️</div>
     <div class="confirm-title">Save Stock Changes?</div>
     <div class="confirm-msg">Update this stock entry?</div>
     <div class="confirm-btn-row">
@@ -964,7 +964,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <h3>Upcoming Expirations</h3>
-      <button class="modal-close" onclick="closeModal('modal-exp')">âœ•</button>
+      <button class="modal-close" onclick="closeModal('modal-exp')">✕</button>
     </div>
     <div class="modal-body">
       <div class="modal-filter-row">

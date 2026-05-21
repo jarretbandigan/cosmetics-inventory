@@ -1,9 +1,9 @@
-﻿// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // SALES LOG
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// STAGE 2: SALES â€” Scan to Sell + Manual Log
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ─────────────────────────────────────────
+// ═══════════════════════════════════════════
+// STAGE 2: SALES — Scan to Sell + Manual Log
+// ═══════════════════════════════════════════
 
 function setSaleMode(mode, el) {
   saleMode = mode;
@@ -60,8 +60,8 @@ function onSaleProductChange() {
         '<div class="sell-stock-line-meta">Qty available: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
       '</div>' +
       '<div class="sell-stock-line-price">' +
-        (hasMarkdown && p.selling ? '<div class="original">â‚±' + esc(p.selling) + '</div>' : '') +
-        '<div class="' + (hasMarkdown ? 'markdown' : '') + '">â‚±' + esc(priceUse) + '</div>' +
+        (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
+        '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -105,7 +105,7 @@ function confirmLogSale() {
     setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available in this stock line (exp: ' + (s.exp || 'no expiry') + '). Stock will go to ' + (currentStockQty - qty) + '. Continue?');
     openModal('modal-confirm-oversell');
   } else {
-    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at â‚±' + (price || '0') + ' each?');
+    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
     openModal('modal-confirm-sale');
   }
 }
@@ -147,8 +147,8 @@ function recordSaleInternal(sale) {
   });
 
   // STAGE 3: Log the sale
-  const totalAmt = sale.price ? 'â‚±' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
-  logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at â‚±' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
+  const totalAmt = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
+  logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at ₱' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
 
   checkAutoMarkdownReset(sale.stockLineId);
   checkAutoOutOfStock(sale.productId);
@@ -172,10 +172,10 @@ function recordSaleInternal(sale) {
   applyFilters();
 
   // Show summary
-  const total = sale.price ? 'â‚±' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
+  const total = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
   setEl('summary-name', sale.productName);
-  document.getElementById('summary-detail').innerHTML = 'Qty: ' + sale.qty + ' Ã— â‚±' + esc(sale.price || '0') + (sale.isMarkdown ? '  <span style="color:#6B3FA0;font-weight:600">[Markdown]</span>' : '') + '<br>Exp: ' + esc(sale.exp || 'no expiry');
-  setEl('summary-total', total ? total + ' total' : 'â€”');
+  document.getElementById('summary-detail').innerHTML = 'Qty: ' + sale.qty + ' × ₱' + esc(sale.price || '0') + (sale.isMarkdown ? '  <span style="color:#6B3FA0;font-weight:600">[Markdown]</span>' : '') + '<br>Exp: ' + esc(sale.exp || 'no expiry');
+  setEl('summary-total', total ? total + ' total' : '—');
   openModal('modal-sale-summary');
   updateCounts();
 }
@@ -242,7 +242,7 @@ function onSellBarcodeDetected(raw) {
 
   const ridEsc = esc(p.recordId);
   let html = '<div class="sell-scan-result">' +
-    '<div class="sell-found-name">âœ… ' + esc(p.name) + '</div>' +
+    '<div class="sell-found-name">✅ ' + esc(p.name) + '</div>' +
     '<div class="sell-found-sub">' + (p.brand ? esc(p.brand) + ' | ' : '') + 'Total: ' + productTotalQty(p.recordId) + ' ' + esc(p.unit || 'pcs') + '</div>';
 
   if (lines.length === 0) {
@@ -260,8 +260,8 @@ function onSellBarcodeDetected(raw) {
           '<div class="sell-stock-line-meta">Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
         '</div>' +
         '<div class="sell-stock-line-price">' +
-          (hasMarkdown && p.selling ? '<div class="original">â‚±' + esc(p.selling) + '</div>' : '') +
-          '<div class="' + (hasMarkdown ? 'markdown' : '') + '">â‚±' + esc(priceUse) + '</div>' +
+          (hasMarkdown && p.selling ? '<div class="original">₱' + esc(p.selling) + '</div>' : '') +
+          '<div class="' + (hasMarkdown ? 'markdown' : '') + '">₱' + esc(priceUse) + '</div>' +
         '</div>' +
       '</div>';
     });
@@ -270,7 +270,7 @@ function onSellBarcodeDetected(raw) {
 
   html += '</div>';
   resultEl.innerHTML = html;
-  setEl('sell-scan-status', 'Product found â€” select stock line');
+  setEl('sell-scan-status', 'Product found — select stock line');
   document.getElementById('sell-scan-status').className = 'scan-status success';
 }
 
@@ -312,7 +312,7 @@ function confirmSellScan() {
     setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available. Stock will go to ' + (currentStockQty - qty) + '. Continue?');
     openModal('modal-confirm-oversell');
   } else {
-    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at â‚±' + (price || '0') + ' each?');
+    setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
     openModal('modal-confirm-sale');
   }
 }
@@ -329,19 +329,19 @@ function renderSalesList() {
   const list = document.getElementById('sales-list');
   if (!list) return;
   if (sales.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">ðŸ§¾</div><p>No sales recorded yet.</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="icon">🧾</div><p>No sales recorded yet.</p></div>';
     return;
   }
   const shown = sales.slice(0, 50);
   list.innerHTML = shown.map(s => {
-    const total = s.price ? 'â‚±' + (parseFloat(s.price) * s.qtySold).toFixed(2) : '';
+    const total = s.price ? '₱' + (parseFloat(s.price) * s.qtySold).toFixed(2) : '';
     // FIX L4: detect deleted product
     const productExists = s.productId ? products.some(p => p.recordId === s.productId) : true;
     const deletedTag = !productExists ? ' <span class="sale-log-deleted-tag">Product Removed</span>' : '';
     const markdownTag = s.isMarkdown ? ' <span class="sale-log-deleted-tag" style="background:#F3EEFB;color:#6B3FA0">Markdown</span>' : '';
     return '<div class="sale-log-item">' +
       '<div class="sale-log-name">' + esc(s.productName) + (s.brand ? ' <span style="font-weight:400;color:var(--gray-400)">(' + esc(s.brand) + ')</span>' : '') + deletedTag + markdownTag + '</div>' +
-      '<div class="sale-log-meta">Qty: ' + s.qtySold + (s.price ? '  |  â‚±' + esc(s.price) + ' each' : '') + '  |  ' + esc(s.date) + '</div>' +
+      '<div class="sale-log-meta">Qty: ' + s.qtySold + (s.price ? '  |  ₱' + esc(s.price) + ' each' : '') + '  |  ' + esc(s.date) + '</div>' +
       (s.exp ? '<div class="sale-stock-info">Stock line: exp ' + esc(s.exp) + '</div>' : '') +
       (total ? '<div class="sale-log-price">' + total + ' total</div>' : '') +
     '</div>';

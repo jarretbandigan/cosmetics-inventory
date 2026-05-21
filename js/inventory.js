@@ -1,9 +1,9 @@
-﻿// Helper for safe DOM updates (used in counts)
+// Helper for safe DOM updates (used in counts)
 function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // INVENTORY LIST
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function setStatusFilter(val, el) {
   activeStatusFilter = val;
   document.querySelectorAll('#filter-availability .filter-chip').forEach(c => c.classList.remove('active'));
@@ -100,10 +100,10 @@ function renderList(filtered, q) {
           '<div>' +
             '<div class="stock-exp-label">Expiry' + pulledTag + '</div>' +
             '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
-            (hasMarkdown ? '<div class="stock-markdown-info">ðŸ’° Marked down: â‚±' + esc(s.markdownPrice) + '</div>' : '') +
+            (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
           '</div>' +
           '<div class="qty-control">' +
-            '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">âˆ’</button>' +
+            '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">−</button>' +
             '<div class="qty-val" id="qv-' + sidEsc + '">' + origQty + '</div>' +
             '<button class="qty-ctrl-btn plus" onclick="changeStockQty(\'' + sidEsc + '\',1)">+</button>' +
           '</div>' +
@@ -131,7 +131,7 @@ function renderList(filtered, q) {
         '<div class="detail-row"><span class="detail-label">Barcode</span><span class="detail-value" style="font-family:monospace">' + esc(p.barcode) + '</span></div>' +
         (p.category ? '<div class="detail-row"><span class="detail-label">Category</span><span class="detail-value">' + esc(p.category) + '</span></div>' : '') +
         (p.desc ? '<div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">' + esc(p.desc) + '</span></div>' : '') +
-        (p.cost || p.selling ? '<div class="detail-row"><span class="detail-label">Price</span><span class="detail-value">' + (p.cost ? 'Cost: â‚±' + esc(p.cost) : '') + (p.cost && p.selling ? '  |  ' : '') + (p.selling ? 'Selling: â‚±' + esc(p.selling) : '') + '</span></div>' : '') +
+        (p.cost || p.selling ? '<div class="detail-row"><span class="detail-label">Price</span><span class="detail-value">' + (p.cost ? 'Cost: ₱' + esc(p.cost) : '') + (p.cost && p.selling ? '  |  ' : '') + (p.selling ? 'Selling: ₱' + esc(p.selling) : '') + '</span></div>' : '') +
         (p.notes ? '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">' + esc(p.notes) + '</span></div>' : '') +
         '<div class="stock-lines">' +
           '<div class="stock-lines-title">Stock Entries (' + lines.length + ')</div>' +
@@ -154,16 +154,16 @@ function renderList(filtered, q) {
           '<div class="product-name">' + esc(p.name) + '</div>' +
           (p.brand ? '<div class="product-brand">' + esc(p.brand) + '</div>' : '') +
           '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + esc(p.unit || 'pcs') + '</span></div>' +
-          (partialPulled ? '<div class="partial-pullout-info">âš  ' + pulledLineCount + ' of ' + totalLineCount + ' stock lines pulled out</div>' : '') +
+          (partialPulled ? '<div class="partial-pullout-info">⚠ ' + pulledLineCount + ' of ' + totalLineCount + ' stock lines pulled out</div>' : '') +
         '</div>' +
         '<div class="product-badges">' +
           '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
-          (onSale ? '<span class="status-badge status-sale">ðŸ’° On Sale</span>' : '') +
+          (onSale ? '<span class="status-badge status-sale">💰 On Sale</span>' : '') +
           (partialPulled ? '<span class="status-badge status-partial">Partial Pull</span>' : '') +
         '</div>' +
       '</div>' +
       '<button class="more-details-btn" onclick="toggleDetails(\'' + ridEsc + '\',this)">' +
-        '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? 'â–¾' : 'â–¸') + '</span> More Details' +
+        '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? '▾' : '▸') + '</span> More Details' +
       '</button>' +
       detailsHTML +
     '</div>';
@@ -174,7 +174,7 @@ function toggleDetails(rid, btn) {
   const el = document.getElementById('pd-' + rid);
   const icon = document.getElementById('mdb-icon-' + rid);
   const open = el.classList.toggle('open');
-  icon.textContent = open ? 'â–¾' : 'â–¸';
+  icon.textContent = open ? '▾' : '▸';
   openDetailsPanelId = open ? rid : null;
 }
 
@@ -196,9 +196,9 @@ function getExpCls(exp) {
   return '';
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// STOCK QTY CONTROLS â€” FIX 10: use data attr
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// STOCK QTY CONTROLS — FIX 10: use data attr
+// ─────────────────────────────────────────
 function changeStockQty(sid, delta) {
   const valEl = document.getElementById('qv-' + sid);
   const saveRow = document.getElementById('ssr-' + sid);
@@ -237,7 +237,7 @@ function saveStockQty(sid, rid) {
   document.getElementById('ssr-' + sid).classList.remove('visible');
   document.getElementById('sw-' + sid).textContent = 'was ' + newQty;
   openDetailsPanelId = rid;
-  if (product) logActivity('update', rid, product.name, 'Qty manually adjusted (exp: ' + (stock.exp || 'no expiry') + '): ' + oldQty + ' â†’ ' + newQty);
+  if (product) logActivity('update', rid, product.name, 'Qty manually adjusted (exp: ' + (stock.exp || 'no expiry') + '): ' + oldQty + ' → ' + newQty);
   checkAutoMarkdownReset(sid);
   checkAutoOutOfStock(rid);
   saveAll();
@@ -275,8 +275,8 @@ function doEditStock() {
   s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
   if (product) {
     const changes = [];
-    if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' â†’ ' + (s.exp || 'none'));
-    if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' â†’ ' + s.qty);
+    if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' → ' + (s.exp || 'none'));
+    if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' → ' + s.qty);
     if (changes.length) logActivity('edit', product.recordId, product.name, 'Stock entry edited: ' + changes.join(', '));
   }
   openDetailsPanelId = s.productId;
@@ -313,9 +313,9 @@ function doRemoveStock() {
   removingStockId = null;
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // EDIT PRODUCT
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function openEditProduct(rid) {
   const p = products.find(x => x.recordId === rid);
   if (!p) return;
@@ -350,7 +350,7 @@ function doEditProduct() {
   p.selling = document.getElementById('edit-selling').value.trim();
   p.status = document.getElementById('edit-status').value;
   openDetailsPanelId = editingProductId;
-  logActivity('edit', p.recordId, p.name, 'Product edited' + (oldStatus !== p.status ? ' (status: ' + oldStatus + ' â†’ ' + p.status + ')' : ''));
+  logActivity('edit', p.recordId, p.name, 'Product edited' + (oldStatus !== p.status ? ' (status: ' + oldStatus + ' → ' + p.status + ')' : ''));
   saveAll();
   closeModal('modal-confirm-edit');
   closeModal('modal-edit-product');
@@ -358,9 +358,9 @@ function doEditProduct() {
   showToast('Product updated!');
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 // DELETE PRODUCT
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
 function confirmDeleteProduct(rid) {
   deletingProductId = rid;
   openModal('modal-confirm-delete');
@@ -390,9 +390,9 @@ function doDeleteProduct() {
   deletingProductId = null;
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// ADD STOCK â€” FIX 13: keep panel open after
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// ADD STOCK — FIX 13: keep panel open after
+// ─────────────────────────────────────────
 function openAddStock(rid) {
   const p = products.find(x => x.recordId === rid);
   if (!p) return;
@@ -416,7 +416,7 @@ function doAddStock() {
   if (existingLine) {
     const oldQty = parseInt(existingLine.qty) || 0;
     existingLine.qty = oldQty + qty;
-    if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' â†’ ' + existingLine.qty);
+    if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qty + ' unit(s) added to existing stock entry.');
   } else {
     stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false });
@@ -431,9 +431,9 @@ function doAddStock() {
   applyFilters();
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// EXPIRY MODAL â€” FIX 11: proper confirm modal
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────
+// EXPIRY MODAL — FIX 11: proper confirm modal
+// ─────────────────────────────────────────
 function openExpModal() {
   activeExpFilter = 30;
   document.querySelectorAll('#modal-exp .filter-chip').forEach((c, i) => c.classList.toggle('active', i === 0));
@@ -457,7 +457,7 @@ function renderExpList() {
 
   const list = document.getElementById('exp-modal-list');
   if (items.length === 0) {
-    list.innerHTML = '<div class="empty-state" style="padding:24px"><div class="icon">âœ…</div><p>No items expiring within this period.</p></div>';
+    list.innerHTML = '<div class="empty-state" style="padding:24px"><div class="icon">✅</div><p>No items expiring within this period.</p></div>';
     return;
   }
 
@@ -476,16 +476,16 @@ function renderExpList() {
       '<div class="exp-sub">' + esc(p.barcode) + (p.brand ? ' | ' + esc(p.brand) : '') + ' | Qty: ' + s.qty + ' ' + esc(p.unit || 'pcs') + '</div>' +
       '<div class="exp-days">' + daysLabel + ' (' + esc(s.exp) + ')</div>' +
       '<div class="exp-item-prices">' +
-        (p.selling ? 'Selling: â‚±' + esc(p.selling) : '') +
-        (s.markdownPrice ? ' <span class="markdown-price">| Marked down: â‚±' + esc(s.markdownPrice) + '</span>' : '') +
+        (p.selling ? 'Selling: ₱' + esc(p.selling) : '') +
+        (s.markdownPrice ? ' <span class="markdown-price">| Marked down: ₱' + esc(s.markdownPrice) + '</span>' : '') +
       '</div>' +
       '<div class="exp-item-actions">' +
-        '<button class="btn btn-purple-outline btn-sm" onclick="openMarkdownInput(\'' + sidEsc + '\')">ðŸ’° ' + (s.markdownPrice ? 'Edit Markdown' : 'Mark Down') + '</button>' +
+        '<button class="btn btn-purple-outline btn-sm" onclick="openMarkdownInput(\'' + sidEsc + '\')">💰 ' + (s.markdownPrice ? 'Edit Markdown' : 'Mark Down') + '</button>' +
         '<button class="btn btn-amber-outline btn-sm" onclick="pullOutStockLine(\'' + sidEsc + '\')">Pull Out</button>' +
         '<button class="btn btn-danger-outline btn-sm" onclick="confirmRemoveStockFromExp(\'' + sidEsc + '\')">Remove</button>' +
       '</div>' +
       '<div class="markdown-input-row" id="mir-' + sidEsc + '">' +
-        '<div class="field" style="margin-top:8px"><label>New Markdown Price (â‚±)</label><div class="price-wrap"><span class="price-symbol">â‚±</span><input type="number" id="mip-' + sidEsc + '" placeholder="0.00" min="0" step="0.01" inputmode="decimal" value="' + esc(s.markdownPrice || '') + '"></div></div>' +
+        '<div class="field" style="margin-top:8px"><label>New Markdown Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="mip-' + sidEsc + '" placeholder="0.00" min="0" step="0.01" inputmode="decimal" value="' + esc(s.markdownPrice || '') + '"></div></div>' +
         '<div class="btn-row" style="margin-bottom:0">' +
           '<button class="btn btn-secondary btn-sm" onclick="cancelMarkdownInput(\'' + sidEsc + '\')">Cancel</button>' +
           (s.markdownPrice ? '<button class="btn btn-danger-outline btn-sm" onclick="removeMarkdown(\'' + sidEsc + '\')">Remove</button>' : '') +
@@ -519,8 +519,8 @@ function confirmMarkdown(sid) {
   const oldPrice = s.markdownPrice;
   s.markdownPrice = price;
   if (p) {
-    const verb = oldPrice ? 'updated from â‚±' + oldPrice + ' to' : 'set to';
-    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' â‚±' + price + ' (exp: ' + (s.exp || 'no expiry') + ')');
+    const verb = oldPrice ? 'updated from ₱' + oldPrice + ' to' : 'set to';
+    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' ₱' + price + ' (exp: ' + (s.exp || 'no expiry') + ')');
   }
   saveAll();
   renderExpList();
@@ -535,7 +535,7 @@ function removeMarkdown(sid) {
   const p = products.find(x => x.recordId === s.productId);
   const old = s.markdownPrice;
   s.markdownPrice = '';
-  if (p) logActivity('markdown-removed', p.recordId, p.name, 'Markdown removed (was â‚±' + old + ', exp: ' + (s.exp || 'no expiry') + ')');
+  if (p) logActivity('markdown-removed', p.recordId, p.name, 'Markdown removed (was ₱' + old + ', exp: ' + (s.exp || 'no expiry') + ')');
   saveAll();
   renderExpList();
   applyFilters();
