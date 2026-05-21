@@ -576,7 +576,6 @@ function doDiscardCheck() {
 function viewPastCheck(cid) {
   const c = inventoryChecks.find(x => x.id === cid);
   if (!c) return;
-  viewingCheckId = cid;
   setEl('past-check-title', new Date(c.completedAt).toLocaleString());
   const items = c.items || [];
   const discrepancies = items.filter(i => i.actualQty != null && i.actualQty != i.recordedQty);

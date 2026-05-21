@@ -77,7 +77,7 @@ async function doLogin() {
   }
 }
 
-function doLogout() {
+function doLogout(focusField = true) {
   clearAuthToken();
   // Make sure user is on home page when logging out
   document.getElementById('page-home').classList.add('active');
@@ -86,17 +86,20 @@ function doLogout() {
   try { if (codeReader) { codeReader.reset(); codeReader = null; } } catch(e) {}
   try { if (typeof saleScannerReader !== 'undefined' && saleScannerReader) { saleScannerReader.reset(); saleScannerReader = null; } } catch(e) {}
   try { if (typeof checkScannerReader !== 'undefined' && checkScannerReader) { checkScannerReader.reset(); checkScannerReader = null; } } catch(e) {}
-  showLogin();
+  showLogin(focusField);
 }
 
-function showLogin() {
+// focusField: true for intentional visits (app load, manual logout),
+// false for auto-logout redirects so the keyboard doesn't slam up mid-browse
+function showLogin(focusField = true) {
   document.getElementById('login-page').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-  // Focus username after slight delay
-  setTimeout(() => {
-    const u = document.getElementById('login-username');
-    if (u && !u.value) u.focus();
-  }, 100);
+  if (focusField) {
+    setTimeout(() => {
+      const u = document.getElementById('login-username');
+      if (u && !u.value) u.focus();
+    }, 100);
+  }
 }
 
 function showApp() {
@@ -128,9 +131,12 @@ function checkAuthExpiry() {
   if (!isAuthValid()) {
     // Token expired
     showToast('Session expired. Please sign in again.');
-    doLogout();
+    doLogout(false); // don't auto-focus — keyboard shouldn't slam up mid-browse
   }
 }
+
+// Stored so the interval can be cleared if needed (e.g. future Supabase auth swap)
+let authExpiryIntervalId = null;
 
 // Attach activity listeners (will be set after DOM ready in init)
 function setupAuthListeners() {
@@ -138,6 +144,6 @@ function setupAuthListeners() {
     document.addEventListener(evt, trackActivity, { passive: true });
   });
   // Check expiry every 60 seconds
-  setInterval(checkAuthExpiry, 60000);
+  authExpiryIntervalId = setInterval(checkAuthExpiry, 60000);
 }
 

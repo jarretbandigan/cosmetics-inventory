@@ -145,9 +145,9 @@ function confirmAddToExisting() {
     showToast('New stock entry added' + (exp ? ' for exp: ' + exp : '') + '.');
   }
 
-  saveAll();
   closeModal('modal-existing');
   checkAutoOutOfStock(existingBarcodeProductId);
+  saveAll();
   existingBarcodeProductId = null;
   updateCounts();
 }

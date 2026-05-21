@@ -3,6 +3,7 @@
 // before any code that calls them
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const APP_VERSION = '2.6.0';
+const EXPIRY_WARNING_DAYS = 30;
 
 function esc(str) {
   // FIX L3: Properly escape all XSS-prone chars including single quote
@@ -62,7 +63,6 @@ let activeSaleFilter = 'all';
 let saleMode = 'scan';
 let saleScannerReader = null;
 let pendingSale = null;
-let pendingMarkdown = null;
 // STAGE 3: Activity log + reports state
 let activeReportSection = 'activity';
 let activityTypeFilter = 'all';
@@ -72,7 +72,6 @@ let pendingManualLog = null;
 // STAGE 4: Inventory check state
 let checkScannerReader = null;
 let pendingDuplicateScan = null;
-let viewingCheckId = null;
 
 // STAGE 3: Log activity helper (used by all actions)
 function logActivity(type, productId, productName, description) {
@@ -204,25 +203,24 @@ function updateCounts() {
   const activeProds = products.filter(p => p.status === 'active').length;
   const totalUnits = stockLines.reduce((s, l) => s + (parseInt(l.qty) || 0), 0);
   const now = new Date(); now.setHours(0,0,0,0);
-  const in30 = new Date(now.getTime() + 30 * 86400000);
+  const in30 = new Date(now.getTime() + EXPIRY_WARNING_DAYS * 86400000);
   const expiring = stockLines.filter(s => {
     if (!s.exp || (parseInt(s.qty) || 0) <= 0) return false;
     const d = new Date(s.exp);
     return d >= now && d <= in30;
   }).length;
 
-  const setElVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setElVal('home-active', activeProds);
-  setElVal('home-total', totalUnits);
-  setElVal('home-expiring', expiring);
-  setElVal('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
-  setElVal('stat-expiring', expiring);
-  setElVal('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
+  setEl('home-active', activeProds);
+  setEl('home-total', totalUnits);
+  setEl('home-expiring', expiring);
+  setEl('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
+  setEl('stat-expiring', expiring);
+  setEl('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
 
   // STAGE 3: Cost and selling value
   const val = calcInventoryValue();
-  setElVal('home-cost-value', formatMoney(val.cost));
-  setElVal('home-selling-value', formatMoney(val.sell));
+  setEl('home-cost-value', formatMoney(val.cost));
+  setEl('home-selling-value', formatMoney(val.sell));
 }
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

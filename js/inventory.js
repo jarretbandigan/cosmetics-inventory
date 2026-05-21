@@ -183,7 +183,7 @@ function getExpLabel(exp) {
   const now = new Date(); now.setHours(0,0,0,0);
   const diff = Math.ceil((new Date(exp) - now) / 86400000);
   if (diff < 0) return ' (Expired)';
-  if (diff <= 30) return ' (Expiring soon)';
+  if (diff <= EXPIRY_WARNING_DAYS) return ' (Expiring soon)';
   return '';
 }
 
@@ -192,7 +192,7 @@ function getExpCls(exp) {
   const now = new Date(); now.setHours(0,0,0,0);
   const diff = Math.ceil((new Date(exp) - now) / 86400000);
   if (diff < 0) return 'expired';
-  if (diff <= 30) return 'warning';
+  if (diff <= EXPIRY_WARNING_DAYS) return 'warning';
   return '';
 }
 
@@ -466,7 +466,7 @@ function renderExpList() {
     if (!p) return '';
     const d = new Date(s.exp);
     const diff = Math.ceil((d - now) / 86400000);
-    const isCritical = diff <= 30;
+    const isCritical = diff <= EXPIRY_WARNING_DAYS;
     const daysLabel = diff < 0 ? 'Expired ' + Math.abs(diff) + ' day(s) ago' :
       diff === 0 ? 'Expires today!' : 'Expires in ' + diff + ' day(s)';
     const sidEsc = esc(s.id);
@@ -529,27 +529,6 @@ function confirmMarkdown(sid) {
   updateCounts();
 }
 
-// Kept for compatibility but no longer used since modal removed
-function doApplyMarkdown() {
-  if (!pendingMarkdown) return;
-  const s = stockLines.find(x => x.id === pendingMarkdown.sid);
-  if (!s) return;
-  const p = products.find(x => x.recordId === s.productId);
-  const oldPrice = s.markdownPrice;
-  s.markdownPrice = pendingMarkdown.price;
-  if (p) {
-    const verb = oldPrice ? 'updated from â‚±' + oldPrice + ' to' : 'set to';
-    logActivity('markdown', p.recordId, p.name, 'Price markdown ' + verb + ' â‚±' + pendingMarkdown.price + ' (exp: ' + (s.exp || 'no expiry') + ')');
-  }
-  saveAll();
-  closeModal('modal-confirm-markdown');
-  pendingMarkdown = null;
-  renderExpList();
-  applyFilters();
-  showToast('Markdown applied');
-  updateCounts();
-}
-
 function removeMarkdown(sid) {
   const s = stockLines.find(x => x.id === sid);
   if (!s) return;
@@ -598,11 +577,6 @@ function restoreStockLine(sid) {
   saveAll();
   applyFilters();
   showToast('Stock line restored');
-}
-
-// Old function kept for backward compatibility but now pulls only the specific line
-function pullOutFromExp(sid) {
-  pullOutStockLine(sid);
 }
 
 // FIX 11: use modal instead of confirm()
