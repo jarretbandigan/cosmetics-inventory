@@ -1,5 +1,5 @@
 # INVENTORY SYSTEM - Claude Code Instructions
-App Version: v2.6.0 | Updated: May 2026
+App Version: v2.7.0 | Updated: May 2026
 
 ---
 
@@ -56,21 +56,21 @@ https://github.com/jarretbandigan/cosmetics-inventory
 
 ## TIER 3: FILE STRUCTURE
 
-- index.html - HTML structure only, 990 lines
-- css/style.css - all styling, 839 lines
+- index.html - HTML structure only, 993 lines
+- css/style.css - all styling, 845 lines
 - js/auth.js - login, logout, auto-logout timer, 149 lines
 - js/scanner.js - ZXing barcode scanning, camera, 154 lines
-- js/inventory.js - inventory list, render, search, filter, sort, stock controls, 612 lines
+- js/inventory.js - inventory list, render, search, filter, sort, stock controls, 659 lines
 - js/sales.js - scan to sell, manual sale log, oversell, 350 lines
 - js/reports.js - activity log, reports tab, inventory check, 616 lines
 - js/data.js - CSV export, import, storage meter, migrations, saveAll, 434 lines
-- js/app.js - app init, navigation, utilities, What's New, product form, 393 lines
+- js/app.js - app init, navigation, utilities, What's New, product form, 391 lines
 
 Script load order: auth.js, scanner.js, inventory.js, sales.js, reports.js, data.js, app.js
 
 ---
 
-## TIER 4: CURRENT APP STATE - v2.6.0
+## TIER 4: CURRENT APP STATE - v2.7.0
 
 Default login: username admin, password amaya0827
 
@@ -96,6 +96,7 @@ What is working:
 - CSV export and import covers all data
 - Data protection: undo on delete (6 seconds), storage meter, saveAll validates before writing
 - Bottom nav: Scan, Inventory, Sales, Reports, Data
+- Mobile UI improvements: compact home stats, dynamic inventory count card, More/Hide Details toggle, partial on-sale badge, qty breakdown on cards, teal Restore button, home icon in header
 
 ---
 
@@ -113,7 +114,7 @@ Five localStorage keys:
 ## TIER 6: ROADMAP
 
 - Phase 1: Polish and Stabilize - COMPLETE
-- Phase 2: Go Mobile-Ready - NEXT - layout fixes on real phone, no new features
+- Phase 2: Go Mobile-Ready - IN PROGRESS - first batch complete (v2.7.0), further phone testing may surface more fixes
 - Phase 2.5: Backend and Database (Supabase) - PENDING
 - Phase 3: Package as Mobile App (Capacitor) - PENDING
 - Phase 3.5: PH Market Features - PENDING
@@ -150,6 +151,7 @@ Five localStorage keys:
 
 ## TIER 7: VERSION HISTORY
 
+- v2.7.0 - Phase 2 mobile UI improvements: compact home stats, dynamic filter card, More/Hide Details toggle, partial on-sale badge, qty breakdown, teal Restore button, home icon in header
 - v2.6.0 - QA cleanup, post-split audit, EXPIRY_WARNING_DAYS constant, dead code removed, auth improvements
 - v2.6.0 - Login screen, SHA-256 auth, auto-logout 30 mins, pull out per stock line, partial pull badge
 - v2.5.0 - Inventory Check, manual and scan mode, draft auto-save, discrepancy summary, check history
@@ -164,7 +166,7 @@ Five localStorage keys:
 
 ## NOTES
 - Assistant Claude for this project is named Amaya
-- Next version is v2.7.0
+- Next version is v2.8.0
 - App targets Philippine boutiques and small cosmetics resellers
 - There are 3 real beta users. Treat data safety as the highest priority.
 - Future Shop mode is a customer-facing store locator and product browser
