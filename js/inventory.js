@@ -35,6 +35,26 @@ function clearSearch() {
   applyFilters();
 }
 
+function updateProductsCardLabel(filteredCount) {
+  const lbl = document.getElementById('stat-products-lbl');
+  if (!lbl) return;
+  const isFiltered = activeStatusFilter !== 'all' || activeSaleFilter !== 'all';
+  if (!isFiltered) { lbl.textContent = 'Products'; return; }
+
+  const none = filteredCount === 0;
+  if (activeSaleFilter === 'onsale') {
+    lbl.textContent = none ? 'No On Sale Products' : 'On Sale Products';
+  } else if (activeStatusFilter === 'active') {
+    lbl.textContent = 'Active Products';
+  } else if (activeStatusFilter === 'out') {
+    lbl.textContent = none ? 'No Out of Stock Products' : 'Out of Stock Products';
+  } else if (activeStatusFilter === 'pulled') {
+    lbl.textContent = none ? 'No Pulled Out Products' : 'Pulled Out Products';
+  } else {
+    lbl.textContent = 'Products';
+  }
+}
+
 function applyFilters() {
   const searchEl = document.getElementById('search-input');
   const sortEl = document.getElementById('sort-select');
@@ -60,14 +80,29 @@ function applyFilters() {
 
   renderList(filtered, q);
   updateCounts();
+  updateProductsCardLabel(filtered.length);
 }
 
 function renderList(filtered, q) {
   const list = document.getElementById('inventory-list');
   if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4E6;</div><p>' +
-      (products.length === 0 ? 'No products yet.<br>Go to Scan to add your first product.' : 'No results found.') +
-      '</p></div>';
+    let emptyMsg;
+    if (products.length === 0) {
+      emptyMsg = 'No products yet.<br>Go to Scan to add your first product.';
+    } else if (q) {
+      emptyMsg = 'No results found.';
+    } else if (activeSaleFilter === 'onsale') {
+      emptyMsg = 'No On Sale Products found.';
+    } else if (activeStatusFilter === 'out') {
+      emptyMsg = 'No Out of Stock Products found.';
+    } else if (activeStatusFilter === 'pulled') {
+      emptyMsg = 'No Pulled Out Products found.';
+    } else if (activeStatusFilter === 'active') {
+      emptyMsg = 'No Active Products found.';
+    } else {
+      emptyMsg = 'No results found.';
+    }
+    list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4E6;</div><p>' + emptyMsg + '</p></div>';
     return;
   }
 
@@ -147,14 +182,23 @@ function renderList(filtered, q) {
     const partialPulled = isPartiallyPulledOut(rid);
     const pulledLineCount = pulledOutCount(rid);
     const totalLineCount = lines.length;
+    const activeLines = lines.filter(s => !s.pulledOut);
+    const saleLineCount = activeLines.filter(s => s.markdownPrice && s.markdownPrice !== '' && (parseInt(s.qty) || 0) > 0).length;
+    const partialSale = saleLineCount > 0 && saleLineCount < activeLines.length;
+    const pulledQty = lines.filter(s => s.pulledOut).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
+    const onSaleQty = activeLines.filter(s => s.markdownPrice && s.markdownPrice !== '' && (parseInt(s.qty) || 0) > 0).reduce((sum, s) => sum + (parseInt(s.qty) || 0), 0);
+    const activeRegularQty = totalQty - pulledQty - onSaleQty;
+    const unit = esc(p.unit || 'pcs');
 
     return '<div class="product-card">' +
       '<div class="product-card-main">' +
         '<div class="product-card-left">' +
           '<div class="product-name">' + esc(p.name) + '</div>' +
           (p.brand ? '<div class="product-brand">' + esc(p.brand) + '</div>' : '') +
-          '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + esc(p.unit || 'pcs') + '</span></div>' +
+          '<div class="product-meta"><span class="product-qty">Total: ' + totalQty + ' ' + unit + '</span></div>' +
           (partialPulled ? '<div class="partial-pullout-info">⚠ ' + pulledLineCount + ' of ' + totalLineCount + ' stock lines pulled out</div>' : '') +
+          (partialSale ? '<div class="partial-pullout-info">💰 ' + saleLineCount + ' of ' + totalLineCount + ' stock lines on sale</div>' : '') +
+          (pulledQty > 0 || onSaleQty > 0 ? '<div class="qty-breakdown">' + totalQty + ' ' + unit + ' total' + (pulledQty > 0 ? ' · ' + pulledQty + ' pulled out' : '') + (onSaleQty > 0 ? ' · ' + onSaleQty + ' on sale' : '') + ' · ' + activeRegularQty + ' active</div>' : '') +
         '</div>' +
         '<div class="product-badges">' +
           '<span class="status-badge ' + statusCls + '">' + statusLabel + '</span>' +
@@ -163,7 +207,8 @@ function renderList(filtered, q) {
         '</div>' +
       '</div>' +
       '<button class="more-details-btn" onclick="toggleDetails(\'' + ridEsc + '\',this)">' +
-        '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? '▾' : '▸') + '</span> More Details' +
+        '<span id="mdb-icon-' + ridEsc + '">' + (isOpen ? '▾' : '▸') + '</span> ' +
+        '<span id="mdb-lbl-' + ridEsc + '">' + (isOpen ? 'Hide Details' : 'More Details') + '</span>' +
       '</button>' +
       detailsHTML +
     '</div>';
@@ -173,8 +218,10 @@ function renderList(filtered, q) {
 function toggleDetails(rid, btn) {
   const el = document.getElementById('pd-' + rid);
   const icon = document.getElementById('mdb-icon-' + rid);
+  const lbl = document.getElementById('mdb-lbl-' + rid);
   const open = el.classList.toggle('open');
   icon.textContent = open ? '▾' : '▸';
+  if (lbl) lbl.textContent = open ? 'Hide Details' : 'More Details';
   openDetailsPanelId = open ? rid : null;
 }
 

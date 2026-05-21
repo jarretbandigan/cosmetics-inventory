@@ -83,16 +83,17 @@ body {
 
 .home-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  padding: 14px 16px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px 16px 0;
 }
 .home-stat {
   background: #fff; border: 1px solid var(--gray-100);
-  border-radius: 12px; padding: 12px 8px; text-align: center;
+  border-radius: 10px; padding: 8px 6px; text-align: center;
 }
-.home-stat .num { font-size: 22px; font-weight: 700; color: var(--pink-600); }
-.home-stat .lbl { font-size: 10px; color: var(--gray-400); margin-top: 2px; line-height: 1.3; }
+.home-stat .num { font-size: 18px; font-weight: 700; color: var(--pink-600); }
+.home-stat .lbl { font-size: 10px; color: var(--gray-400); margin-top: 1px; line-height: 1.3; }
+.home-stat .lbl-sub { font-size: 9px; color: var(--gray-300); margin-top: 3px; line-height: 1.3; }
 .home-stat.warn .num { color: var(--amber-400); }
 
 .home-actions {
@@ -134,7 +135,7 @@ body {
 }
 .back-btn {
   background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
-  color: #fff; font-size: 20px; width: 34px; height: 34px;
+  color: #fff; font-size: 18px; width: 34px; height: 34px;
   cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .app-header h2 { font-size: 17px; font-weight: 600; flex: 1; }
@@ -214,6 +215,7 @@ body {
 }
 .btn-danger-outline { background: var(--red-50); color: var(--red-600); border: 1px solid #f7c1c1; }
 .btn-amber-outline { background: var(--amber-50); color: var(--amber-600); border: 1px solid #f0d5a0; }
+.btn-teal-outline { background: var(--teal-50); color: var(--teal-600); border: 1px solid #b2ddd0; font-weight: 600; }
 .btn-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .btn-row .btn { flex: 1; }
 
@@ -683,9 +685,9 @@ input[type="file"] { display: none; }
 
 .home-stats-3 {
   display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px; padding: 8px 16px 0;
+  gap: 6px; padding: 6px 16px 0;
 }
-.home-stat .num.small { font-size: 15px; }
+.home-stat .num.small { font-size: 13px; }
 .home-stat.teal .num { color: var(--teal-600); }
 .home-stat.blue .num { color: var(--blue-600); }
 
@@ -836,4 +838,8 @@ input[type="file"] { display: none; }
 .partial-pullout-info {
   font-size: 11px; color: var(--gray-500);
   font-style: italic; margin-top: 2px;
+}
+.qty-breakdown {
+  font-size: 10px; color: var(--gray-400);
+  margin-top: 2px;
 }
