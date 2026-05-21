@@ -2,7 +2,7 @@
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.7.0';
 const EXPIRY_WARNING_DAYS = 30;
 
 function esc(str) {
@@ -215,8 +215,6 @@ function updateCounts() {
   setEl('home-expiring', expiring);
   setEl('stat-products', products.filter(p => activeStatusFilter === 'all' || p.status === activeStatusFilter).length);
   setEl('stat-expiring', expiring);
-  setEl('app-header-sub', products.length + ' product' + (products.length !== 1 ? 's' : ''));
-
   // STAGE 3: Cost and selling value
   const val = calcInventoryValue();
   setEl('home-cost-value', formatMoney(val.cost));

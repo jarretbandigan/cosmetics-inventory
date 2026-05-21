@@ -14,7 +14,7 @@
   <div class="login-box">
     <div class="login-logo">💄</div>
     <div class="login-title">Inventory System</div>
-    <div class="login-version">v2.6.0</div>
+    <div class="login-version">v2.7.0</div>
     <div class="login-error" id="login-error">Incorrect username or password</div>
     <div class="login-field">
       <label>Username</label>
@@ -38,7 +38,7 @@
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.6.0</div>
+    <div class="home-version">v2.7.0</div>
   </div>
 
   <div class="mode-selector">
@@ -58,6 +58,7 @@
     <div class="home-stat">
       <div class="num" id="home-active">0</div>
       <div class="lbl">Active Products</div>
+      <div class="lbl-sub">Out of stock and pulled out items not counted</div>
     </div>
     <div class="home-stat warn">
       <div class="num" id="home-expiring">0</div>
@@ -121,7 +122,7 @@
 <!-- ═══════════════ APP PAGE ═══════════════ -->
 <div class="page" id="page-app">
   <div class="app-header">
-    <button class="back-btn" onclick="goHome()">‹</button>
+    <button class="back-btn" onclick="goHome()">🏠</button>
     <h2 id="app-header-title">Inventory</h2>
     <span class="hdr-right" id="app-header-sub"></span>
   </div>
@@ -208,7 +209,7 @@
     <div class="summary-bar">
       <div class="summary-card">
         <div class="num" id="stat-products">0</div>
-        <div class="lbl">Products</div>
+        <div class="lbl" id="stat-products-lbl">Products</div>
       </div>
       <div class="summary-card clickable warn" onclick="openExpModal()">
         <div class="num" id="stat-expiring">0</div>
@@ -537,13 +538,15 @@
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.6.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Login screen now protects access. Sign in with your credentials.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Auto-logout after 30 minutes of inactivity for safety.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pull out a specific stock line by expiry, not the entire product.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Visual distinction when only some stock lines are pulled out.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restore button to undo a stock line pull out.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Markdown applies directly without an extra confirmation step.</div></div>
+      <div class="whats-new-version">Version 2.7.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home screen stats are more compact and easier to read on mobile.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Inventory list now shows a dynamic count card that updates as you filter.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">More Details button now toggles to Hide Details after tapping.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Product cards now show partial on sale badge matching the pulled out style.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pulled out cards now show full qty breakdown: total, pulled out, on sale, active.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restore button is now clearly visible with teal color.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home button added to app header for easy navigation.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Active Products subtitle added to clarify why count differs from total units.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
