@@ -47,6 +47,9 @@ function renderActivityLog() {
     if (activityTypeFilter !== 'all') {
       if (activityTypeFilter === 'manual') {
         if (manualTypes.indexOf(a.type) === -1) return false;
+      } else if (activityTypeFilter === 'sale') {
+        // group price-change (customer request) with sales filter
+        if (a.type !== 'sale' && a.type !== 'price-change') return false;
       } else if (a.type !== activityTypeFilter) return false;
     }
     if (dateFilter === 'today' && a.date !== todayStr) return false;
@@ -82,11 +85,11 @@ function renderActivityLog() {
 
 function activityTypeLabel(t) {
   return {
-    'add':'Added','update':'Updated','sale':'Sale','markdown':'Markdown',
-    'markdown-removed':'Markdown Off','pulled':'Pulled Out','status':'Status',
-    'delivery':'Delivery','transfer':'Transfer','damaged':'Damaged','note':'Note',
-    'other':'Other','removed':'Removed','edit':'Edited','check':'Stock Check',
-    'discrepancy':'Discrepancy'
+    'add':'Added','update':'Updated','sale':'Sale','price-change':'Price Change',
+    'markdown':'Markdown','markdown-removed':'Markdown Off','pulled':'Pulled Out',
+    'status':'Status','delivery':'Delivery','transfer':'Transfer','damaged':'Damaged',
+    'note':'Note','other':'Other','removed':'Removed','edit':'Edited',
+    'check':'Stock Check','discrepancy':'Discrepancy'
   }[t] || t;
 }
 

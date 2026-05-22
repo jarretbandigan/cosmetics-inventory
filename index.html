@@ -14,7 +14,7 @@
   <div class="login-box">
     <div class="login-logo">💄</div>
     <div class="login-title">Inventory System</div>
-    <div class="login-version">v2.7.0</div>
+    <div class="login-version">v2.8.0</div>
     <div class="login-error" id="login-error">Incorrect username or password</div>
     <div class="login-field">
       <label>Username</label>
@@ -35,23 +35,11 @@
 <div class="page active" id="page-home">
   <div class="home-header">
     <button class="logout-btn" onclick="doLogout()">🔒 Sign Out</button>
+    <button class="logout-btn" onclick="showModeSelector(false)" style="right:auto;left:12px;">⚙️ Mode</button>
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.7.0</div>
-  </div>
-
-  <div class="mode-selector">
-    <div class="mode-btn coming-soon">
-      <div class="mode-icon">🛍️</div>
-      <div class="mode-label">Shop</div>
-      <div><span class="coming-soon-tag">Coming Soon</span></div>
-    </div>
-    <button class="mode-btn primary-mode" onclick="goToApp('scan')">
-      <div class="mode-icon">📋</div>
-      <div class="mode-label">Manage Business</div>
-      <div class="mode-desc">Inventory and sales</div>
-    </button>
+    <div class="home-version">v2.8.0</div>
   </div>
 
   <div class="home-stats">
@@ -123,6 +111,7 @@
 <div class="page" id="page-app">
   <div class="app-header">
     <button class="back-btn" onclick="goHome()">🏠</button>
+    <button class="back-btn" onclick="showModeSelector(false)" title="Switch Mode">⚙️</button>
     <h2 id="app-header-title">Inventory</h2>
     <span class="hdr-right" id="app-header-sub"></span>
   </div>
@@ -176,7 +165,6 @@
           </select>
         </div>
         <div class="field"><label>Description</label><textarea id="f-desc" placeholder="Shade, variant, size..."></textarea></div>
-        <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Any additional notes..."></textarea></div>
         <div class="field-row">
           <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
           <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
@@ -197,6 +185,7 @@
         </div>
         <div class="field"><label>Expiration Date</label><input type="date" id="f-exp"></div>
         <div class="field"><label>Storage Location</label><input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2"></div>
+        <div class="field"><label>Notes</label><textarea id="f-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       </div>
       <button class="btn btn-primary" onclick="confirmSaveProduct(false)" style="margin-bottom:8px">Save to Inventory</button>
       <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">💾 Save and Scan Next</button>
@@ -367,6 +356,33 @@
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.8.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Mode selector appears right after login — tap ⚙️ in the header to switch modes anytime</li>
+            <li>Android back button shows a logout confirmation when the mode selector is open</li>
+            <li>Price change warning when the sale price is edited before confirming — logged as customer-requested price change</li>
+            <li>Notes moved from product level to individual stock entries — different notes per batch</li>
+            <li>Partial pull out: choose how many units to pull out instead of always pulling the whole stock line</li>
+            <li>Pulled-out units from a partial pull appear as a separate Pulled Out stock entry with pull date shown</li>
+            <li>Restoring a partial pull out merges the units back into the matching active stock entry automatically</li>
+          </ul>
+        </div>
+        <div class="version-item">
+          <div class="version-num">Version 2.7.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Home screen stats are more compact and easier to read on mobile</li>
+            <li>Inventory list now shows a dynamic count card that updates as you filter</li>
+            <li>More Details button now toggles to Hide Details after tapping</li>
+            <li>Product cards now show partial on sale badge matching the pulled out style</li>
+            <li>Pulled out cards now show full qty breakdown: total, pulled out, on sale, active</li>
+            <li>Restore button is now clearly visible with teal color</li>
+            <li>Home button added to app header for easy navigation</li>
+            <li>Active Products subtitle added to clarify why count differs from total units</li>
+          </ul>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.6.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -538,15 +554,12 @@
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.7.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home screen stats are more compact and easier to read on mobile.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Inventory list now shows a dynamic count card that updates as you filter.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">More Details button now toggles to Hide Details after tapping.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Product cards now show partial on sale badge matching the pulled out style.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pulled out cards now show full qty breakdown: total, pulled out, on sale, active.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restore button is now clearly visible with teal color.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home button added to app header for easy navigation.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Active Products subtitle added to clarify why count differs from total units.</div></div>
+      <div class="whats-new-version">Version 2.8.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Mode selector now appears right after login so you always start in the right mode. Tap ⚙️ anytime to switch.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Price change warning: if you change the price before confirming a sale, the app will ask you to confirm and logs it as a customer-requested price change.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Notes are now on each stock entry instead of the product, so you can add different notes per batch or expiry date.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Partial pull out: you can now pull out only some units from a stock entry. The pulled units appear as a separate Pulled Out entry.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restoring a partial pull out adds the units back to the original active stock entry automatically.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>
@@ -755,6 +768,7 @@
           <option value="add">Item Added</option>
           <option value="update">Stock Updated</option>
           <option value="sale">Sale Recorded</option>
+          <option value="price-change">Price Change - Customer Request</option>
           <option value="markdown">Price Markdown</option>
           <option value="markdown-removed">Markdown Removed</option>
           <option value="pulled">Item Pulled Out</option>
@@ -895,7 +909,6 @@
         </select>
       </div>
       <div class="field"><label>Description</label><textarea id="edit-desc"></textarea></div>
-      <div class="field"><label>Notes</label><textarea id="edit-notes"></textarea></div>
       <div class="field-row">
         <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
         <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
@@ -928,6 +941,7 @@
         </div>
       </div>
       <div class="field"><label>Storage Location</label><input type="text" id="add-stock-loc" placeholder="e.g. Shelf A"></div>
+      <div class="field"><label>Notes</label><textarea id="add-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       <button class="btn btn-primary" onclick="doAddStock()">Add Stock</button>
     </div>
   </div>
@@ -945,6 +959,7 @@
       <input type="hidden" id="edit-stock-id">
       <div class="field"><label>Expiry Date</label><input type="date" id="edit-stock-exp"></div>
       <div class="field"><label>Quantity</label><input type="number" id="edit-stock-qty" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Notes</label><textarea id="edit-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       <button class="btn btn-primary" onclick="confirmEditStock()">Save Changes</button>
     </div>
   </div>
@@ -976,6 +991,84 @@
         <button class="filter-chip" onclick="setExpFilter(180,this)">6 Months</button>
       </div>
       <div id="exp-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 4: Partial Pull Out Confirmation Modal -->
+<div class="modal-backdrop" id="modal-confirm-pullout">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-title">Pull Out Stock</div>
+      <div class="confirm-msg" id="pullout-qty-label">How many units to pull out?</div>
+      <div class="field" style="margin-top:12px">
+        <input type="number" id="pullout-qty-input" min="1" inputmode="numeric" style="text-align:center;font-size:18px">
+      </div>
+      <div id="pullout-qty-error" style="color:var(--red-500);font-size:12px;text-align:center;min-height:16px;margin-top:4px"></div>
+      <div class="confirm-btn-row" style="margin-top:12px">
+        <button class="btn btn-secondary" onclick="closeModal('modal-confirm-pullout');pendingPullOutStockId=null;">Cancel</button>
+        <button class="btn btn-amber" onclick="confirmPullOut()">Pull Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 2: Price Change Warning Modal -->
+<div class="modal-backdrop" id="modal-price-change-warn">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-title">Price Changed</div>
+      <div class="confirm-msg" id="price-change-msg"></div>
+      <div class="confirm-btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('modal-price-change-warn')">Cancel</button>
+        <button class="btn btn-primary" onclick="doPriceChangeSale()">Confirm Sale</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 1: Mode Selector Modal -->
+<div class="modal-backdrop" id="modal-mode-selector">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3>Select Mode</h3>
+      <button class="modal-close" id="mode-selector-close" onclick="closeModeSelector()" style="display:none">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;text-align:center;line-height:1.5">Choose how you want to use the app.</p>
+      <div class="mode-selector" style="padding:0;margin-bottom:0">
+        <div class="mode-btn coming-soon">
+          <div class="mode-icon">🛍️</div>
+          <div class="mode-label">Shop</div>
+          <div><span class="coming-soon-tag">Coming Soon</span></div>
+        </div>
+        <button class="mode-btn primary-mode" onclick="selectManageBusiness()">
+          <div class="mode-icon">📋</div>
+          <div class="mode-label">Manage Business</div>
+          <div class="mode-desc">Inventory and sales</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 1: Mode Selector Logout Confirm -->
+<div class="modal-backdrop" id="modal-mode-logout-confirm">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">🔒</div>
+      <div class="confirm-title">Sign Out?</div>
+      <div class="confirm-msg">Are you sure you want to sign out?</div>
+      <div class="confirm-btn-row">
+        <button class="btn btn-secondary" onclick="hideModeLogoutConfirm()">No</button>
+        <button class="btn btn-danger-outline" onclick="doLogout()">Yes</button>
+      </div>
     </div>
   </div>
 </div>

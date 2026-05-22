@@ -129,13 +129,18 @@ function renderList(filtered, q) {
       const origQty = parseInt(s.qty) || 0;
       const hasMarkdown = !!s.markdownPrice;
       const isPulled = !!s.pulledOut;
-      const pulledTag = isPulled ? '<span class="stock-pulled-tag">Pulled Out</span>' : '';
+      const isPartialLine = !!s.isPartialPullOutLine;
+      const pulledTag = isPulled
+        ? '<span class="stock-pulled-tag">Pulled Out</span>' +
+          (isPartialLine && s.pulledOutDate ? '<span class="stock-pulled-date"> · ' + esc(s.pulledOutDate) + '</span>' : '')
+        : '';
       return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + (isPulled ? ' pulled-out' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
         '<div class="stock-line-top">' +
           '<div>' +
             '<div class="stock-exp-label">Expiry' + pulledTag + '</div>' +
             '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
             (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
+            (s.notes ? '<div class="stock-notes-display">📝 ' + esc(s.notes) + '</div>' : '') +
           '</div>' +
           '<div class="qty-control">' +
             '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">−</button>' +
@@ -167,7 +172,6 @@ function renderList(filtered, q) {
         (p.category ? '<div class="detail-row"><span class="detail-label">Category</span><span class="detail-value">' + esc(p.category) + '</span></div>' : '') +
         (p.desc ? '<div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">' + esc(p.desc) + '</span></div>' : '') +
         (p.cost || p.selling ? '<div class="detail-row"><span class="detail-label">Price</span><span class="detail-value">' + (p.cost ? 'Cost: ₱' + esc(p.cost) : '') + (p.cost && p.selling ? '  |  ' : '') + (p.selling ? 'Selling: ₱' + esc(p.selling) : '') + '</span></div>' : '') +
-        (p.notes ? '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">' + esc(p.notes) + '</span></div>' : '') +
         '<div class="stock-lines">' +
           '<div class="stock-lines-title">Stock Entries (' + lines.length + ')</div>' +
           (stockHTML || '<div style="font-size:13px;color:var(--gray-400);text-align:center;padding:8px">No stock entries</div>') +
@@ -306,6 +310,7 @@ function openEditStock(sid) {
   document.getElementById('edit-stock-id').value = sid;
   document.getElementById('edit-stock-exp').value = s.exp || '';
   document.getElementById('edit-stock-qty').value = s.qty || 0;
+  document.getElementById('edit-stock-notes').value = s.notes || '';
   openModal('modal-edit-stock');
 }
 
@@ -317,13 +322,15 @@ function doEditStock() {
   const s = stockLines.find(x => x.id === editingStockId);
   if (!s) return;
   const product = products.find(p => p.recordId === s.productId);
-  const oldExp = s.exp, oldQty = s.qty;
+  const oldExp = s.exp, oldQty = s.qty, oldNotes = s.notes || '';
   s.exp = document.getElementById('edit-stock-exp').value;
   s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
+  s.notes = document.getElementById('edit-stock-notes').value.trim();
   if (product) {
     const changes = [];
     if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' → ' + (s.exp || 'none'));
     if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' → ' + s.qty);
+    if (oldNotes !== s.notes) changes.push('notes updated');
     if (changes.length) logActivity('edit', product.recordId, product.name, 'Stock entry edited: ' + changes.join(', '));
   }
   openDetailsPanelId = s.productId;
@@ -372,7 +379,6 @@ function openEditProduct(rid) {
   document.getElementById('edit-brand').value = p.brand || '';
   document.getElementById('edit-category').value = p.category || '';
   document.getElementById('edit-desc').value = p.desc || '';
-  document.getElementById('edit-notes').value = p.notes || '';
   document.getElementById('edit-cost').value = p.cost || '';
   document.getElementById('edit-selling').value = p.selling || '';
   document.getElementById('edit-status').value = p.status || 'active';
@@ -392,7 +398,6 @@ function doEditProduct() {
   p.brand = document.getElementById('edit-brand').value.trim();
   p.category = document.getElementById('edit-category').value;
   p.desc = document.getElementById('edit-desc').value.trim();
-  p.notes = document.getElementById('edit-notes').value.trim();
   p.cost = document.getElementById('edit-cost').value.trim();
   p.selling = document.getElementById('edit-selling').value.trim();
   p.status = document.getElementById('edit-status').value;
@@ -449,6 +454,7 @@ function openAddStock(rid) {
   document.getElementById('add-stock-qty').value = '1';
   document.getElementById('add-stock-unit').value = p.unit || 'pcs';
   document.getElementById('add-stock-loc').value = p.location || '';
+  document.getElementById('add-stock-notes').value = '';
   openModal('modal-add-stock');
 }
 
@@ -466,7 +472,8 @@ function doAddStock() {
     if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qty + ' unit(s) added to existing stock entry.');
   } else {
-    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false });
+    const addNotes = document.getElementById('add-stock-notes').value.trim();
+    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false, notes: addNotes });
     if (p) logActivity('add', rid, p.name, 'New stock entry: ' + qty + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added.');
   }
@@ -600,14 +607,81 @@ function pullOutStockLine(sid) {
     showToast('Already pulled out');
     return;
   }
-  s.pulledOut = true;
-  logActivity('pulled', p.recordId, p.name, 'Stock line pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
-  // Auto-sync product status if all lines are pulled out
-  syncProductStatusFromStockLines(p.recordId);
+  const maxQty = parseInt(s.qty) || 0;
+  pendingPullOutStockId = sid;
+  const unit = p.unit || 'pcs';
+  setEl('pullout-qty-label', 'How many units to pull out? (Max: ' + maxQty + ' ' + unit + ')');
+  const input = document.getElementById('pullout-qty-input');
+  if (input) {
+    input.value = maxQty;
+    input.max = maxQty;
+    input.min = 1;
+  }
+  setEl('pullout-qty-error', '');
+  openModal('modal-confirm-pullout');
+}
+
+// v2.8.0 Item 4: Confirm partial or full pull out
+function confirmPullOut() {
+  const sid = pendingPullOutStockId;
+  if (!sid) return;
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) { closeModal('modal-confirm-pullout'); return; }
+  const p = products.find(x => x.recordId === s.productId);
+  if (!p) { closeModal('modal-confirm-pullout'); return; }
+
+  const maxQty = parseInt(s.qty) || 0;
+  const input = document.getElementById('pullout-qty-input');
+  const inputQty = parseInt(input ? input.value : maxQty) || 0;
+
+  if (inputQty < 1) {
+    setEl('pullout-qty-error', 'Enter at least 1.');
+    return;
+  }
+  if (inputQty > maxQty) {
+    setEl('pullout-qty-error', 'Cannot exceed available qty (' + maxQty + ').');
+    return;
+  }
+
+  closeModal('modal-confirm-pullout');
+  pendingPullOutStockId = null;
+
+  if (inputQty >= maxQty) {
+    // Full pull out - existing behavior unchanged
+    s.pulledOut = true;
+    logActivity('pulled', p.recordId, p.name, 'Stock line fully pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + maxQty + ')');
+    syncProductStatusFromStockLines(p.recordId);
+    showToast('Stock line pulled out');
+  } else {
+    // Partial pull out — deduct from original, create a new pulled-out stock line
+    const remaining = maxQty - inputQty;
+    s.qty = remaining;
+    const pullDate = today();
+    const newLine = {
+      id: generateId('STK'),
+      productId: s.productId,
+      exp: s.exp,
+      qty: inputQty,
+      dateAdded: pullDate,
+      markdownPrice: '',
+      pulledOut: true,
+      isPartialPullOutLine: true,
+      pulledOutDate: pullDate,
+      loc: '',
+      batch: '',
+      notes: ''
+    };
+    stockLines.push(newLine);
+    logActivity('pulled', p.recordId, p.name,
+      'Partial pull out: ' + inputQty + ' units pulled out from ' +
+      (s.exp || 'no expiry') + ' stock line. ' + remaining + ' remaining active.');
+    checkAutoOutOfStock(p.recordId);
+    showToast(inputQty + ' unit(s) pulled out');
+  }
+
   saveAll();
   renderExpList();
   applyFilters();
-  showToast('Stock line pulled out');
 }
 
 // STAGE 5: Restore a pulled-out stock line back to available
@@ -617,6 +691,47 @@ function restoreStockLine(sid) {
   const p = products.find(x => x.recordId === s.productId);
   if (!p) return;
   if (!s.pulledOut) return;
+
+  // v2.8.0 Item 4 revised: partial pull-out lines merge back into active stock
+  if (s.isPartialPullOutLine) {
+    const restoredQty = parseInt(s.qty) || 0;
+    const expLabel = s.exp || 'no expiry';
+    // Find an active stock line for the same product and expiry date
+    const target = stockLines.find(x => x.productId === s.productId && x.exp === s.exp && !x.pulledOut && x.id !== sid);
+    if (target) {
+      // Merge back into existing active line
+      target.qty = (parseInt(target.qty) || 0) + restoredQty;
+    } else {
+      // No matching active line — create a fresh one
+      stockLines.push({
+        id: generateId('STK'),
+        productId: s.productId,
+        exp: s.exp,
+        qty: restoredQty,
+        dateAdded: today(),
+        markdownPrice: '',
+        pulledOut: false,
+        isPartialPullOutLine: false,
+        pulledOutDate: '',
+        loc: '',
+        batch: '',
+        notes: ''
+      });
+    }
+    // Delete the partial pull-out line
+    stockLines = stockLines.filter(x => x.id !== sid);
+    logActivity('edit', p.recordId, p.name,
+      'Restored: ' + restoredQty + ' units returned to active stock for ' + expLabel);
+    syncProductStatusFromStockLines(p.recordId);
+    checkAutoOutOfStock(p.recordId);
+    saveAll();
+    renderExpList();
+    applyFilters();
+    showToast(restoredQty + ' unit(s) restored to active stock');
+    return;
+  }
+
+  // Regular (non-partial) restore — flip pulled-out flag back to active
   s.pulledOut = false;
   logActivity('edit', p.recordId, p.name, 'Stock line restored from pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
   syncProductStatusFromStockLines(p.recordId);

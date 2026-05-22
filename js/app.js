@@ -2,7 +2,7 @@
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.8.0';
 const EXPIRY_WARNING_DAYS = 30;
 
 function esc(str) {
@@ -72,6 +72,12 @@ let pendingManualLog = null;
 // STAGE 4: Inventory check state
 let checkScannerReader = null;
 let pendingDuplicateScan = null;
+// v2.8.0 Item 4: Partial pull out state
+let pendingPullOutStockId = null;
+// v2.8.0 Item 1: Mode selector state
+let modeSelectorFromLogin = false;
+// v2.8.0 Item 2: Sales price change tracking
+let originalSalePrice = '';
 
 // STAGE 3: Log activity helper (used by all actions)
 function logActivity(type, productId, productName, description) {
@@ -278,11 +284,43 @@ function initWhatsNew() {
   }
 }
 
-// Close modal on backdrop tap (not whatsnew)
+// Close modal on backdrop tap (not whatsnew; mode-selector and pullout handled separately below)
 document.querySelectorAll('.modal-backdrop').forEach(b => {
   b.addEventListener('click', function(e) {
-    if (e.target === b && b.id !== 'modal-whatsnew') b.classList.remove('active');
+    if (e.target === b && b.id !== 'modal-whatsnew' && b.id !== 'modal-mode-selector' && b.id !== 'modal-confirm-pullout') {
+      b.classList.remove('active');
+    }
   });
+});
+
+// v2.8.0 Item 1: Mode selector backdrop — only dismiss when not from login
+document.getElementById('modal-mode-selector').addEventListener('click', function(e) {
+  if (e.target === this && !modeSelectorFromLogin) closeModeSelector();
+});
+
+// v2.8.0 Item 4: Pull out modal backdrop — dismiss and clear state
+document.getElementById('modal-confirm-pullout').addEventListener('click', function(e) {
+  if (e.target === this) { closeModal('modal-confirm-pullout'); pendingPullOutStockId = null; }
+});
+
+// v2.8.0 Item 1: Android back button via History API
+window.addEventListener('popstate', function() {
+  const modeModal = document.getElementById('modal-mode-selector');
+  if (modeModal && modeModal.classList.contains('active')) {
+    if (modeSelectorFromLogin) {
+      history.pushState({ modeSelectorOpen: true }, ''); // re-push so back works again
+      openModal('modal-mode-logout-confirm');
+    } else {
+      closeModeSelector();
+    }
+    return;
+  }
+  const logoutConfirm = document.getElementById('modal-mode-logout-confirm');
+  if (logoutConfirm && logoutConfirm.classList.contains('active')) {
+    hideModeLogoutConfirm();
+    if (modeSelectorFromLogin) history.pushState({ modeSelectorOpen: true }, '');
+    return;
+  }
 });
 
 // ─────────────────────────────────────────
@@ -304,7 +342,7 @@ function openNewProductForm(barcode) {
   document.getElementById('form-record-id').textContent = 'Record ID: ' + newId;
   document.getElementById('form-record-id').dataset.rid = newId;
   document.getElementById('form-barcode').textContent = barcode;
-  ['f-name','f-brand','f-desc','f-notes','f-cost','f-selling','f-loc'].forEach(id => { document.getElementById(id).value = ''; });
+  ['f-name','f-brand','f-desc','f-cost','f-selling','f-loc','f-stock-notes'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('f-category').value = '';
   document.getElementById('f-status').value = 'active';
   document.getElementById('f-qty').value = '1';
@@ -340,7 +378,6 @@ function doSaveProduct() {
     brand: document.getElementById('f-brand').value.trim(),
     category: document.getElementById('f-category').value,
     desc: document.getElementById('f-desc').value.trim(),
-    notes: document.getElementById('f-notes').value.trim(),
     cost: document.getElementById('f-cost').value.trim(),
     selling: document.getElementById('f-selling').value.trim(),
     status: document.getElementById('f-status').value,
@@ -357,6 +394,7 @@ function doSaveProduct() {
     dateAdded: today(),
     markdownPrice: '',
     pulledOut: false,
+    notes: document.getElementById('f-stock-notes').value.trim(),
   });
 
   checkAutoOutOfStock(recordId);
@@ -372,6 +410,35 @@ function doSaveProduct() {
     setEl('scan-status', 'Ready to scan next item');
     setTimeout(() => startScanner(), 300);
   }
+}
+
+// ─────────────────────────────────────────
+// v2.8.0 Item 1: MODE SELECTOR
+// ─────────────────────────────────────────
+function showModeSelector(fromLogin) {
+  modeSelectorFromLogin = !!fromLogin;
+  const closeBtn = document.getElementById('mode-selector-close');
+  if (closeBtn) closeBtn.style.display = fromLogin ? 'none' : 'flex';
+  openModal('modal-mode-selector');
+  if (fromLogin) {
+    history.pushState({ modeSelectorOpen: true }, '');
+  }
+}
+
+function closeModeSelector() {
+  closeModal('modal-mode-selector');
+}
+
+function selectManageBusiness() {
+  closeModeSelector();
+}
+
+function showModeLogoutConfirm() {
+  openModal('modal-mode-logout-confirm');
+}
+
+function hideModeLogoutConfirm() {
+  closeModal('modal-mode-logout-confirm');
 }
 
 // ─────────────────────────────────────────

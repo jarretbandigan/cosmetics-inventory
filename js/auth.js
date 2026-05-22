@@ -66,6 +66,7 @@ async function doLogin() {
       document.getElementById('login-password').value = '';
       errEl.classList.remove('visible');
       showApp();
+      if (typeof showModeSelector === 'function') showModeSelector(true);
     } else {
       errEl.textContent = 'Incorrect username or password';
       errEl.classList.add('visible');
