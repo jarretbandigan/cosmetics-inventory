@@ -335,7 +335,7 @@ function openNewProductForm(barcode) {
   document.getElementById('form-record-id').textContent = 'Record ID: ' + newId;
   document.getElementById('form-record-id').dataset.rid = newId;
   document.getElementById('form-barcode').textContent = barcode;
-  ['f-name','f-brand','f-desc','f-notes','f-cost','f-selling','f-loc'].forEach(id => { document.getElementById(id).value = ''; });
+  ['f-name','f-brand','f-desc','f-cost','f-selling','f-loc','f-stock-notes'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('f-category').value = '';
   document.getElementById('f-status').value = 'active';
   document.getElementById('f-qty').value = '1';
@@ -371,7 +371,6 @@ function doSaveProduct() {
     brand: document.getElementById('f-brand').value.trim(),
     category: document.getElementById('f-category').value,
     desc: document.getElementById('f-desc').value.trim(),
-    notes: document.getElementById('f-notes').value.trim(),
     cost: document.getElementById('f-cost').value.trim(),
     selling: document.getElementById('f-selling').value.trim(),
     status: document.getElementById('f-status').value,
@@ -388,6 +387,7 @@ function doSaveProduct() {
     dateAdded: today(),
     markdownPrice: '',
     pulledOut: false,
+    notes: document.getElementById('f-stock-notes').value.trim(),
   });
 
   checkAutoOutOfStock(recordId);

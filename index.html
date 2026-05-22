@@ -165,7 +165,6 @@
           </select>
         </div>
         <div class="field"><label>Description</label><textarea id="f-desc" placeholder="Shade, variant, size..."></textarea></div>
-        <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Any additional notes..."></textarea></div>
         <div class="field-row">
           <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-cost" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
           <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="f-selling" placeholder="0.00" min="0" step="0.01" inputmode="decimal"></div></div>
@@ -186,6 +185,7 @@
         </div>
         <div class="field"><label>Expiration Date</label><input type="date" id="f-exp"></div>
         <div class="field"><label>Storage Location</label><input type="text" id="f-loc" placeholder="e.g. Shelf A, Cabinet 2"></div>
+        <div class="field"><label>Notes</label><textarea id="f-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       </div>
       <button class="btn btn-primary" onclick="confirmSaveProduct(false)" style="margin-bottom:8px">Save to Inventory</button>
       <button class="btn btn-teal" onclick="confirmSaveProduct(true)" style="margin-bottom:8px">💾 Save and Scan Next</button>
@@ -885,7 +885,6 @@
         </select>
       </div>
       <div class="field"><label>Description</label><textarea id="edit-desc"></textarea></div>
-      <div class="field"><label>Notes</label><textarea id="edit-notes"></textarea></div>
       <div class="field-row">
         <div class="field"><label>Cost Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-cost" min="0" step="0.01" inputmode="decimal"></div></div>
         <div class="field"><label>Selling Price (₱)</label><div class="price-wrap"><span class="price-symbol">₱</span><input type="number" id="edit-selling" min="0" step="0.01" inputmode="decimal"></div></div>
@@ -918,6 +917,7 @@
         </div>
       </div>
       <div class="field"><label>Storage Location</label><input type="text" id="add-stock-loc" placeholder="e.g. Shelf A"></div>
+      <div class="field"><label>Notes</label><textarea id="add-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       <button class="btn btn-primary" onclick="doAddStock()">Add Stock</button>
     </div>
   </div>
@@ -935,6 +935,7 @@
       <input type="hidden" id="edit-stock-id">
       <div class="field"><label>Expiry Date</label><input type="date" id="edit-stock-exp"></div>
       <div class="field"><label>Quantity</label><input type="number" id="edit-stock-qty" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Notes</label><textarea id="edit-stock-notes" placeholder="Any notes for this stock entry..."></textarea></div>
       <button class="btn btn-primary" onclick="confirmEditStock()">Save Changes</button>
     </div>
   </div>

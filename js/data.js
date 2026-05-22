@@ -130,6 +130,26 @@ if (oldData && products.length === 0) {
   }
 })();
 
+// v2.8.0 Item 3: Migrate product-level notes to first stock line
+(function migrateItem3Notes() {
+  let needsSave = false;
+  // Add notes field to all stock lines missing it
+  stockLines.forEach(s => {
+    if (typeof s.notes === 'undefined') { s.notes = ''; needsSave = true; }
+  });
+  // Copy non-empty product notes to the first stock line whose notes is empty
+  products.forEach(p => {
+    if (p.notes && p.notes.trim()) {
+      const lines = stockLines.filter(s => s.productId === p.recordId);
+      const target = lines.find(s => !s.notes);
+      if (target) { target.notes = p.notes; needsSave = true; }
+    }
+  });
+  if (needsSave) {
+    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
+  }
+})();
+
 // ─────────────────────────────────────────
 // SAVE
 // ─────────────────────────────────────────
@@ -166,15 +186,15 @@ function exportCSV() {
 
   // Products + stock sheet (STAGE 2: markdownPrice, STAGE 5: pulledOut)
   if (products.length > 0) {
-    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price','Pulled Out'];
+    const prodHeaders = ['Record ID','Barcode','Name','Brand','Category','Description','Notes','Cost Price','Selling Price','Status','Unit','Location','Date Added','Stock ID','Expiry','Qty','Stock Date Added','Markdown Price','Pulled Out','Stock Notes'];
     const prodRows = [];
     products.forEach(p => {
       const lines = stockLines.filter(s => s.productId === p.recordId);
       if (lines.length === 0) {
-        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','','',''].map(csvCell));
+        prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes||'',p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,'','','','','','',''].map(csvCell));
       } else {
         lines.forEach(s => {
-          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes,p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||'',s.pulledOut?'yes':''].map(csvCell));
+          prodRows.push([p.recordId,p.barcode,p.name,p.brand,p.category,p.desc,p.notes||'',p.cost,p.selling,p.status,p.unit,p.location,p.dateAdded,s.id,s.exp,s.qty,s.dateAdded,s.markdownPrice||'',s.pulledOut?'yes':'',s.notes||''].map(csvCell));
         });
       }
     });
@@ -282,7 +302,7 @@ function importCSV(input) {
         const sid = (c[13] || '').trim();
         if (sid && !stockLines.find(s => s.id === sid)) {
           // STAGE 2: c[17] is markdownPrice (new column)
-          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'', pulledOut:(c[18]||'').toLowerCase()==='yes' });
+          stockLines.push({ id:sid, productId:rid, exp:c[14]||'', qty:parseInt(c[15])||1, dateAdded:c[16]||'', markdownPrice:c[17]||'', pulledOut:(c[18]||'').toLowerCase()==='yes', notes:c[19]||'' });
           addedStocks++;
         }
       } else {

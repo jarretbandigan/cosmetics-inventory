@@ -136,6 +136,7 @@ function renderList(filtered, q) {
             '<div class="stock-exp-label">Expiry' + pulledTag + '</div>' +
             '<div class="stock-exp ' + expCls + '">' + (s.exp ? esc(s.exp) + expLabel : 'No expiry set') + '</div>' +
             (hasMarkdown ? '<div class="stock-markdown-info">💰 Marked down: ₱' + esc(s.markdownPrice) + '</div>' : '') +
+            (s.notes ? '<div class="stock-notes-display">📝 ' + esc(s.notes) + '</div>' : '') +
           '</div>' +
           '<div class="qty-control">' +
             '<button class="qty-ctrl-btn minus" onclick="changeStockQty(\'' + sidEsc + '\',-1)">−</button>' +
@@ -167,7 +168,6 @@ function renderList(filtered, q) {
         (p.category ? '<div class="detail-row"><span class="detail-label">Category</span><span class="detail-value">' + esc(p.category) + '</span></div>' : '') +
         (p.desc ? '<div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">' + esc(p.desc) + '</span></div>' : '') +
         (p.cost || p.selling ? '<div class="detail-row"><span class="detail-label">Price</span><span class="detail-value">' + (p.cost ? 'Cost: ₱' + esc(p.cost) : '') + (p.cost && p.selling ? '  |  ' : '') + (p.selling ? 'Selling: ₱' + esc(p.selling) : '') + '</span></div>' : '') +
-        (p.notes ? '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">' + esc(p.notes) + '</span></div>' : '') +
         '<div class="stock-lines">' +
           '<div class="stock-lines-title">Stock Entries (' + lines.length + ')</div>' +
           (stockHTML || '<div style="font-size:13px;color:var(--gray-400);text-align:center;padding:8px">No stock entries</div>') +
@@ -306,6 +306,7 @@ function openEditStock(sid) {
   document.getElementById('edit-stock-id').value = sid;
   document.getElementById('edit-stock-exp').value = s.exp || '';
   document.getElementById('edit-stock-qty').value = s.qty || 0;
+  document.getElementById('edit-stock-notes').value = s.notes || '';
   openModal('modal-edit-stock');
 }
 
@@ -317,13 +318,15 @@ function doEditStock() {
   const s = stockLines.find(x => x.id === editingStockId);
   if (!s) return;
   const product = products.find(p => p.recordId === s.productId);
-  const oldExp = s.exp, oldQty = s.qty;
+  const oldExp = s.exp, oldQty = s.qty, oldNotes = s.notes || '';
   s.exp = document.getElementById('edit-stock-exp').value;
   s.qty = parseInt(document.getElementById('edit-stock-qty').value) || 0;
+  s.notes = document.getElementById('edit-stock-notes').value.trim();
   if (product) {
     const changes = [];
     if (oldExp !== s.exp) changes.push('expiry: ' + (oldExp || 'none') + ' → ' + (s.exp || 'none'));
     if (oldQty != s.qty) changes.push('qty: ' + oldQty + ' → ' + s.qty);
+    if (oldNotes !== s.notes) changes.push('notes updated');
     if (changes.length) logActivity('edit', product.recordId, product.name, 'Stock entry edited: ' + changes.join(', '));
   }
   openDetailsPanelId = s.productId;
@@ -372,7 +375,6 @@ function openEditProduct(rid) {
   document.getElementById('edit-brand').value = p.brand || '';
   document.getElementById('edit-category').value = p.category || '';
   document.getElementById('edit-desc').value = p.desc || '';
-  document.getElementById('edit-notes').value = p.notes || '';
   document.getElementById('edit-cost').value = p.cost || '';
   document.getElementById('edit-selling').value = p.selling || '';
   document.getElementById('edit-status').value = p.status || 'active';
@@ -392,7 +394,6 @@ function doEditProduct() {
   p.brand = document.getElementById('edit-brand').value.trim();
   p.category = document.getElementById('edit-category').value;
   p.desc = document.getElementById('edit-desc').value.trim();
-  p.notes = document.getElementById('edit-notes').value.trim();
   p.cost = document.getElementById('edit-cost').value.trim();
   p.selling = document.getElementById('edit-selling').value.trim();
   p.status = document.getElementById('edit-status').value;
@@ -449,6 +450,7 @@ function openAddStock(rid) {
   document.getElementById('add-stock-qty').value = '1';
   document.getElementById('add-stock-unit').value = p.unit || 'pcs';
   document.getElementById('add-stock-loc').value = p.location || '';
+  document.getElementById('add-stock-notes').value = '';
   openModal('modal-add-stock');
 }
 
@@ -466,7 +468,8 @@ function doAddStock() {
     if (p) logActivity('update', rid, p.name, 'Stock added: +' + qty + ' to existing entry (exp: ' + (exp || 'no expiry') + '). ' + oldQty + ' → ' + existingLine.qty);
     showToast(qty + ' unit(s) added to existing stock entry.');
   } else {
-    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false });
+    const addNotes = document.getElementById('add-stock-notes').value.trim();
+    stockLines.push({ id: generateId('STK'), productId: rid, exp, qty, dateAdded: today(), markdownPrice: '', pulledOut: false, notes: addNotes });
     if (p) logActivity('add', rid, p.name, 'New stock entry: ' + qty + ' units (exp: ' + (exp || 'no expiry') + ')');
     showToast('New stock entry added.');
   }
