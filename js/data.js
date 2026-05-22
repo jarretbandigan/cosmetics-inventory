@@ -150,6 +150,25 @@ if (oldData && products.length === 0) {
   }
 })();
 
+// v2.8.0 Item 4 revised: Clean up old partial pull out flag; init new fields
+(function migrateItem4PartialPullOut() {
+  let needsSave = false;
+  stockLines.forEach(s => {
+    // Remove the old partialPullOut flag from the original approach (deduct-and-flag)
+    // Those lines are already correct active stock — just clear the flag
+    if (s.partialPullOut === true && s.pulledOut === false) {
+      delete s.partialPullOut;
+      needsSave = true;
+    }
+    // Init new fields so they are always defined
+    if (typeof s.isPartialPullOutLine === 'undefined') { s.isPartialPullOutLine = false; needsSave = true; }
+    if (typeof s.pulledOutDate === 'undefined') { s.pulledOutDate = ''; needsSave = true; }
+  });
+  if (needsSave) {
+    try { localStorage.setItem('ci_stocks', JSON.stringify(stockLines)); } catch(e) {}
+  }
+})();
+
 // ─────────────────────────────────────────
 // SAVE
 // ─────────────────────────────────────────

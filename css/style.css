@@ -833,6 +833,9 @@ input[type="file"] { display: none; }
   text-transform: uppercase; letter-spacing: 0.3px;
   margin-left: 6px;
 }
+.stock-pulled-date {
+  font-size: 10px; color: var(--gray-500); font-weight: 400;
+}
 .status-partial {
   background: var(--gray-100); color: var(--gray-700);
   font-size: 9px;

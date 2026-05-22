@@ -129,7 +129,11 @@ function renderList(filtered, q) {
       const origQty = parseInt(s.qty) || 0;
       const hasMarkdown = !!s.markdownPrice;
       const isPulled = !!s.pulledOut;
-      const pulledTag = isPulled ? '<span class="stock-pulled-tag">Pulled Out</span>' : '';
+      const isPartialLine = !!s.isPartialPullOutLine;
+      const pulledTag = isPulled
+        ? '<span class="stock-pulled-tag">Pulled Out</span>' +
+          (isPartialLine && s.pulledOutDate ? '<span class="stock-pulled-date"> · ' + esc(s.pulledOutDate) + '</span>' : '')
+        : '';
       return '<div class="stock-line' + (hasMarkdown ? ' has-markdown' : '') + (isPulled ? ' pulled-out' : '') + '" id="sl-' + sidEsc + '" data-orig-qty="' + origQty + '">' +
         '<div class="stock-line-top">' +
           '<div>' +
@@ -643,19 +647,36 @@ function confirmPullOut() {
   pendingPullOutStockId = null;
 
   if (inputQty >= maxQty) {
-    // Full pull out - existing behavior
+    // Full pull out - existing behavior unchanged
     s.pulledOut = true;
     logActivity('pulled', p.recordId, p.name, 'Stock line fully pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + maxQty + ')');
     syncProductStatusFromStockLines(p.recordId);
     showToast('Stock line pulled out');
   } else {
-    // Partial pull out - deduct qty, mark as partial
+    // Partial pull out — deduct from original, create a new pulled-out stock line
     const remaining = maxQty - inputQty;
     s.qty = remaining;
-    s.partialPullOut = true;
-    logActivity('pulled', p.recordId, p.name, 'Partial pull out (exp: ' + (s.exp || 'no expiry') + '): ' + inputQty + ' pulled, ' + remaining + ' remaining');
+    const pullDate = today();
+    const newLine = {
+      id: generateId('STK'),
+      productId: s.productId,
+      exp: s.exp,
+      qty: inputQty,
+      dateAdded: pullDate,
+      markdownPrice: '',
+      pulledOut: true,
+      isPartialPullOutLine: true,
+      pulledOutDate: pullDate,
+      loc: '',
+      batch: '',
+      notes: ''
+    };
+    stockLines.push(newLine);
+    logActivity('pulled', p.recordId, p.name,
+      'Partial pull out: ' + inputQty + ' units pulled out from ' +
+      (s.exp || 'no expiry') + ' stock line. ' + remaining + ' remaining active.');
     checkAutoOutOfStock(p.recordId);
-    showToast(inputQty + ' unit(s) pulled out, ' + remaining + ' remaining');
+    showToast(inputQty + ' unit(s) pulled out');
   }
 
   saveAll();
@@ -670,6 +691,47 @@ function restoreStockLine(sid) {
   const p = products.find(x => x.recordId === s.productId);
   if (!p) return;
   if (!s.pulledOut) return;
+
+  // v2.8.0 Item 4 revised: partial pull-out lines merge back into active stock
+  if (s.isPartialPullOutLine) {
+    const restoredQty = parseInt(s.qty) || 0;
+    const expLabel = s.exp || 'no expiry';
+    // Find an active stock line for the same product and expiry date
+    const target = stockLines.find(x => x.productId === s.productId && x.exp === s.exp && !x.pulledOut && x.id !== sid);
+    if (target) {
+      // Merge back into existing active line
+      target.qty = (parseInt(target.qty) || 0) + restoredQty;
+    } else {
+      // No matching active line — create a fresh one
+      stockLines.push({
+        id: generateId('STK'),
+        productId: s.productId,
+        exp: s.exp,
+        qty: restoredQty,
+        dateAdded: today(),
+        markdownPrice: '',
+        pulledOut: false,
+        isPartialPullOutLine: false,
+        pulledOutDate: '',
+        loc: '',
+        batch: '',
+        notes: ''
+      });
+    }
+    // Delete the partial pull-out line
+    stockLines = stockLines.filter(x => x.id !== sid);
+    logActivity('edit', p.recordId, p.name,
+      'Restored: ' + restoredQty + ' units returned to active stock for ' + expLabel);
+    syncProductStatusFromStockLines(p.recordId);
+    checkAutoOutOfStock(p.recordId);
+    saveAll();
+    renderExpList();
+    applyFilters();
+    showToast(restoredQty + ' unit(s) restored to active stock');
+    return;
+  }
+
+  // Regular (non-partial) restore — flip pulled-out flag back to active
   s.pulledOut = false;
   logActivity('edit', p.recordId, p.name, 'Stock line restored from pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
   syncProductStatusFromStockLines(p.recordId);
