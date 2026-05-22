@@ -1,5 +1,5 @@
 # INVENTORY SYSTEM - Claude Code Instructions
-App Version: v2.7.0 | Updated: May 2026
+App Version: v2.8.0 | Updated: May 2026
 
 ---
 
@@ -70,24 +70,26 @@ Script load order: auth.js, scanner.js, inventory.js, sales.js, reports.js, data
 
 ---
 
-## TIER 4: CURRENT APP STATE - v2.7.0
+## TIER 4: CURRENT APP STATE - v2.8.0
 
 Default login: username admin, password amaya0827
 
 What is working:
 - Barcode scanning via phone camera (ZXing v0.21.0)
 - Grouped inventory: Products and Stock Lines separate. One product, multiple stock lines by expiry date.
-- Product fields: Record ID, Barcode, Name, Brand, Category, Description, Cost Price, Selling Price, Notes, Status
-- Stock line fields: Expiry Date, Qty, Unit, Date Added, Storage Location, Batch Number, Markdown Price
+- Product fields: Record ID, Barcode, Name, Brand, Category, Description, Cost Price, Selling Price, Status
+- Stock line fields: Expiry Date, Qty, Unit, Date Added, Storage Location, Batch Number, Markdown Price, Notes
 - Dual status: Availability (Active, Out of Stock, Pulled Out) and Sales Status (None, On Sale)
 - Scan to Sell: scan barcode, select stock line, confirm, deducts qty
 - Manual Sale Log: pick product and stock line, enter qty and price, confirm
 - Oversell warning with override option
+- Price change warning: if sale price is edited before confirming, logs as customer-requested price change
 - Price Markdown per stock line with auto-removal on zero stock
 - Expiring Soon popup with 30, 90, 180 day filters
-- Pull out per individual stock line with partial pull badge and restore
+- Partial pull out: choose qty to pull out; pulled units become a separate Pulled Out stock entry with pull date
+- Restore on partial pull-out line merges units back into the matching active stock entry
 - Login with SHA-256 hashing and auto-logout after 30 minutes
-- App Mode selector: Shop (Coming Soon) and Manage Business
+- Mode selector post-login modal; ⚙️ button in header to switch modes; Android back button support
 - What's New modal on first open after update
 - Version History under Data tab
 - Activity Log with auto-logging and manual entries
@@ -151,6 +153,7 @@ Five localStorage keys:
 
 ## TIER 7: VERSION HISTORY
 
+- v2.8.0 - Mode selector post-login, sales price change warning, notes on stock lines, partial pull out creates separate pulled-out stock entry with restore-merge
 - v2.7.0 - Phase 2 mobile UI improvements: compact home stats, dynamic filter card, More/Hide Details toggle, partial on-sale badge, qty breakdown, teal Restore button, home icon in header
 - v2.6.0 - QA cleanup, post-split audit, EXPIRY_WARNING_DAYS constant, dead code removed, auth improvements
 - v2.6.0 - Login screen, SHA-256 auth, auto-logout 30 mins, pull out per stock line, partial pull badge
@@ -166,7 +169,7 @@ Five localStorage keys:
 
 ## NOTES
 - Assistant Claude for this project is named Amaya
-- Next version is v2.8.0
+- Next version is v2.9.0
 - App targets Philippine boutiques and small cosmetics resellers
 - There are 3 real beta users. Treat data safety as the highest priority.
 - Future Shop mode is a customer-facing store locator and product browser

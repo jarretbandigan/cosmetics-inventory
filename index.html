@@ -14,7 +14,7 @@
   <div class="login-box">
     <div class="login-logo">💄</div>
     <div class="login-title">Inventory System</div>
-    <div class="login-version">v2.7.0</div>
+    <div class="login-version">v2.8.0</div>
     <div class="login-error" id="login-error">Incorrect username or password</div>
     <div class="login-field">
       <label>Username</label>
@@ -39,7 +39,7 @@
     <div class="home-logo">💄</div>
     <div class="home-title">Cosmetics Inventory</div>
     <div class="home-sub">Simple Inventory System</div>
-    <div class="home-version">v2.7.0</div>
+    <div class="home-version">v2.8.0</div>
   </div>
 
   <div class="home-stats">
@@ -356,6 +356,33 @@
       </button>
       <div class="changelog-body" id="changelog-body">
         <div class="version-item" style="margin-top:12px">
+          <div class="version-num">Version 2.8.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Mode selector appears right after login — tap ⚙️ in the header to switch modes anytime</li>
+            <li>Android back button shows a logout confirmation when the mode selector is open</li>
+            <li>Price change warning when the sale price is edited before confirming — logged as customer-requested price change</li>
+            <li>Notes moved from product level to individual stock entries — different notes per batch</li>
+            <li>Partial pull out: choose how many units to pull out instead of always pulling the whole stock line</li>
+            <li>Pulled-out units from a partial pull appear as a separate Pulled Out stock entry with pull date shown</li>
+            <li>Restoring a partial pull out merges the units back into the matching active stock entry automatically</li>
+          </ul>
+        </div>
+        <div class="version-item">
+          <div class="version-num">Version 2.7.0</div>
+          <div class="version-date">May 2026</div>
+          <ul class="version-changes">
+            <li>Home screen stats are more compact and easier to read on mobile</li>
+            <li>Inventory list now shows a dynamic count card that updates as you filter</li>
+            <li>More Details button now toggles to Hide Details after tapping</li>
+            <li>Product cards now show partial on sale badge matching the pulled out style</li>
+            <li>Pulled out cards now show full qty breakdown: total, pulled out, on sale, active</li>
+            <li>Restore button is now clearly visible with teal color</li>
+            <li>Home button added to app header for easy navigation</li>
+            <li>Active Products subtitle added to clarify why count differs from total units</li>
+          </ul>
+        </div>
+        <div class="version-item">
           <div class="version-num">Version 2.6.0</div>
           <div class="version-date">May 2026</div>
           <ul class="version-changes">
@@ -527,15 +554,12 @@
       <button class="modal-close" onclick="closeWhatsNew()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="whats-new-version">Version 2.7.0 — May 2026</div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home screen stats are more compact and easier to read on mobile.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Inventory list now shows a dynamic count card that updates as you filter.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">More Details button now toggles to Hide Details after tapping.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Product cards now show partial on sale badge matching the pulled out style.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Pulled out cards now show full qty breakdown: total, pulled out, on sale, active.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restore button is now clearly visible with teal color.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Home button added to app header for easy navigation.</div></div>
-      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Active Products subtitle added to clarify why count differs from total units.</div></div>
+      <div class="whats-new-version">Version 2.8.0 — May 2026</div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Mode selector now appears right after login so you always start in the right mode. Tap ⚙️ anytime to switch.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Price change warning: if you change the price before confirming a sale, the app will ask you to confirm and logs it as a customer-requested price change.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Notes are now on each stock entry instead of the product, so you can add different notes per batch or expiry date.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Partial pull out: you can now pull out only some units from a stock entry. The pulled units appear as a separate Pulled Out entry.</div></div>
+      <div class="whats-new-item"><div class="whats-new-dot"></div><div class="whats-new-text">Restoring a partial pull out adds the units back to the original active stock entry automatically.</div></div>
       <button class="btn btn-primary" style="margin-top:20px" onclick="closeWhatsNew()">Got it</button>
     </div>
   </div>

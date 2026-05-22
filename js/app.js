@@ -2,7 +2,7 @@
 // FIX 1: Define all utility functions FIRST
 // before any code that calls them
 // ─────────────────────────────────────────
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.8.0';
 const EXPIRY_WARNING_DAYS = 30;
 
 function esc(str) {
