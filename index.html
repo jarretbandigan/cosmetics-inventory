@@ -744,6 +744,7 @@
           <option value="add">Item Added</option>
           <option value="update">Stock Updated</option>
           <option value="sale">Sale Recorded</option>
+          <option value="price-change">Price Change - Customer Request</option>
           <option value="markdown">Price Markdown</option>
           <option value="markdown-removed">Markdown Removed</option>
           <option value="pulled">Item Pulled Out</option>
@@ -965,6 +966,22 @@
         <button class="filter-chip" onclick="setExpFilter(180,this)">6 Months</button>
       </div>
       <div id="exp-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- v2.8.0 Item 2: Price Change Warning Modal -->
+<div class="modal-backdrop" id="modal-price-change-warn">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-title">Price Changed</div>
+      <div class="confirm-msg" id="price-change-msg"></div>
+      <div class="confirm-btn-row">
+        <button class="btn btn-secondary" onclick="closeModal('modal-price-change-warn')">Cancel</button>
+        <button class="btn btn-primary" onclick="doPriceChangeSale()">Confirm Sale</button>
+      </div>
     </div>
   </div>
 </div>

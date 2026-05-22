@@ -74,6 +74,8 @@ let checkScannerReader = null;
 let pendingDuplicateScan = null;
 // v2.8.0 Item 1: Mode selector state
 let modeSelectorFromLogin = false;
+// v2.8.0 Item 2: Sales price change tracking
+let originalSalePrice = '';
 
 // STAGE 3: Log activity helper (used by all actions)
 function logActivity(type, productId, productName, description) {

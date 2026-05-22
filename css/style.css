@@ -677,6 +677,7 @@ input[type="file"] { display: none; }
 .activity-type-edit { background: var(--amber-50); color: #704600; }
 .activity-type-check { background: var(--blue-50); color: #115789; }
 .activity-type-discrepancy { background: var(--red-50); color: #842323; }
+.activity-type-price-change { background: var(--amber-50); color: #704600; }
 
 .activity-desc { font-size: 13px; color: var(--gray-800); margin-top: 6px; line-height: 1.5; }
 .activity-product { font-size: 12px; color: var(--gray-500); margin-top: 4px; }

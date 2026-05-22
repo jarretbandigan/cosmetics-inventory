@@ -78,7 +78,10 @@ function selectManualStockLine(sid, rid) {
   const p = products.find(x => x.recordId === rid);
   if (s && p) {
     const priceEl = document.getElementById('sale-price');
-    if (priceEl) priceEl.value = s.markdownPrice || p.selling || '';
+    if (priceEl) {
+      originalSalePrice = s.markdownPrice || p.selling || '';
+      priceEl.value = originalSalePrice;
+    }
   }
   document.getElementById('sale-product-select').dataset.stockLineId = sid;
 }
@@ -104,6 +107,8 @@ function confirmLogSale() {
   if (qty > currentStockQty) {
     setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available in this stock line (exp: ' + (s.exp || 'no expiry') + '). Stock will go to ' + (currentStockQty - qty) + '. Continue?');
     openModal('modal-confirm-oversell');
+  } else if (isPriceChanged(originalSalePrice, price)) {
+    showPriceChangeWarning(originalSalePrice, price);
   } else {
     setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
     openModal('modal-confirm-sale');
@@ -113,8 +118,12 @@ function confirmLogSale() {
 function doRecordSaleAnyway() {
   closeModal('modal-confirm-oversell');
   if (!pendingSale) return;
-  setEl('confirm-sale-msg', 'Proceed with this oversell?');
-  openModal('modal-confirm-sale');
+  if (isPriceChanged(originalSalePrice, pendingSale.price)) {
+    showPriceChangeWarning(originalSalePrice, pendingSale.price);
+  } else {
+    setEl('confirm-sale-msg', 'Proceed with this oversell?');
+    openModal('modal-confirm-sale');
+  }
 }
 
 function doRecordSale() {
@@ -146,9 +155,16 @@ function recordSaleInternal(sale) {
     date: sale.date,
   });
 
-  // STAGE 3: Log the sale
+  // STAGE 3 / v2.8.0 Item 2: Log the sale (with price-change type if applicable)
   const totalAmt = sale.price ? '₱' + (parseFloat(sale.price) * sale.qty).toFixed(2) : '';
-  logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at ₱' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
+  if (sale.priceChanged) {
+    logActivity('price-change', sale.productId, sale.productName,
+      'Price change - customer request: ' + sale.qty + 'x ' + sale.productName +
+      '. Original ₱' + (sale.originalPrice || '0') + ' → Sold at ₱' + (sale.price || '0') + ' each' +
+      (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
+  } else {
+    logActivity('sale', sale.productId, sale.productName, 'Sold ' + sale.qty + 'x at ₱' + (sale.price || '0') + ' each (exp: ' + (sale.exp || 'no expiry') + ')' + (sale.isMarkdown ? ' [MARKDOWN]' : '') + (totalAmt ? '. Total: ' + totalAmt : ''));
+  }
 
   checkAutoMarkdownReset(sale.stockLineId);
   checkAutoOutOfStock(sale.productId);
@@ -288,7 +304,8 @@ function selectSellStockLine(sid, rid) {
 
   document.getElementById('sell-entry').style.display = 'block';
   document.getElementById('sell-qty').value = '1';
-  document.getElementById('sell-price').value = s.markdownPrice || p.selling || '';
+  originalSalePrice = s.markdownPrice || p.selling || '';
+  document.getElementById('sell-price').value = originalSalePrice;
   document.getElementById('sell-date').value = today();
 }
 
@@ -311,6 +328,8 @@ function confirmSellScan() {
   if (qty > currentStockQty) {
     setEl('oversell-msg', 'Selling ' + qty + ' but only ' + currentStockQty + ' available. Stock will go to ' + (currentStockQty - qty) + '. Continue?');
     openModal('modal-confirm-oversell');
+  } else if (isPriceChanged(originalSalePrice, price)) {
+    showPriceChangeWarning(originalSalePrice, price);
   } else {
     setEl('confirm-sale-msg', 'Record sale: ' + qty + 'x ' + p.name + ' at ₱' + (price || '0') + ' each?');
     openModal('modal-confirm-sale');
@@ -346,5 +365,33 @@ function renderSalesList() {
       (total ? '<div class="sale-log-price">' + total + ' total</div>' : '') +
     '</div>';
   }).join('') + (sales.length > 50 ? '<div class="sales-note">Showing 50 most recent. Export CSV to see all ' + sales.length + ' sales.</div>' : '');
+}
+
+// ─────────────────────────────────────────
+// v2.8.0 Item 2: PRICE CHANGE WARNING
+// ─────────────────────────────────────────
+function isPriceChanged(original, entered) {
+  const orig = parseFloat(original) || 0;
+  const entr = parseFloat(entered) || 0;
+  return orig !== entr;
+}
+
+function showPriceChangeWarning(originalPrice, newPrice) {
+  const origDisplay = originalPrice ? '₱' + originalPrice : '₱0';
+  const newDisplay = newPrice ? '₱' + newPrice : '₱0';
+  setEl('price-change-msg',
+    'Price changed from ' + origDisplay + ' to ' + newDisplay + '. ' +
+    'This will be logged as a customer-requested price change. Continue?'
+  );
+  openModal('modal-price-change-warn');
+}
+
+function doPriceChangeSale() {
+  closeModal('modal-price-change-warn');
+  if (!pendingSale) return;
+  pendingSale.priceChanged = true;
+  pendingSale.originalPrice = originalSalePrice;
+  recordSaleInternal(pendingSale);
+  pendingSale = null;
 }
 
