@@ -603,14 +603,64 @@ function pullOutStockLine(sid) {
     showToast('Already pulled out');
     return;
   }
-  s.pulledOut = true;
-  logActivity('pulled', p.recordId, p.name, 'Stock line pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + s.qty + ')');
-  // Auto-sync product status if all lines are pulled out
-  syncProductStatusFromStockLines(p.recordId);
+  const maxQty = parseInt(s.qty) || 0;
+  pendingPullOutStockId = sid;
+  const unit = p.unit || 'pcs';
+  setEl('pullout-qty-label', 'How many units to pull out? (Max: ' + maxQty + ' ' + unit + ')');
+  const input = document.getElementById('pullout-qty-input');
+  if (input) {
+    input.value = maxQty;
+    input.max = maxQty;
+    input.min = 1;
+  }
+  setEl('pullout-qty-error', '');
+  openModal('modal-confirm-pullout');
+}
+
+// v2.8.0 Item 4: Confirm partial or full pull out
+function confirmPullOut() {
+  const sid = pendingPullOutStockId;
+  if (!sid) return;
+  const s = stockLines.find(x => x.id === sid);
+  if (!s) { closeModal('modal-confirm-pullout'); return; }
+  const p = products.find(x => x.recordId === s.productId);
+  if (!p) { closeModal('modal-confirm-pullout'); return; }
+
+  const maxQty = parseInt(s.qty) || 0;
+  const input = document.getElementById('pullout-qty-input');
+  const inputQty = parseInt(input ? input.value : maxQty) || 0;
+
+  if (inputQty < 1) {
+    setEl('pullout-qty-error', 'Enter at least 1.');
+    return;
+  }
+  if (inputQty > maxQty) {
+    setEl('pullout-qty-error', 'Cannot exceed available qty (' + maxQty + ').');
+    return;
+  }
+
+  closeModal('modal-confirm-pullout');
+  pendingPullOutStockId = null;
+
+  if (inputQty >= maxQty) {
+    // Full pull out - existing behavior
+    s.pulledOut = true;
+    logActivity('pulled', p.recordId, p.name, 'Stock line fully pulled out (exp: ' + (s.exp || 'no expiry') + ', qty: ' + maxQty + ')');
+    syncProductStatusFromStockLines(p.recordId);
+    showToast('Stock line pulled out');
+  } else {
+    // Partial pull out - deduct qty, mark as partial
+    const remaining = maxQty - inputQty;
+    s.qty = remaining;
+    s.partialPullOut = true;
+    logActivity('pulled', p.recordId, p.name, 'Partial pull out (exp: ' + (s.exp || 'no expiry') + '): ' + inputQty + ' pulled, ' + remaining + ' remaining');
+    checkAutoOutOfStock(p.recordId);
+    showToast(inputQty + ' unit(s) pulled out, ' + remaining + ' remaining');
+  }
+
   saveAll();
   renderExpList();
   applyFilters();
-  showToast('Stock line pulled out');
 }
 
 // STAGE 5: Restore a pulled-out stock line back to available

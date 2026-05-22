@@ -72,6 +72,8 @@ let pendingManualLog = null;
 // STAGE 4: Inventory check state
 let checkScannerReader = null;
 let pendingDuplicateScan = null;
+// v2.8.0 Item 4: Partial pull out state
+let pendingPullOutStockId = null;
 // v2.8.0 Item 1: Mode selector state
 let modeSelectorFromLogin = false;
 // v2.8.0 Item 2: Sales price change tracking
@@ -282,10 +284,10 @@ function initWhatsNew() {
   }
 }
 
-// Close modal on backdrop tap (not whatsnew; mode-selector handled separately below)
+// Close modal on backdrop tap (not whatsnew; mode-selector and pullout handled separately below)
 document.querySelectorAll('.modal-backdrop').forEach(b => {
   b.addEventListener('click', function(e) {
-    if (e.target === b && b.id !== 'modal-whatsnew' && b.id !== 'modal-mode-selector') {
+    if (e.target === b && b.id !== 'modal-whatsnew' && b.id !== 'modal-mode-selector' && b.id !== 'modal-confirm-pullout') {
       b.classList.remove('active');
     }
   });
@@ -294,6 +296,11 @@ document.querySelectorAll('.modal-backdrop').forEach(b => {
 // v2.8.0 Item 1: Mode selector backdrop — only dismiss when not from login
 document.getElementById('modal-mode-selector').addEventListener('click', function(e) {
   if (e.target === this && !modeSelectorFromLogin) closeModeSelector();
+});
+
+// v2.8.0 Item 4: Pull out modal backdrop — dismiss and clear state
+document.getElementById('modal-confirm-pullout').addEventListener('click', function(e) {
+  if (e.target === this) { closeModal('modal-confirm-pullout'); pendingPullOutStockId = null; }
 });
 
 // v2.8.0 Item 1: Android back button via History API

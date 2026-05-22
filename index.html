@@ -971,6 +971,26 @@
   </div>
 </div>
 
+<!-- v2.8.0 Item 4: Partial Pull Out Confirmation Modal -->
+<div class="modal-backdrop" id="modal-confirm-pullout">
+  <div class="modal confirm-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body">
+      <div class="confirm-icon">⚠️</div>
+      <div class="confirm-title">Pull Out Stock</div>
+      <div class="confirm-msg" id="pullout-qty-label">How many units to pull out?</div>
+      <div class="field" style="margin-top:12px">
+        <input type="number" id="pullout-qty-input" min="1" inputmode="numeric" style="text-align:center;font-size:18px">
+      </div>
+      <div id="pullout-qty-error" style="color:var(--red-500);font-size:12px;text-align:center;min-height:16px;margin-top:4px"></div>
+      <div class="confirm-btn-row" style="margin-top:12px">
+        <button class="btn btn-secondary" onclick="closeModal('modal-confirm-pullout');pendingPullOutStockId=null;">Cancel</button>
+        <button class="btn btn-amber" onclick="confirmPullOut()">Pull Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- v2.8.0 Item 2: Price Change Warning Modal -->
 <div class="modal-backdrop" id="modal-price-change-warn">
   <div class="modal confirm-modal">
